@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="OMNeT++ NED doc generator"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+<link rel="stylesheet" href="material-icons.css">
+<link rel="stylesheet" href="material.blue-light_blue.min.css">
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<title>LoRaMediumCache</title>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div id="top" class="mdl-layout__header-row">
+      <span class="mdl-layout-title">LoRaMediumCache</span>
+      <div class="mdl-layout-spacer"></div>
+<!--
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+        <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+          <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" id="search" />
+          <label class="mdl-textfield__label" for="search">Enter your query...</label>
+        </div>
+      </div>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons">code</i>
+      </button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+        <i class="material-icons">more_vert</i>
+      </button>
+      <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+        <li class="mdl-menu__item">OMNeT++ Website</li>
+      </ul>
+-->
+    </div>
+  </header>
+
+  <div class="drawer mdl-layout__drawer">
+    <nav id="side-nav" class="mdl-navigation">
+      <div id="nav-tree">
+        <div id="nav-tree-contents">
+          <div id="nav-sync" class="sync"></div>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <script type="text/javascript">
+  $(document).ready(function(){initNavTree(location.pathname.split("/").slice(-1).toString(),'');});
+  </script>
+
+  <main class="mdl-layout__content">
+    <div id="doc-content">
+
+    <p>Package: <a class="reference-ned" href="packages.html#Global_Medium_DSL">Global.Medium.DSL</a></p>
+<h2 class="comptitle" style="float: left;">LoRaMediumCache</h2>
+<span class="mdl-chip" style="float: right; margin-top: 6pt; background-color: #00ff0040;">
+    <span class="mdl-chip__text">compound module</span>
+</span><div style="clear: both;"/>
+<p>(no description)</p>
+<img src="Global.Medium.DSL.LoRaMediumCache-type.svg" ismap="yes" usemap="#type-diagram"/><map name="type-diagram">
+</map>
+<h3 class="subtitle">Inheritance diagram</h3>
+<p>The following diagram shows inheritance relationships for this type.
+Unresolved types are missing from the diagram.</p>
+<object type="image/svg+xml" data="Global.Medium.DSL.LoRaMediumCache-inheritance.svg"></object>
+<h3 class="subtitle">Parameters</h3>
+<table class="paramstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="defaultvalue">Default value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr class="local">
+      <td>carrierFrequency</td>
+      <td>double</td>
+      <td>0Hz/0</td>
+      <td>
+<p>TODO: rename to maxRangeCarrierFrequency?</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>maxSpeed</td>
+      <td>double</td>
+      <td>0mps/0</td>
+      <td>
+<p>maxium speed on the medium, NaN means medium computes using mobility models</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>maxTransmissionPower</td>
+      <td>double</td>
+      <td>0.025118W</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>minInterferencePower</td>
+      <td>double</td>
+      <td>0dBm/0</td>
+      <td>
+<p>TODO: @unit(W) + dBm/dBW &lt;--&gt; W</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>minReceptionPower</td>
+      <td>double</td>
+      <td>0dBm/0</td>
+      <td>
+<p>TODO: @unit(W) + dBm/dBW &lt;--&gt; W</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>maxAntennaGain</td>
+      <td>double</td>
+      <td>0dB</td>
+      <td>
+<p>maximum antenna gain on the medium, NaN means medium computes using antenna models</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>minInterferenceTime</td>
+      <td>double</td>
+      <td>1ps</td>
+      <td>
+<p>minimum time interval to consider two overlapping signals interfering</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>maxTransmissionDuration</td>
+      <td>double</td>
+      <td>4s</td>
+      <td>
+<p>maximum duration of a transmission on the medium</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>maxCommunicationRange</td>
+      <td>double</td>
+      <td>0m/0</td>
+      <td>
+<p>maximum communication range on the medium, NaN means medium computes using transmitter and receiver models</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>maxInterferenceRange</td>
+      <td>double</td>
+      <td>0m/0</td>
+      <td>
+<p>maximum interference range on the medium, NaN means medium computes using transmitter and receiver models</p>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Properties</h3>
+<table class="propertiestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="value">Value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td>display</td>
+      <td>i=block/table2</td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>class</td>
+      <td>medium::LoRaMediumCache</td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Source code</h3>
+<pre class="src">
+<span style="color: #800000; font-weight: bold; ">module</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">LoRaMediumCache</span><span style="color: #3d3d3d; "> </span><span style="color: #800000; font-weight: bold; ">like</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">IMediumLimitCache</span><span style="color: #3d3d3d; ">
+{
+    </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">carrierFrequency</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">Hz</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">Hz</span><span style="color: #3d3d3d; ">/</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">);       </span><span style="color: #808080; font-style: italic; ">// TODO: rename to maxRangeCarrierFrequency?
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">maxSpeed</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">mps</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">mps</span><span style="color: #3d3d3d; ">/</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">);             </span><span style="color: #808080; font-style: italic; ">// maxium speed on the medium, NaN means medium computes using mobility models
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">maxTransmissionPower</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">W</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">.</span><span style="color: #008000; ">025118</span><span style="color: #3d3d3d; ">W</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">minInterferencePower</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">/</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">); </span><span style="color: #808080; font-style: italic; ">// TODO: @unit(W) + dBm/dBW &lt;--&gt; W
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">minReceptionPower</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">/</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">);    </span><span style="color: #808080; font-style: italic; ">// TODO: @unit(W) + dBm/dBW &lt;--&gt; W
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">maxAntennaGain</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">dB</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">dB</span><span style="color: #3d3d3d; ">);           </span><span style="color: #808080; font-style: italic; ">// maximum antenna gain on the medium, NaN means medium computes using antenna models
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">minInterferenceTime</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">s</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">1</span><span style="color: #3d3d3d; ">ps</span><span style="color: #3d3d3d; ">);       </span><span style="color: #808080; font-style: italic; ">// minimum time interval to consider two overlapping signals interfering
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">maxTransmissionDuration</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">s</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">4</span><span style="color: #3d3d3d; ">s</span><span style="color: #3d3d3d; ">);    </span><span style="color: #808080; font-style: italic; ">// maximum duration of a transmission on the medium
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">maxCommunicationRange</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">m</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">m</span><span style="color: #3d3d3d; ">/</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">);    </span><span style="color: #808080; font-style: italic; ">// maximum communication range on the medium, NaN means medium computes using transmitter and receiver models
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">double</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">maxInterferenceRange</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@unit</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">m</span><span style="color: #3d3d3d; ">) = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">m</span><span style="color: #3d3d3d; ">/</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">);     </span><span style="color: #808080; font-style: italic; ">// maximum interference range on the medium, NaN means medium computes using transmitter and receiver models
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; font-weight: bold; ">@display</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;i=block/table2&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@class</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">medium</span><span style="color: #3d3d3d; ">::</span><span style="color: #3d3d3d; ">LoRaMediumCache</span><span style="color: #3d3d3d; ">);
+}
+</span></pre>
+File: <a href="src-Global-Medium-DSL-LoRaMediumCache.ned.html">src/Global/Medium/DSL/LoRaMediumCache.ned</a>
+<hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.svg"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+
+
+    </div><!-- doc-content -->
+  </main>
+</div>
+
+<script type="text/javascript" src="material.min.js"></script>
+</body>
+</html>

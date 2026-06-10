@@ -1,0 +1,18 @@
+# Rutas de LibTorch
+LIBTORCH_DIR = /home/ylnner/Documents/LibTorch/libtorch
+
+# 1. Rutas de cabeceras
+INCLUDE_PATH += -I$(LIBTORCH_DIR)/include \
+                -I$(LIBTORCH_DIR)/include/torch/csrc/api/include
+
+# 2. Flags del compilador (El ABI=1 es crítico para Ubuntu moderno)
+CXXFLAGS += -std=c++17 -D_GLIBCXX_USE_CXX11_ABI=1
+
+# 3. Forzar al enlazador a buscar los símbolos (Solución al error undefined symbol)
+# Usamos --no-as-needed para que no ignore libtorch aunque parezca no usada al inicio
+LDFLAGS += -L$(LIBTORCH_DIR)/lib -Wl,-rpath,$(LIBTORCH_DIR)/lib
+LDFLAGS += -Wl,--no-as-needed
+
+# 4. Librerías específicas
+# Es mejor usar LIBS para que opp_makemake las coloque al final de la línea de comando
+LIBS += -ltorch -ltorch_cpu -lc10

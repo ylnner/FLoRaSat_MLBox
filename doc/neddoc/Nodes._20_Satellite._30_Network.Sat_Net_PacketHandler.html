@@ -1,0 +1,395 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="OMNeT++ NED doc generator"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+<link rel="stylesheet" href="material-icons.css">
+<link rel="stylesheet" href="material.blue-light_blue.min.css">
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<title>Sat_Net_PacketHandler</title>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div id="top" class="mdl-layout__header-row">
+      <span class="mdl-layout-title">Sat_Net_PacketHandler</span>
+      <div class="mdl-layout-spacer"></div>
+<!--
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+        <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+          <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" id="search" />
+          <label class="mdl-textfield__label" for="search">Enter your query...</label>
+        </div>
+      </div>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons">code</i>
+      </button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+        <i class="material-icons">more_vert</i>
+      </button>
+      <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+        <li class="mdl-menu__item">OMNeT++ Website</li>
+      </ul>
+-->
+    </div>
+  </header>
+
+  <div class="drawer mdl-layout__drawer">
+    <nav id="side-nav" class="mdl-navigation">
+      <div id="nav-tree">
+        <div id="nav-tree-contents">
+          <div id="nav-sync" class="sync"></div>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <script type="text/javascript">
+  $(document).ready(function(){initNavTree(location.pathname.split("/").slice(-1).toString(),'');});
+  </script>
+
+  <main class="mdl-layout__content">
+    <div id="doc-content">
+
+    <p>Package: <a class="reference-ned" href="packages.html#Nodes__20_Satellite__30_Network">Nodes._20_Satellite._30_Network</a></p>
+<h2 class="comptitle" style="float: left;">Sat_Net_PacketHandler</h2>
+<span class="mdl-chip" style="float: right; margin-top: 6pt; background-color: #ff000040;">
+    <span class="mdl-chip__text">simple module</span>
+</span><div style="clear: both;"/>
+<p><a class="reference-cpp" href="../doxy/classsatellite_1_1Sat__Net__PacketHandler.html">C++ definition</a></p>
+
+<p>Central packet handler that receives all incoming packets and coordinates routing.</p>
+<p>This module serves as the main entry point for all packets arriving at the satellite
+network layer from ISL, GSL, and DSL interfaces. Upon receiving a packet, it forwards
+it to the routing module for a routing decision. The routing module then calls back
+sendMessage() to forward the packet to the appropriate output gate.</p>
+<img src="Nodes._20_Satellite._30_Network.Sat_Net_PacketHandler-type.svg" ismap="yes" usemap="#type-diagram"/><map name="type-diagram">
+<area shape="rect" href="Nodes._20_Satellite._30_Network.Sat_Net_PacketHandler.html" title="" alt="" coords="0,31,202,71">
+</map>
+<h3 class="subtitle">Used in compound modules</h3>
+<table class="typestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td><a title="Nodes._20_Satellite._30_Network.Sat_Net" href="Nodes._20_Satellite._30_Network.Sat_Net.html">Sat_Net</a></td>
+      <td><i>compound&nbsp;module</i></td>
+      <td>
+<p><a title="Nodes._20_Satellite.Satellite" href="Nodes._20_Satellite.Satellite.html">Satellite</a> Network Layer - Compound module coordinating routing and packet forwarding.</p>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Parameters</h3>
+<table class="paramstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="defaultvalue">Default value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr class="local">
+      <td>numGroundLinks</td>
+      <td>int</td>
+      <td>40</td>
+      <td>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Properties</h3>
+<table class="propertiestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="value">Value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td>class</td>
+      <td>satellite::Sat_Net_PacketHandler</td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>display</td>
+      <td>i=block/switch</td>
+      <td>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Gates</h3>
+<table class="gatestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Direction</th>
+      <th class="gatesize">Size</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr class="local">
+      <td>leftIn</td>
+      <td>input</td>
+      <td></td>
+      <td>
+<p>ISL gates</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>leftOut</td>
+      <td>output</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>upIn</td>
+      <td>input</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>upOut</td>
+      <td>output</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>rightIn</td>
+      <td>input</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>rightOut</td>
+      <td>output</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>downIn</td>
+      <td>input</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>downOut</td>
+      <td>output</td>
+      <td></td>
+      <td>
+</td>
+   </tr>
+   <tr class="local">
+      <td>groundLinkIn [ ]</td>
+      <td>input</td>
+      <td>numGroundLinks</td>
+      <td>
+<p>Ground <a title="Nodes._30_Station.Station" href="Nodes._30_Station.Station.html">Station</a> gates</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>groundLinkOut [ ]</td>
+      <td>output</td>
+      <td>numGroundLinks</td>
+      <td>
+</td>
+   </tr>
+   <tr class="local">
+      <td>lowerLayerLoRaIn</td>
+      <td>input</td>
+      <td></td>
+      <td>
+<p>Device/<a title="Nodes._10_Terminal.Terminal" href="Nodes._10_Terminal.Terminal.html">Terminal</a> LoRa gates</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>lowerLayerLoRaOut</td>
+      <td>output</td>
+      <td></td>
+      <td>
+</td>
+   </tr>
+   <tr class="local">
+      <td>lowerLayerGWLoRaIn</td>
+      <td>input</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>lowerLayerGWLoRaOut</td>
+      <td>output</td>
+      <td></td>
+      <td>
+</td>
+   </tr>
+   <tr class="local">
+      <td>lowerInDSL</td>
+      <td>input</td>
+      <td></td>
+      <td>
+<p>Lower layer connections (from parent compound module)</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>lowerOutDSL</td>
+      <td>output</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>lowerInISL</td>
+      <td>input</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>lowerOutISL</td>
+      <td>output</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>lowerInGSL</td>
+      <td>input</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>lowerOutGSL</td>
+      <td>output</td>
+      <td></td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Signals</h3>
+<table class="signalstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="unit">Unit</th>
+   </tr>
+   <tr class="local">
+      <td>packetReceived</td>
+      <td>inet::Packet</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>packetSent</td>
+      <td>inet::Packet</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>packetDropped</td>
+      <td>inet::Packet</td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Statistics</h3>
+<table class="statisticstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="title">Title</th>
+      <th class="source">Source</th>
+      <th class="record">Record</th>
+      <th class="unit">Unit</th>
+      <th class="interpolationmode">Interpolation Mode</th>
+   </tr>
+   <tr class="local">
+      <td>packetsReceived</td>
+      <td></td>
+      <td>packetReceived</td>
+      <td>count, vector</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>packetsSent</td>
+      <td></td>
+      <td>packetSent</td>
+      <td>count, vector</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>packetsDropped</td>
+      <td></td>
+      <td>packetDropped</td>
+      <td>count, vector</td>
+      <td></td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Source code</h3>
+<pre class="src">
+<span style="color: #808080; font-style: italic; ">//
+// Central packet handler that receives all incoming packets and coordinates routing.
+// 
+// This module serves as the main entry point for all packets arriving at the satellite
+// network layer from ISL, GSL, and DSL interfaces. Upon receiving a packet, it forwards
+// it to the routing module for a routing decision. The routing module then calls back
+// sendMessage() to forward the packet to the appropriate output gate.
+//
+</span><span style="color: #800000; font-weight: bold; ">simple</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">Sat_Net_PacketHandler</span><span style="color: #3d3d3d; ">
+{
+    </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@class</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">satellite</span><span style="color: #3d3d3d; ">::</span><span style="color: #3d3d3d; ">Sat_Net_PacketHandler</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@display</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;i=block/switch&quot;</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">numGroundLinks</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">40</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetReceived</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">inet</span><span style="color: #3d3d3d; ">::</span><span style="color: #3d3d3d; ">Packet</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetSent</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">inet</span><span style="color: #3d3d3d; ">::</span><span style="color: #3d3d3d; ">Packet</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetDropped</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">inet</span><span style="color: #3d3d3d; ">::</span><span style="color: #3d3d3d; ">Packet</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetsReceived</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">source</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">packetReceived</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetsSent</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">source</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">packetSent</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetsDropped</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">source</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">packetDropped</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">);
+
+    </span><span style="color: #800000; font-weight: bold; ">gates</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #808080; font-style: italic; ">// ISL gates
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">leftIn</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">leftOut</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">upIn</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">upOut</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">rightIn</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">rightOut</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">downIn</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">downOut</span><span style="color: #3d3d3d; ">;
+
+        </span><span style="color: #808080; font-style: italic; ">// Ground Station gates
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">groundLinkIn</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">numGroundLinks</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">groundLinkOut</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">numGroundLinks</span><span style="color: #3d3d3d; ">];
+
+        </span><span style="color: #808080; font-style: italic; ">// Device/Terminal LoRa gates
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerLayerLoRaIn</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@labels</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">LoRaGate</span><span style="color: #3d3d3d; ">/</span><span style="color: #3d3d3d; ">up</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerLayerLoRaOut</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@labels</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">LoRaGate</span><span style="color: #3d3d3d; ">/</span><span style="color: #3d3d3d; ">down</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerLayerGWLoRaIn</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@labels</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">LoRaGate</span><span style="color: #3d3d3d; ">/</span><span style="color: #3d3d3d; ">up</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerLayerGWLoRaOut</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; font-weight: bold; ">@labels</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">LoRaGate</span><span style="color: #3d3d3d; ">/</span><span style="color: #3d3d3d; ">down</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">// Lower layer connections (from parent compound module)
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerInDSL</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerOutDSL</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerInISL</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerOutISL</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerInGSL</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">lowerOutGSL</span><span style="color: #3d3d3d; ">;
+}
+</span></pre>
+File: <a href="src-Nodes-_20_Satellite-_30_Network-Sat_Net_PacketHandler.ned.html">src/Nodes/_20_Satellite/_30_Network/Sat_Net_PacketHandler.ned</a>
+<hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.svg"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+
+
+    </div><!-- doc-content -->
+  </main>
+</div>
+
+<script type="text/javascript" src="material.min.js"></script>
+</body>
+</html>

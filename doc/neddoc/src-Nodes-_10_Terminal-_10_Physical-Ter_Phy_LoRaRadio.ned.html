@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="OMNeT++ NED doc generator"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+<link rel="stylesheet" href="material-icons.css">
+<link rel="stylesheet" href="material.blue-light_blue.min.css">
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<title>Ter_Phy_LoRaRadio.ned</title>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div id="top" class="mdl-layout__header-row">
+      <span class="mdl-layout-title">Ter_Phy_LoRaRadio.ned</span>
+      <div class="mdl-layout-spacer"></div>
+<!--
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+        <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+          <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" id="search" />
+          <label class="mdl-textfield__label" for="search">Enter your query...</label>
+        </div>
+      </div>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons">code</i>
+      </button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+        <i class="material-icons">more_vert</i>
+      </button>
+      <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+        <li class="mdl-menu__item">OMNeT++ Website</li>
+      </ul>
+-->
+    </div>
+  </header>
+
+  <div class="drawer mdl-layout__drawer">
+    <nav id="side-nav" class="mdl-navigation">
+      <div id="nav-tree">
+        <div id="nav-tree-contents">
+          <div id="nav-sync" class="sync"></div>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <script type="text/javascript">
+  $(document).ready(function(){initNavTree(location.pathname.split("/").slice(-1).toString(),'');});
+  </script>
+
+  <main class="mdl-layout__content">
+    <div id="doc-content">
+
+    <h2 class="comptitle">NED File src/Nodes/_10_Terminal/_10_Physical/Ter_Phy_LoRaRadio.ned</h2>
+<table class="typestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td><a title="Nodes._10_Terminal._10_Physical.Ter_Phy_LoRaRadio" href="Nodes._10_Terminal._10_Physical.Ter_Phy_LoRaRadio.html">Ter_Phy_LoRaRadio</a></td>
+      <td><i>compound&nbsp;module</i></td>
+      <td><i>(no description)</i></td>
+   </tr>
+</table>
+<h3 class="subtitle">Source code</h3>
+<pre class="src">
+<span style="color: #808080; font-style: italic; ">//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see http://www.gnu.org/licenses/.
+// 
+</span><span style="color: #3d3d3d; ">
+</span><span style="color: #800000; font-weight: bold; ">package</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">Nodes</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">_10_Terminal</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">_10_Physical</span><span style="color: #3d3d3d; ">;
+
+</span><span style="color: #800000; font-weight: bold; ">import</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">Global</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">Transceiver</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">LoRaReceiver</span><span style="color: #3d3d3d; ">;
+</span><span style="color: #800000; font-weight: bold; ">import</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">Global</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">Transceiver</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">LoRaTransmitter</span><span style="color: #3d3d3d; ">;
+</span><span style="color: #800000; font-weight: bold; ">import</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">inet</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">physicallayer</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">wireless</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">common</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">base</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">packetlevel</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">FlatRadioBase</span><span style="color: #3d3d3d; ">;
+</span><span style="color: #800000; font-weight: bold; ">import</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">inet</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">power</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">storage</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">IdealEpEnergyStorage</span><span style="color: #3d3d3d; ">;
+
+
+</span><span style="color: #800000; font-weight: bold; ">module</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">Ter_Phy_LoRaRadio</span><span style="color: #3d3d3d; "> </span><span style="color: #800000; font-weight: bold; ">extends</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">FlatRadioBase</span><span style="color: #3d3d3d; ">
+{
+    </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@networkNode</span><span style="color: #3d3d3d; ">();
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetSentToUpper</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">cPacket</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetReceivedFromUpper</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">cPacket</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">radioModeChanged</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">long</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">listeningChanged</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">receptionStateChanged</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">long</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">transmissionStateChanged</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">long</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">receivedSignalPartChanged</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">long</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">transmittedSignalPartChanged</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">long</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">transmissionStarted</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">transmissionEnded</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">receptionStarted</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">receptionEnded</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">minSNIR</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">packetErrorRate</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">bitErrorRate</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">symbolErrorRate</span><span style="color: #3d3d3d; ">];
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">droppedPacket</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">long</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">radioMode</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;Radio mode&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">source</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">radioModeChanged</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">sample</span><span style="color: #3d3d3d; ">-</span><span style="color: #3d3d3d; ">hold</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">receptionState</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;Radio reception state&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">source</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">receptionStateChanged</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">sample</span><span style="color: #3d3d3d; ">-</span><span style="color: #3d3d3d; ">hold</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">transmissionState</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;Radio transmission state&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">source</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">transmissionStateChanged</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">sample</span><span style="color: #3d3d3d; ">-</span><span style="color: #3d3d3d; ">hold</span><span style="color: #3d3d3d; ">);
+
+		</span><span style="color: #808080; font-style: italic; ">///*.interfaceTableModule = default(absPath(this.interfaceTableModule));
+</span><span style="color: #3d3d3d; ">
+        </span><span style="color: #3d3d3d; ">antenna</span><span style="color: #3d3d3d; ">.</span><span style="color: #800000; font-weight: bold; ">typename</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;IsotropicAntenna&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; ">transmitter</span><span style="color: #3d3d3d; ">.</span><span style="color: #800000; font-weight: bold; ">typename</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;Global.Transceiver.LoRaTransmitter&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; ">receiver</span><span style="color: #3d3d3d; ">.</span><span style="color: #800000; font-weight: bold; ">typename</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;Global.Transceiver.LoRaReceiver&quot;</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #3d3d3d; ">centerFrequency</span><span style="color: #3d3d3d; "> = </span><span style="color: #008000; ">868</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">MHz</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #3d3d3d; ">bandwidth</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">.</span><span style="color: #008000; ">25</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">MHz</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">// 802.15.4-2006 (page 28)
+</span><span style="color: #3d3d3d; ">        *.</span><span style="color: #3d3d3d; ">bitrate</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">250</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">kbps</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">// PHY Header, 802.15.4-2006 (page 43)
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// 4 octets Preamble
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// 1 octet SFD
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// 7 bit Frame length
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// 1 bit Reserved
+</span><span style="color: #3d3d3d; ">        *.</span><span style="color: #3d3d3d; ">headerBitLength</span><span style="color: #3d3d3d; "> = (</span><span style="color: #008000; ">4</span><span style="color: #3d3d3d; ">*</span><span style="color: #008000; ">8</span><span style="color: #3d3d3d; "> + </span><span style="color: #008000; ">1</span><span style="color: #3d3d3d; ">*</span><span style="color: #008000; ">8</span><span style="color: #3d3d3d; "> + </span><span style="color: #008000; ">7</span><span style="color: #3d3d3d; "> + </span><span style="color: #008000; ">1</span><span style="color: #3d3d3d; ">) * </span><span style="color: #008000; ">1</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">b</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #3d3d3d; ">transmitter</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">headerLength</span><span style="color: #3d3d3d; "> = </span><span style="color: #008000; ">5</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">B</span><span style="color: #3d3d3d; ">;
+
+        </span><span style="color: #808080; font-style: italic; ">// RSSI sensitivity (ATmega256RFR2, page 566)
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; ">receiver</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">energyDetection</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(-</span><span style="color: #008000; ">90</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">// Lowest receiver sensitivity at SF 12,
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; ">receiver</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">sensitivity</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(-</span><span style="color: #008000; ">137</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">// There is no fixed boundary, because of the
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// DSSS and the capture effect. Taking the sensitivity minus some
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// arbitrary value as an approximate guess.
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; ">receiver</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">minInterferencePower</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(-</span><span style="color: #008000; ">120</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">// Minimum SNIR
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// -8 dB results into 98% PER for a PSDU of 20 octets
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; ">receiver</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">snirThreshold</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(-</span><span style="color: #008000; ">8</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">dB</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">//Default transmitter power set to maximum for cache limits
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; ">transmitter</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">power</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">25</span><span style="color: #3d3d3d; ">.</span><span style="color: #008000; ">118</span><span style="color: #3d3d3d; ">mW</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; ">transmitter</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">preambleDuration</span><span style="color: #3d3d3d; "> = </span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">.</span><span style="color: #008000; ">001</span><span style="color: #3d3d3d; ">s</span><span style="color: #3d3d3d; ">;
+
+        </span><span style="color: #000080; font-weight: bold; ">bool</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">iAmGateway</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">false</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@class</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">radio</span><span style="color: #3d3d3d; ">::</span><span style="color: #3d3d3d; ">Ter_Phy_LoRaRadio</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@display</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;bgb=200,575&quot;</span><span style="color: #3d3d3d; ">);
+
+    </span><span style="color: #800000; font-weight: bold; ">submodules</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #3d3d3d; ">IdealEpEnergyStorage</span><span style="color: #3d3d3d; ">: </span><span style="color: #3d3d3d; ">IdealEpEnergyStorage</span><span style="color: #3d3d3d; "> {
+            </span><span style="color: #3d3d3d; font-weight: bold; ">@display</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;p=100,500&quot;</span><span style="color: #3d3d3d; ">);
+        }
+}
+</span></pre>
+
+<hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.svg"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+
+
+    </div><!-- doc-content -->
+  </main>
+</div>
+
+<script type="text/javascript" src="material.min.js"></script>
+</body>
+</html>

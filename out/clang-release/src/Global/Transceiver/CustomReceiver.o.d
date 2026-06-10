@@ -1,0 +1,417 @@
+../out/clang-release/src/Global/Transceiver/CustomReceiver.o: \
+  Global/Transceiver/CustomReceiver.cc \
+  Global/Transceiver/CustomReceiver.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IRadioMedium.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IWirelessSignal.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IArrival.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IPrintableObject.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETDefs.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/precompiled_release.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/precompiled.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/include/omnetpp.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/opp_defines.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/features.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Compat.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/InitStages.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/InitStageRegistry.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/Coord.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETMath.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/Quaternion.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/EulerAngles.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Units.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IRadioSignal.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Functions.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/AlgebraicOperations.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/PrimitiveFunctions.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/FunctionBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/IFunction.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Ptr.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IntrusivePtr.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Domain.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Interval.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Point.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Interpolators.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/IInterpolator.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/CompoundFunctions.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IListening.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPhysicalLayerFrame.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/PhysicalLayerDefs.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReception.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/bitlevel/ISignalAnalogModel.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ITransmission.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/Packet.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TagBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/BitsChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/Chunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/MemoryInputStream.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/MacAddress.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/ipv4/Ipv4Address.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/ipv6/Ipv6Address.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/InterfaceToken.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/MemoryOutputStream.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TemporarySharedPtr.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/IRegionTaggedObject.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/SharingRegionTagSet.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/BytesChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/EmptyChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/SequenceChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/SliceChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/ITaggedObject.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/SharingTagSet.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IAntennaGain.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IMaterial.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IPhysicalEnvironment.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IVisitor.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/RotationMatrix.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IGround.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IMaterialRegistry.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/common/Material.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IObjectCache.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/object/LineSegment.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/base/GeometricObjectBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IPhysicalObject.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/base/ShapeBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IAnalogModel.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IInterference.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/INoise.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IRadio.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IAntenna.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/contract/IMobility.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPhysicalLayer.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReceiver.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IListeningDecision.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReceptionDecision.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReceptionResult.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/RadioControlInfo_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETDefs_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Units_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IModulation_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IModulation.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IApskModulation.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ISnir.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ITransmitter.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IBackgroundNoise.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ICommunicationCache.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IntervalTree.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IMediumLimitCache.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/INeighborCache.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IObstacleLoss.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPathLoss.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPropagation.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/ReceptionResult.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/BandListening.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ListeningBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/ListeningDecision.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/ReceptionDecision.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandNoiseBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NoiseBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarSnir.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/SnirBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/FlatReceiverBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandReceiverBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/SnirReceiverBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ReceiverBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IErrorModel.h \
+  Global/Transceiver/CustomTransmission.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/TransmissionBase.h \
+  Global/Utilities/libnorad/ccoord.h Global/Utilities/libnorad/globals.h \
+  Global/Transceiver/CustomReception.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarReception.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/FlatReceptionBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandReceptionBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ReceptionBase.h \
+  Global/Channel/CustomBandListening.h Global/Utilities/CSVReader.h \
+  Global/Base/_20_Data_Link/Base_MacProtocol.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/NetworkInterface.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/ILifecycle.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ModuleRefByPar.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ModuleAccess.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/TagSet.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Protocol.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Simsignals.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Simsignals_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/StringFormat.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/L3Address.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/ModuleIdAddress.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/ModulePathAddress.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/clns/ClnsAddress.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/IInterfaceTable.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/PacketProcessorBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPacketProcessor.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPassivePacketSink.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPacketQueue.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPacketCollection.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPassivePacketSource.h \
+  Global/Messages/_20_Data_Link/Base_MacFrame_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/Chunk_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/BitCountChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/ByteCountChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/cPacketChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/StreamBufferChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/EncryptedChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/FieldsChunk.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/MacAddress_m.h \
+  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/CanvasProjection.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/LineSegmentsMobilityBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MovingMobilityBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MobilityBase.h \
+  Global/Mobility/INorad.h Global/Utilities/libnorad/cEci.h \
+  Global/Utilities/libnorad/cVector.h \
+  Global/Utilities/libnorad/cJulian.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarNoise.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/SignalTag_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TagBase_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/MacAddressTag_m.h \
+  Global/Messages/_30_Network/Net_CstRoutingTag_m.h \
+  Nodes/_10_Terminal/_40_Application/Ter_App.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/NodeStatus.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/LifecycleOperation.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/Message.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/InterfaceTag_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/INetfilter.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/stlutils.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/NetworkHeaderBase_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ProtocolTag_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Protocol_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/L3Address_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/ipv4/Ipv4Header_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TlvOptions_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/IpProtocolId_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/transportlayer/common/CrcMode_m.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ProtocolGroup.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/ActivePacketSinkBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/PacketSinkBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IActivePacketSink.h \
+  Global/Statistics/TransmissionStatistics/TransmissionStatistics.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETUtils.h \
+  Global/Messages/_10_Physical/LoRaPhyPreamble_m.h \
+  Global/Statistics/TransmissionStatistics/CstTransmissionStatisticsTag_m.h \
+  Global/Utilities/Utils.h Nodes/_10_Terminal/Ter.h \
+  Nodes/_10_Terminal/_60_Mobility/Ter_Mob.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/static/StationaryMobility.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/StationaryMobilityBase.h \
+  Global/Utilities/Constants.h Global/Utilities/PositionAwareBase.h \
+  Global/Utilities/libnorad/cEcef.h Global/Utilities/libnorad/cSite.h \
+  Global/Utilities/utils/SetUtils.h Nodes/_20_Satellite/Sat.h \
+  Global/Utilities/ISLDirection.h Global/Utilities/ISLDirection_m.h \
+  Global/Utilities/ISLState.h \
+  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h \
+  Global/Utilities/libnorad/cOrbitA.h Global/Utilities/libnorad/cTLE.h \
+  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h \
+  Global/Messages/_40_Application/LoRaAppPacket_m.h
+Global/Transceiver/CustomReceiver.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IRadioMedium.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IWirelessSignal.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IArrival.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IPrintableObject.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETDefs.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/precompiled_release.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/precompiled.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/include/omnetpp.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/opp_defines.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/features.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Compat.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/InitStages.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/InitStageRegistry.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/Coord.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETMath.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/Quaternion.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/EulerAngles.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Units.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IRadioSignal.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Functions.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/AlgebraicOperations.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/PrimitiveFunctions.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/FunctionBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/IFunction.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Ptr.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IntrusivePtr.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Domain.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Interval.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Point.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/Interpolators.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/IInterpolator.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/math/CompoundFunctions.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IListening.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPhysicalLayerFrame.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/PhysicalLayerDefs.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReception.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/bitlevel/ISignalAnalogModel.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ITransmission.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/Packet.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TagBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/BitsChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/Chunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/MemoryInputStream.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/MacAddress.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/ipv4/Ipv4Address.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/ipv6/Ipv6Address.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/InterfaceToken.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/MemoryOutputStream.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TemporarySharedPtr.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/IRegionTaggedObject.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/SharingRegionTagSet.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/BytesChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/EmptyChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/SequenceChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/SliceChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/ITaggedObject.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/SharingTagSet.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IAntennaGain.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IMaterial.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IPhysicalEnvironment.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IVisitor.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/RotationMatrix.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IGround.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IMaterialRegistry.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/common/Material.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IObjectCache.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/object/LineSegment.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/base/GeometricObjectBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/environment/contract/IPhysicalObject.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/base/ShapeBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IAnalogModel.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IInterference.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/INoise.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IRadio.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IAntenna.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/contract/IMobility.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPhysicalLayer.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReceiver.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IListeningDecision.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReceptionDecision.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IReceptionResult.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/RadioControlInfo_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETDefs_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Units_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IModulation_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IModulation.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IApskModulation.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ISnir.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ITransmitter.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IBackgroundNoise.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/ICommunicationCache.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IntervalTree.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IMediumLimitCache.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/INeighborCache.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IObstacleLoss.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPathLoss.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IPropagation.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/ReceptionResult.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/BandListening.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ListeningBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/ListeningDecision.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/ReceptionDecision.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandNoiseBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NoiseBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarSnir.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/SnirBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/FlatReceiverBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandReceiverBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/SnirReceiverBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ReceiverBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/IErrorModel.h:
+Global/Transceiver/CustomTransmission.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/TransmissionBase.h:
+Global/Utilities/libnorad/ccoord.h:
+Global/Utilities/libnorad/globals.h:
+Global/Transceiver/CustomReception.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarReception.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/FlatReceptionBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandReceptionBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ReceptionBase.h:
+Global/Channel/CustomBandListening.h:
+Global/Utilities/CSVReader.h:
+Global/Base/_20_Data_Link/Base_MacProtocol.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/NetworkInterface.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/ILifecycle.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ModuleRefByPar.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ModuleAccess.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/tag/TagSet.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Protocol.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Simsignals.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Simsignals_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/StringFormat.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/L3Address.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/ModuleIdAddress.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/ModulePathAddress.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/clns/ClnsAddress.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/IInterfaceTable.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/PacketProcessorBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPacketProcessor.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPassivePacketSink.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPacketQueue.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPacketCollection.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IPassivePacketSource.h:
+Global/Messages/_20_Data_Link/Base_MacFrame_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/Chunk_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/BitCountChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/ByteCountChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/cPacketChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/StreamBufferChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/EncryptedChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/chunk/FieldsChunk.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/MacAddress_m.h:
+Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/geometry/common/CanvasProjection.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/LineSegmentsMobilityBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MovingMobilityBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MobilityBase.h:
+Global/Mobility/INorad.h:
+Global/Utilities/libnorad/cEci.h:
+Global/Utilities/libnorad/cVector.h:
+Global/Utilities/libnorad/cJulian.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarNoise.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/contract/packetlevel/SignalTag_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TagBase_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/MacAddressTag_m.h:
+Global/Messages/_30_Network/Net_CstRoutingTag_m.h:
+Nodes/_10_Terminal/_40_Application/Ter_App.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/NodeStatus.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/LifecycleOperation.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/Message.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/linklayer/common/InterfaceTag_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/INetfilter.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/stlutils.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/NetworkHeaderBase_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ProtocolTag_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/Protocol_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/L3Address_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/ipv4/Ipv4Header_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TlvOptions_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/common/IpProtocolId_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/transportlayer/common/CrcMode_m.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/ProtocolGroup.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/ActivePacketSinkBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/PacketSinkBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IActivePacketSink.h:
+Global/Statistics/TransmissionStatistics/TransmissionStatistics.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETUtils.h:
+Global/Messages/_10_Physical/LoRaPhyPreamble_m.h:
+Global/Statistics/TransmissionStatistics/CstTransmissionStatisticsTag_m.h:
+Global/Utilities/Utils.h:
+Nodes/_10_Terminal/Ter.h:
+Nodes/_10_Terminal/_60_Mobility/Ter_Mob.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/static/StationaryMobility.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/StationaryMobilityBase.h:
+Global/Utilities/Constants.h:
+Global/Utilities/PositionAwareBase.h:
+Global/Utilities/libnorad/cEcef.h:
+Global/Utilities/libnorad/cSite.h:
+Global/Utilities/utils/SetUtils.h:
+Nodes/_20_Satellite/Sat.h:
+Global/Utilities/ISLDirection.h:
+Global/Utilities/ISLDirection_m.h:
+Global/Utilities/ISLState.h:
+Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h:
+Global/Utilities/libnorad/cOrbitA.h:
+Global/Utilities/libnorad/cTLE.h:
+Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h:
+Global/Messages/_40_Application/LoRaAppPacket_m.h:

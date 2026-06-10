@@ -1,0 +1,431 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="OMNeT++ NED doc generator"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+<link rel="stylesheet" href="material-icons.css">
+<link rel="stylesheet" href="material.blue-light_blue.min.css">
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<title>LoRaMedium</title>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div id="top" class="mdl-layout__header-row">
+      <span class="mdl-layout-title">LoRaMedium</span>
+      <div class="mdl-layout-spacer"></div>
+<!--
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+        <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+          <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" id="search" />
+          <label class="mdl-textfield__label" for="search">Enter your query...</label>
+        </div>
+      </div>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons">code</i>
+      </button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+        <i class="material-icons">more_vert</i>
+      </button>
+      <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+        <li class="mdl-menu__item">OMNeT++ Website</li>
+      </ul>
+-->
+    </div>
+  </header>
+
+  <div class="drawer mdl-layout__drawer">
+    <nav id="side-nav" class="mdl-navigation">
+      <div id="nav-tree">
+        <div id="nav-tree-contents">
+          <div id="nav-sync" class="sync"></div>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <script type="text/javascript">
+  $(document).ready(function(){initNavTree(location.pathname.split("/").slice(-1).toString(),'');});
+  </script>
+
+  <main class="mdl-layout__content">
+    <div id="doc-content">
+
+    <p>Package: <a class="reference-ned" href="packages.html#Global_Medium_DSL">Global.Medium.DSL</a></p>
+<h2 class="comptitle" style="float: left;">LoRaMedium</h2>
+<span class="mdl-chip" style="float: right; margin-top: 6pt; background-color: #00ff0040;">
+    <span class="mdl-chip__text">compound module</span>
+</span><div style="clear: both;"/>
+<p>(no description)</p>
+<img src="Global.Medium.DSL.LoRaMedium-type.svg" ismap="yes" usemap="#type-diagram"/><map name="type-diagram">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.propagation.ConstantSpeedPropagation.html" title="propagation : like IPropagation
+
+ConstantSpeedPropagation: This propagation model computes the propagation time to be proportional to the traveled distance,...
+
+IPropagation: The propagation model describes how a radio signal propagates through space over time.
+
+Source:
+propagation: &lt;default(&quot;ConstantSpeedPropagation&quot;)&gt; like IPropagation {
+    parameters:
+        @display(&quot;p=100,100&quot;);
+}" alt="propagation : like IPropagation
+
+ConstantSpeedPropagation: This propagation model computes the propagation time to be proportional to the traveled distance,...
+
+IPropagation: The propagation model describes how a radio signal propagates through space over time.
+
+Source:
+propagation: &lt;default(&quot;ConstantSpeedPropagation&quot;)&gt; like IPropagation {
+    parameters:
+        @display(&quot;p=100,100&quot;);
+}" coords="60,120,144,181">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.contract.packetlevel.IAnalogModel.html" title="analogModel : like IAnalogModel
+
+IAnalogModel: The analog model describes how the analog representation of the transmissions is turned into the...
+
+Source:
+analogModel: &lt;default(signalAnalogRepresentation == &quot;unitDisk&quot; ? &quot;UnitDiskAnalogModel&quot; : signalAnalogRepresentation == &quot;scalar&quot; ? &quot;ScalarAnalogModel&quot; : signalAnalogRepresentation == &quot;dimensional&quot; ? &quot;DimensionalAnalogModel&quot; : &quot;&quot;)&gt; like IAnalogModel {
+    parameters:
+        @display(&quot;p=100,200&quot;);
+}" alt="analogModel : like IAnalogModel
+
+IAnalogModel: The analog model describes how the analog representation of the transmissions is turned into the...
+
+Source:
+analogModel: &lt;default(signalAnalogRepresentation == &quot;unitDisk&quot; ? &quot;UnitDiskAnalogModel&quot; : signalAnalogRepresentation == &quot;scalar&quot; ? &quot;ScalarAnalogModel&quot; : signalAnalogRepresentation == &quot;dimensional&quot; ? &quot;DimensionalAnalogModel&quot; : &quot;&quot;)&gt; like IAnalogModel {
+    parameters:
+        @display(&quot;p=100,200&quot;);
+}" coords="58,220,146,281">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.contract.packetlevel.IBackgroundNoise.html" title="backgroundNoise : like IBackgroundNoise
+
+IBackgroundNoise: The background noise model describes the thermal noise, the cosmic background noise, and other...
+
+Source:
+backgroundNoise: &lt;default(signalAnalogRepresentation == &quot;scalar&quot; ? &quot;IsotropicScalarBackgroundNoise&quot; : signalAnalogRepresentation == &quot;dimensional&quot; ? &quot;IsotropicDimensionalBackgroundNoise&quot; : &quot;&quot;)&gt; like IBackgroundNoise if typename != &quot;&quot; {
+    parameters:
+        @display(&quot;p=100,300&quot;);
+}" alt="backgroundNoise : like IBackgroundNoise
+
+IBackgroundNoise: The background noise model describes the thermal noise, the cosmic background noise, and other...
+
+Source:
+backgroundNoise: &lt;default(signalAnalogRepresentation == &quot;scalar&quot; ? &quot;IsotropicScalarBackgroundNoise&quot; : signalAnalogRepresentation == &quot;dimensional&quot; ? &quot;IsotropicDimensionalBackgroundNoise&quot; : &quot;&quot;)&gt; like IBackgroundNoise if typename != &quot;&quot; {
+    parameters:
+        @display(&quot;p=100,300&quot;);
+}" coords="44,320,160,381">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.pathloss.FreeSpacePathLoss.html" title="pathLoss : like IPathLoss
+
+IPathLoss: The path loss model describes the reduction of power as the signal propagates through space.
+
+Source:
+pathLoss: &lt;default(&quot;FreeSpacePathLoss&quot;)&gt; like IPathLoss {
+    parameters:
+        @display(&quot;p=300,100&quot;);
+}" alt="pathLoss : like IPathLoss
+
+IPathLoss: The path loss model describes the reduction of power as the signal propagates through space.
+
+Source:
+pathLoss: &lt;default(&quot;FreeSpacePathLoss&quot;)&gt; like IPathLoss {
+    parameters:
+        @display(&quot;p=300,100&quot;);
+}" coords="273,120,332,181">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.contract.packetlevel.IObstacleLoss.html" title="obstacleLoss : like IObstacleLoss
+
+IObstacleLoss: The obstacle loss model describes the reduction of power as the signal passes through physical...
+
+Source:
+obstacleLoss: &lt;default(&quot;&quot;)&gt; like IObstacleLoss if typename != &quot;&quot; {
+    parameters:
+        @display(&quot;p=300,200&quot;);
+}" alt="obstacleLoss : like IObstacleLoss
+
+IObstacleLoss: The obstacle loss model describes the reduction of power as the signal passes through physical...
+
+Source:
+obstacleLoss: &lt;default(&quot;&quot;)&gt; like IObstacleLoss if typename != &quot;&quot; {
+    parameters:
+        @display(&quot;p=300,200&quot;);
+}" coords="260,220,345,281">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.medium.MediumLimitCache.html" title="mediumLimitCache : like IMediumLimitCache
+
+Source:
+mediumLimitCache: &lt;default(&quot;MediumLimitCache&quot;)&gt; like IMediumLimitCache {
+    parameters:
+        @display(&quot;p=500,100&quot;);
+}" alt="mediumLimitCache : like IMediumLimitCache
+
+Source:
+mediumLimitCache: &lt;default(&quot;MediumLimitCache&quot;)&gt; like IMediumLimitCache {
+    parameters:
+        @display(&quot;p=500,100&quot;);
+}" coords="438,120,567,181">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.communicationcache.VectorCommunicationCache.html" title="communicationCache : like ICommunicationCache
+
+VectorCommunicationCache: This communication cache model stores radio, transmission and reception related intermediate...
+
+Source:
+communicationCache: &lt;default(&quot;VectorCommunicationCache&quot;)&gt; like ICommunicationCache {
+    parameters:
+        @display(&quot;p=500,300&quot;);
+}" alt="communicationCache : like ICommunicationCache
+
+VectorCommunicationCache: This communication cache model stores radio, transmission and reception related intermediate...
+
+Source:
+communicationCache: &lt;default(&quot;VectorCommunicationCache&quot;)&gt; like ICommunicationCache {
+    parameters:
+        @display(&quot;p=500,300&quot;);
+}" coords="430,320,574,381">
+<area shape="rect" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.contract.packetlevel.INeighborCache.html" title="neighborCache : like INeighborCache
+
+INeighborCache: The neighbor cache model computes the affected set of receivers on the medium for a given...
+
+Source:
+neighborCache: &lt;default(&quot;&quot;)&gt; like INeighborCache if typename != &quot;&quot; {
+    parameters:
+        @display(&quot;p=500,200&quot;);
+}" alt="neighborCache : like INeighborCache
+
+INeighborCache: The neighbor cache model computes the affected set of receivers on the medium for a given...
+
+Source:
+neighborCache: &lt;default(&quot;&quot;)&gt; like INeighborCache if typename != &quot;&quot; {
+    parameters:
+        @display(&quot;p=500,200&quot;);
+}" coords="452,220,552,281">
+</map>
+<h3 class="subtitle">Inheritance diagram</h3>
+<p>The following diagram shows inheritance relationships for this type.
+Unresolved types are missing from the diagram.</p>
+<object type="image/svg+xml" data="Global.Medium.DSL.LoRaMedium-inheritance.svg"></object>
+<h3 class="subtitle">Used in</h3>
+<table class="typestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td><a title="Florasat.Florasat" href="Florasat.Florasat.html">Florasat</a></td>
+      <td><i>network</i></td>
+      <td><i>(no description)</i></td>
+   </tr>
+</table>
+<h3 class="subtitle">Extends</h3>
+<table class="typestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td><a title="inet.physicallayer.wireless.common.medium.RadioMedium" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.medium.RadioMedium.html">RadioMedium</a></td>
+      <td><i>compound&nbsp;module</i></td>
+      <td>
+<p>The medium model describes the shared physical medium where communication
+takes place. It keeps track of radios, noise sources, ongoing transmissions,
+background noise, and other ongoing noises. The medium computes when, where
+and how transmissions and noises arrive at receivers. It also efficiently
+provides the set of interfering transmissions and noises for the receivers.</p>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Parameters</h3>
+<table class="paramstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="defaultvalue">Default value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr class="inherited">
+      <td>physicalEnvironmentModule</td>
+      <td>string</td>
+      <td>"physicalEnvironment"</td>
+      <td>
+<p>module path of the physical environment model</p>
+</td>
+   </tr>
+   <tr class="inherited">
+      <td>signalAnalogRepresentation</td>
+      <td>string</td>
+      <td>"scalar"</td>
+      <td>
+</td>
+   </tr>
+   <tr class="inherited">
+      <td>rangeFilter</td>
+      <td>string</td>
+      <td>"communicationRange"</td>
+      <td>
+<p>filter parameters that control when signals are sent to receiver radios</p>
+</td>
+   </tr>
+   <tr class="inherited">
+      <td>radioModeFilter</td>
+      <td>bool</td>
+      <td>true</td>
+      <td>
+<p>when enabled the radio medium doesn't send signals to a radio if it's neither in receiver nor in transceiver mode</p>
+</td>
+   </tr>
+   <tr class="inherited">
+      <td>listeningFilter</td>
+      <td>bool</td>
+      <td>false</td>
+      <td>
+<p>when enabled the radio medium doesn't send signals to a radio if it listens on the channel in incompatible mode (e.g. different carrier frequency and bandwidth, different modulation)</p>
+</td>
+   </tr>
+   <tr class="inherited">
+      <td>macAddressFilter</td>
+      <td>bool</td>
+      <td>false</td>
+      <td>
+<p>when enabled the radio medium doesn't send signals to a radio if it the destination mac address differs</p>
+</td>
+   </tr>
+   <tr class="inherited">
+      <td>recordTransmissionLog</td>
+      <td>bool</td>
+      <td>false</td>
+      <td>
+<p>logging parameters</p>
+</td>
+   </tr>
+   <tr class="inherited">
+      <td>recordReceptionLog</td>
+      <td>bool</td>
+      <td>false</td>
+      <td>
+<p>when enabled the medium writes one line per reception into the communication log file</p>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Properties</h3>
+<table class="propertiestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="value">Value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td>class</td>
+      <td>medium::LoRaMedium</td>
+      <td></td>
+   </tr>
+   <tr>
+      <td>display</td>
+      <td>i=misc/sun</td>
+      <td>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Signals</h3>
+<table class="signalstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="unit">Unit</th>
+   </tr>
+   <tr class="local">
+      <td>radioRemoved</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>signalDepartureStarted</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>radioAdded</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>signalArrivalStarted</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>signalAdded</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>signalDepartureEnded</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>signalRemoved</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>signalArrivalEnded</td>
+      <td></td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Unassigned submodule parameters</h3>
+<table class="deepparamstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="defaultvalue">Default value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td><a title="inet.physicallayer.wireless.common.contract.packetlevel.INeighborCache" href="../../../inet4.3/doc/neddoc/inet.physicallayer.wireless.common.contract.packetlevel.INeighborCache.html">neighborCache</a>.refillPeriod</td>
+      <td>double</td>
+      <td></td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Source code</h3>
+<pre class="src">
+<span style="color: #800000; font-weight: bold; ">module</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">LoRaMedium</span><span style="color: #3d3d3d; "> </span><span style="color: #800000; font-weight: bold; ">extends</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">RadioMedium</span><span style="color: #3d3d3d; ">
+{
+    </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #3d3d3d; ">propagation</span><span style="color: #3d3d3d; ">.</span><span style="color: #800000; font-weight: bold; ">typename</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;DtSIoTPropagation&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; ">analogModel</span><span style="color: #3d3d3d; ">.</span><span style="color: #800000; font-weight: bold; ">typename</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;LoRaAnalogModel&quot;</span><span style="color: #3d3d3d; ">);
+
+        </span><span style="color: #808080; font-style: italic; ">// 802.15.4-2006, page 266
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">//pathLoss.typename = default(&quot;LoRaLogNormalShadowing&quot;);
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; ">pathLoss</span><span style="color: #3d3d3d; ">.</span><span style="color: #800000; font-weight: bold; ">typename</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;FreeSpacePathLoss&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; ">backgroundNoise</span><span style="color: #3d3d3d; ">.</span><span style="color: #800000; font-weight: bold; ">typename</span><span style="color: #3d3d3d; "> = </span><span style="color: #008000; ">&quot;DimensionalBackgroundNoise&quot;</span><span style="color: #3d3d3d; ">;
+
+        </span><span style="color: #3d3d3d; ">rangeFilter</span><span style="color: #3d3d3d; "> = </span><span style="color: #008000; ">&quot;communicationRange&quot;</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #3d3d3d; ">radioModeFilter</span><span style="color: #3d3d3d; "> = </span><span style="color: #008000; ">true</span><span style="color: #3d3d3d; ">;
+
+        </span><span style="color: #808080; font-style: italic; ">// Reflects the thermal noise for the receiver sensitivity
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #808080; font-style: italic; ">// TODO couple with sensitivity
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; ">backgroundNoise</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">power</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(-</span><span style="color: #008000; ">96</span><span style="color: #3d3d3d; ">.</span><span style="color: #008000; ">616</span><span style="color: #3d3d3d; ">dBm</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; ">backgroundNoise</span><span style="color: #3d3d3d; ">.</span><span style="color: #3d3d3d; ">dimensions</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;time&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@class</span><span style="color: #3d3d3d; ">(</span><span style="color: #3d3d3d; ">medium</span><span style="color: #3d3d3d; ">::</span><span style="color: #3d3d3d; ">LoRaMedium</span><span style="color: #3d3d3d; ">);
+}
+</span></pre>
+File: <a href="src-Global-Medium-DSL-LoRaMedium.ned.html">src/Global/Medium/DSL/LoRaMedium.ned</a>
+<hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.svg"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+
+
+    </div><!-- doc-content -->
+  </main>
+</div>
+
+<script type="text/javascript" src="material.min.js"></script>
+</body>
+</html>

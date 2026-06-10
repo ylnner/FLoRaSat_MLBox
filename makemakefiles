@@ -1,0 +1,13 @@
+#
+# Usage:
+#    make -f makemakefiles
+# or, for Microsoft Visual C++:
+#    nmake -f makemakefiles MMOPT=-n
+#
+
+MAKEMAKE=opp_makemake $(MMOPT)
+
+INET4_5_PROJ=../../samples/inet4.5
+
+all:
+	cd src && $(MAKEMAKE) --make-so -f --deep -o florasat -O out -KINET4_5_PROJ=/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5 -DINET_IMPORT -I. -I/home/ylnner/Documents/LibTorch/libtorch/include -I/home/ylnner/Documents/LibTorch/libtorch/include/torch/csrc/api/include -I$$\(INET4_5_PROJ\)/src -L/usr/local/opt/openssl/lib -L/home/juanfraire/git/leosatellites -L/home/ylnner/Documents/LibTorch/libtorch/lib -L$$\(INET4_5_PROJ\)/src -lINET$$\(D\)
