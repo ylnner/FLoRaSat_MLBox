@@ -74,6 +74,8 @@ inline void doParsimUnpacking(omnetpp::cCommBuffer *b, KiWanFrameType& e) { int 
  *     // Use to compute delay
  *     double queuedAt;
  *     double sentAt;
+ * 
+ *     int repetitionML;
  * }
  * </pre>
  */
@@ -88,6 +90,7 @@ class KiWanFrame : public ::mac::Base_MacFrame
     double SNIR = 0;
     double queuedAt = 0;
     double sentAt = 0;
+    int repetitionML = 0;
 
   private:
     void copy(const KiWanFrame& other);
@@ -127,6 +130,9 @@ class KiWanFrame : public ::mac::Base_MacFrame
 
     virtual double getSentAt() const;
     virtual void setSentAt(double sentAt);
+
+    virtual int getRepetitionML() const;
+    virtual void setRepetitionML(int repetitionML);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const KiWanFrame& obj) {obj.parsimPack(b);}

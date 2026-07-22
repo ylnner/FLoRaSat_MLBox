@@ -4,7 +4,9 @@ import inet.linklayer.base.MacProtocolBase;
 import inet.linklayer.contract.IMacProtocol;
 import inet.queueing.contract.IPacketQueue;
 
+import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_Analytical;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor;
+import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_BiLSTM;
 
 module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 {
@@ -51,7 +53,9 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
         int LoRaBW = default(125000);
         int LoRaCR = default(1);
 		
-		bool useMLBox = default(false);
+		bool useMLBox = default(false);		
+		bool useMLBoxBiLSTM = default(false);
+		bool useAnalytical = default(false);
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {
             parameters:
@@ -61,4 +65,14 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		mlBox: Transmission_Predictor if useMLBox{
 			 @display("p=100,250");
 		}
+	
+		mlBoxBiLSTM: Transmission_Predictor_BiLSTM if useMLBoxBiLSTM{
+			 @display("p=100,250");
+		}		
+		
+		predAnalytical: Transmission_Predictor_Analytical if useAnalytical{
+		    @display("p=100,250");
+		}
+		
+		
 }

@@ -23,40 +23,30 @@ namespace mlbox{
     class Transmission_Predictor: public Base_MLBox{
     private:
         //torch::jit::script::Module model;
-        int seq_length = 16;
+        int seq_length = 8;
         int num_features = 9;
         std::deque<std::vector<double>> window_buffer;
         std::string scalerPath;
+        //double threshold = 0.6437982;
+        //double threshold;
 
         // Transformer
-        /*
         const std::vector<double> means = {
-                48.474721364653256, 12.27788855033557, 8.380613159955256,
-                0.020485389261744966, 11.08165548098434, 1482.4965659843397,
-                712.2818791946308, 212.49161073825502
+                48.55624, 11.99590675, 9.738305531309523,
+                0.0206337, 11.033333333333333, -637.2126753574801,
+                715.0, 214.82142857142858
         };
 
 
         const std::vector<double> scales = {
-                8.470537422002296, 13.373158421026409, 18.80787765213579,
-                0.003554926938735937, 0.7808095021335768, 14601.095273656092,
-                88.56515294364773, 73.66997373619341
-        };
-        */
-        // BiLSTM
-
-        const std::vector<double> means = {
-                48.474721364653256, 12.27788855033557, 8.380613159955256,
-                0.020485389261744966, 11.08165548098434, 1482.4965659843397,
-                712.2818791946308, 212.49161073825502
+                8.630896169328729, 13.408186415520879, 17.75413475236267,
+                0.003885927908492385, 0.8359957469322968, 14639.724227730489,
+                88.94219631712659, 75.23750659052429
         };
 
+        const double mean_delta_t = 61.31933958104395;
+        const double scale_delta_t = 40.97636157062998;
 
-        const std::vector<double> scales = {
-                8.470537422002296, 13.373158421026409, 18.80787765213579,
-                0.003554926938735937, 0.7808095021335768, 14601.095273656092,
-                88.56515294364773, 73.66997373619341
-        };
 
     protected:
         torch::jit::script::Module scaler;
@@ -66,6 +56,7 @@ namespace mlbox{
         void loadModel() override;
         std::vector<double> predict(const std::vector<double>& features) override;
         std::vector<double> scaleFeatures(const std::vector<double>& rawFeatures);
+        double scaleDeltaTime (double raw_delta_time);
     };
 }
 

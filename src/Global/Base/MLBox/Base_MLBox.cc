@@ -14,7 +14,7 @@ Define_Module(Base_MLBox);
 void Base_MLBox::initialize(int stage){
     if (stage == inet::INITSTAGE_LOCAL) {
         modelPath = par("modelPath").stringValue();
-
+        threshold = par("threshold").doubleValue();
         if (!modelPath.empty()) {
             loadModel();
         } else {

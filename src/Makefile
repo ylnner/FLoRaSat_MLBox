@@ -98,6 +98,8 @@ OBJS = \
     $O/Nodes/_10_Terminal/_10_Physical/Ter_Phy_LoRaRadio.o \
     $O/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.o \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.o \
+    $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_Analytical.o \
+    $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.o \
     $O/Nodes/_10_Terminal/_30_Network/GroundForwardingTable.o \
     $O/Nodes/_10_Terminal/_30_Network/Ter_Net_TerminalRouting.o \
     $O/Nodes/_10_Terminal/_30_Network/routing/ddra/Ter_Net_DDRARouting.o \

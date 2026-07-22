@@ -16,12 +16,14 @@ void Transmission_Predictor::initialize(int stage){
 
     if (stage == inet::INITSTAGE_LOCAL) {
         scalerPath = par("scalerPath").stringValue();
+        //threshold = par("threshold").doubleValue();
     }
 }
 
 
 void Transmission_Predictor::loadModel(){
     // Loading model
+    EV << "Transformer model loaded "<<endl;
     model = torch::jit::load(modelPath);
     // Change to eval mode to predict
     model.eval();
@@ -34,10 +36,15 @@ std::vector<double> Transmission_Predictor::scaleFeatures(const std::vector<doub
     for (size_t i = 0; i < rawFeatures.size(); ++i) {
         // Standard Scaler Formula: z = (x - mean) / scale
         scaledFeatures[i] = (rawFeatures[i] - means[i]) / scales[i];
-        EV << "rawFeature: " << rawFeatures[i] <<endl;
-        EV << "scaled: " << scaledFeatures[i] <<endl;
+        //EV << "rawFeature: " << rawFeatures[i] <<endl;
+        //EV << "scaled: " << scaledFeatures[i] <<endl;
     }
     return scaledFeatures;
+}
+
+double Transmission_Predictor::scaleDeltaTime (double raw_delta_time){
+    double scaled_delta = (raw_delta_time - mean_delta_t) / scale_delta_t;
+    return scaled_delta;
 }
 
 std::vector<double> Transmission_Predictor::predict(const std::vector<double>& features){
@@ -70,51 +77,52 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
     // Call the model to predict
     try {
         std::vector<float> flattened;
-        // Transformer
-        /*
-        for (const auto& vec : window_buffer) {
-            for (double value : vec) {
-                flattened.push_back(static_cast<float>(value));
-            }
-        }
-        */
-
-        //Bi Lstm
-        ///*
         std::deque<std::vector<double>> buffer_copia = window_buffer;
 
         double lastTime = buffer_copia.back().back();
         const size_t TIME_INDEX = 8;
+        EV << "lastTime: " << lastTime<<endl;
 
         for (auto& row : buffer_copia) {
-            double deltaTime = lastTime - row[TIME_INDEX];
+            EV << "deltaTime: " << lastTime - row[TIME_INDEX]<<endl;
+            double deltaTime = scaleDeltaTime(lastTime - row[TIME_INDEX]);
+            //double deltaTime = lastTime - row[TIME_INDEX];
+            EV << "deltaTimeScaled: " << deltaTime<<endl;
             row[TIME_INDEX] = deltaTime;
         }
 
 
+        // Transformer
         for (const auto& vec : buffer_copia) {
             for (double value : vec) {
                 flattened.push_back(static_cast<float>(value));
             }
         }
-        //*/
-
 
         // Convert to a Tensor format
         at::Tensor input_tensor = torch::from_blob(flattened.data(),
                                     {1, seq_length, num_features},
                                     torch::kFloat32).clone();
 
-        //torch::NoGradGuard no_grad;
+        // 1. Ver el tamaño/forma (Shape)
+        EV << "Dimensiones (Sizes): " << input_tensor.sizes() << "\n";
+
+        // 2. Ver el tipo de datos (debería ser Float)
+        EV << "Tipo de datos: " << input_tensor.dtype() << "\n";
+
+        // 3. Ver el contenido completo
+        EV << "Tensor completo:\n" << input_tensor << "\n";
+
+        torch::NoGradGuard no_grad;
         // Run model
-        at::Tensor output = model.forward({input_tensor}).toTensor();
+        at::Tensor output = torch::sigmoid(model.forward({input_tensor}).toTensor());
 
         // Get the prediction
         float probability = output.item<float>();
 
         // Round to get final prediction
-        bool transmit = (probability >= 0.5);
-
+        bool transmit = (probability >= threshold);
+        EV << "Threshold: " << threshold <<endl;
         EV << "Probability of the model: " << probability
            << " -> Decision: " << (transmit ? "TRANSMIT (1)" : "NOT TRANSMIT (0)") << "\n";
 
@@ -126,92 +134,5 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
         return {1};
     }
 
-
-    /*
-    std::vector<float> current_features = {
-            1, 2, 3, 4, 5, 6, 7, 8,
-    };
-
-    for (int i =0; i< seq_length; i++){
-        // Insert at back of the buffer
-        window_buffer.push_back(current_features);
-    }
-    int prediction = -1;
-    std::vector<float> flattened;
-    for (const auto& vec : window_buffer) {
-        flattened.insert(flattened.end(), vec.begin(), vec.end());
-    }
-    // Convert to a Tensor format
-    at::Tensor input_tensor = torch::from_blob(flattened.data(),
-                                {1, seq_length, num_features},
-                                torch::kFloat32).clone();
-    // Run model
-    at::Tensor output = model.forward({input_tensor}).toTensor();
-    // Get the prediction
-    float probability = output.item<float>();
-    // Round to get final prediction
-    bool transmit = (probability >= 0.5);
-
-    EV << "Probability of the model: " << probability
-       << " -> Decision: " << (transmit ? "TRANSMIT (1)" : "NO TRANSMITIR (0)") << "\n";
-
-    return std::vector<float>{1};
-    */
 }
 
-
-/*
-void Ter_App_MLBox::handleMessage(cMessage *msg){
-    // 1. Extraer features del evento actual
-    std::vector<float> current_features; //= {f1, f2, f3, f4};
-
-    // Insert at back of the buffer
-    window_buffer.push_back(current_features);
-
-    // Maintain seq_lenght elements in the buffer
-    if (window_buffer.size() > seq_length) {
-        window_buffer.pop_front();
-    }
-
-    int prediction = -1;
-
-    // Check if the buffer reach the size of seq_length to make a prediction, otherwise returns a random number
-    if (window_buffer.size() == seq_length) {
-
-        // Crear el tensor de entrada [1, seq_length, num_features]
-        // Primero aplanamos el deque a un vector plano
-        std::vector<float> flattened;
-        for (const auto& vec : window_buffer) {
-            flattened.insert(flattened.end(), vec.begin(), vec.end());
-        }
-
-        // Convertir a Tensor
-        at::Tensor input_tensor = torch::from_blob(flattened.data(),
-                                    {1, seq_length, num_features},
-                                    torch::kFloat32).clone();
-
-        // Ejecutar Transformer
-        at::Tensor output = model.forward({input_tensor}).toTensor();
-
-
-    } else {
-        EV << "Buffer llenándose: " << window_buffer.size() << "/" << seq_length << "\n";
-        // Decisión por defecto mientras el buffer no está listo
-        prediction = intuniform(0,1);
-    }
-
-    if (prediction != -1){
-
-    }else{
-
-    }
-
-    std::vector<torch::jit::IValue> inputs;
-    inputs.push_back(torch::tensor({{0.5f, 1.2f, 0.8f}}));
-
-    auto output = model.forward(inputs).toTensor();
-    int decision = output.argmax(1).item<int>();
-
-    decision ? send(msg, "out") : delete msg;
-}
-*/

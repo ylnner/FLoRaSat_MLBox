@@ -20,5 +20,6 @@ simple Base_MLBox like Base_IMLBox
     parameters:
         @class(mlbox::Base_MLBox);
         string modelPath = default("");
+        double threshold = default(0.5);
      	
 }

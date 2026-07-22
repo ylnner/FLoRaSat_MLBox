@@ -4828,10 +4828,25 @@
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/FlatReceptionBase.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandReceptionBase.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ReceptionBase.h \
-  Global/Messages/_30_Network/Net_CstRoutingTag_m.h \
-  Global/Messages/_30_Network/DDRARoutingHeader_m.h \
-  Nodes/_10_Terminal/_40_Application/Ter_App.h \
-  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/NodeStatus.h \
+  Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_Analytical.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ScalarAnalogModelBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarNoise.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandNoiseBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NoiseBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/AnalogModelBase.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/BandListening.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ListeningBase.h \
+  Global/Channel/LoRaBandListening.h \
+  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h \
+  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h \
+  Global/Utilities/libnorad/cOrbitA.h Global/Utilities/libnorad/cTLE.h \
+  Global/Utilities/libnorad/cSite.h Global/Channel/LoRaAnalogModel.h \
+  Global/Channel/../../Nodes/_10_Terminal/_60_Mobility/Ter_Mob.h \
+  Nodes/_30_Station/_60_Mobility/Sta_Mob_StationMobility.h \
+  Global/Medium/DSL/LoRaMedium.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/medium/RadioMedium.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/medium/CommunicationLog.h \
+  Global/Utilities/Utils.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag_m.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/Message.h \
@@ -4849,18 +4864,19 @@
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/ActivePacketSinkBase.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/PacketSinkBase.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IActivePacketSink.h \
+  Nodes/_20_Satellite/Sat.h Global/Utilities/Constants.h \
+  Global/Utilities/ISLDirection.h Global/Utilities/ISLDirection_m.h \
+  Global/Utilities/ISLState.h Global/Utilities/PositionAwareBase.h \
+  Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h \
+  Global/Messages/_30_Network/Net_CstRoutingTag_m.h \
+  Global/Messages/_30_Network/DDRARoutingHeader_m.h \
+  Nodes/_10_Terminal/_40_Application/Ter_App.h \
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/NodeStatus.h \
   Global/Statistics/TransmissionStatistics/TransmissionStatistics.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETUtils.h \
   Global/Messages/_10_Physical/LoRaPhyPreamble_m.h \
   Global/Statistics/TransmissionStatistics/CstTransmissionStatisticsTag_m.h \
-  Global/Utilities/Utils.h Nodes/_10_Terminal/Ter.h \
-  Global/Utilities/Constants.h Global/Utilities/PositionAwareBase.h \
-  Global/Utilities/libnorad/cSite.h Global/Utilities/utils/SetUtils.h \
-  Nodes/_20_Satellite/Sat.h Global/Utilities/ISLDirection.h \
-  Global/Utilities/ISLDirection_m.h Global/Utilities/ISLState.h \
-  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h \
-  Global/Utilities/libnorad/cOrbitA.h Global/Utilities/libnorad/cTLE.h \
-  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h \
+  Nodes/_10_Terminal/Ter.h Global/Utilities/utils/SetUtils.h \
   Global/Messages/_40_Application/LoRaAppPacket_m.h
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/include/omnetpp.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/Packet.h:
@@ -9693,10 +9709,27 @@ Global/Base/MLBox/Base_MLBox.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/FlatReceptionBase.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandReceptionBase.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ReceptionBase.h:
-Global/Messages/_30_Network/Net_CstRoutingTag_m.h:
-Global/Messages/_30_Network/DDRARoutingHeader_m.h:
-Nodes/_10_Terminal/_40_Application/Ter_App.h:
-/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/NodeStatus.h:
+Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_Analytical.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ScalarAnalogModelBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/analogmodel/packetlevel/ScalarNoise.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NarrowbandNoiseBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/NoiseBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/AnalogModelBase.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/radio/packetlevel/BandListening.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/base/packetlevel/ListeningBase.h:
+Global/Channel/LoRaBandListening.h:
+Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h:
+Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h:
+Global/Utilities/libnorad/cOrbitA.h:
+Global/Utilities/libnorad/cTLE.h:
+Global/Utilities/libnorad/cSite.h:
+Global/Channel/LoRaAnalogModel.h:
+Global/Channel/../../Nodes/_10_Terminal/_60_Mobility/Ter_Mob.h:
+Nodes/_30_Station/_60_Mobility/Sta_Mob_StationMobility.h:
+Global/Medium/DSL/LoRaMedium.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/medium/RadioMedium.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/medium/CommunicationLog.h:
+Global/Utilities/Utils.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/TimeTag_m.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/packet/Message.h:
@@ -9714,22 +9747,21 @@ Nodes/_10_Terminal/_40_Application/Ter_App.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/ActivePacketSinkBase.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/base/PacketSinkBase.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/queueing/contract/IActivePacketSink.h:
+Nodes/_20_Satellite/Sat.h:
+Global/Utilities/Constants.h:
+Global/Utilities/ISLDirection.h:
+Global/Utilities/ISLDirection_m.h:
+Global/Utilities/ISLState.h:
+Global/Utilities/PositionAwareBase.h:
+Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h:
+Global/Messages/_30_Network/Net_CstRoutingTag_m.h:
+Global/Messages/_30_Network/DDRARoutingHeader_m.h:
+Nodes/_10_Terminal/_40_Application/Ter_App.h:
+/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/lifecycle/NodeStatus.h:
 Global/Statistics/TransmissionStatistics/TransmissionStatistics.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETUtils.h:
 Global/Messages/_10_Physical/LoRaPhyPreamble_m.h:
 Global/Statistics/TransmissionStatistics/CstTransmissionStatisticsTag_m.h:
-Global/Utilities/Utils.h:
 Nodes/_10_Terminal/Ter.h:
-Global/Utilities/Constants.h:
-Global/Utilities/PositionAwareBase.h:
-Global/Utilities/libnorad/cSite.h:
 Global/Utilities/utils/SetUtils.h:
-Nodes/_20_Satellite/Sat.h:
-Global/Utilities/ISLDirection.h:
-Global/Utilities/ISLDirection_m.h:
-Global/Utilities/ISLState.h:
-Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h:
-Global/Utilities/libnorad/cOrbitA.h:
-Global/Utilities/libnorad/cTLE.h:
-Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h:
 Global/Messages/_40_Application/LoRaAppPacket_m.h:

@@ -93,7 +93,12 @@ class Sat_Dsl_Dlk_kMac : public Base_MacProtocol {
         virtual void handleListenState(cMessage *msg);
         virtual void handleResponseState(cMessage *msg);
 
+        // ACHF
         int numReceptions = 0;
+        cOutVector vectorMethod_ReceptionResult;
+
+        cOutVector successfulRepetitionVector;
+        cOutVector successfulRepetitionVectorML;
 
 };
 

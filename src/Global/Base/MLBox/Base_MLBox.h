@@ -24,7 +24,7 @@ protected:
     std::string modelPath;
     torch::jit::script::Module model;
     bool isModelLoaded = false;
-
+    double threshold ;
 public:
     /**
      * @brief Main inference method.

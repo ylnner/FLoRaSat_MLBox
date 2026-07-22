@@ -187,6 +187,7 @@ void KiWanFrame::copy(const KiWanFrame& other)
     this->SNIR = other.SNIR;
     this->queuedAt = other.queuedAt;
     this->sentAt = other.sentAt;
+    this->repetitionML = other.repetitionML;
 }
 
 void KiWanFrame::parsimPack(omnetpp::cCommBuffer *b) const
@@ -200,6 +201,7 @@ void KiWanFrame::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->SNIR);
     doParsimPacking(b,this->queuedAt);
     doParsimPacking(b,this->sentAt);
+    doParsimPacking(b,this->repetitionML);
 }
 
 void KiWanFrame::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -213,6 +215,7 @@ void KiWanFrame::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->SNIR);
     doParsimUnpacking(b,this->queuedAt);
     doParsimUnpacking(b,this->sentAt);
+    doParsimUnpacking(b,this->repetitionML);
 }
 
 int KiWanFrame::getKind() const
@@ -303,6 +306,17 @@ void KiWanFrame::setSentAt(double sentAt)
     this->sentAt = sentAt;
 }
 
+int KiWanFrame::getRepetitionML() const
+{
+    return this->repetitionML;
+}
+
+void KiWanFrame::setRepetitionML(int repetitionML)
+{
+    handleChange();
+    this->repetitionML = repetitionML;
+}
+
 class KiWanFrameDescriptor : public omnetpp::cClassDescriptor
 {
   private:
@@ -316,6 +330,7 @@ class KiWanFrameDescriptor : public omnetpp::cClassDescriptor
         FIELD_SNIR,
         FIELD_queuedAt,
         FIELD_sentAt,
+        FIELD_repetitionML,
     };
   public:
     KiWanFrameDescriptor();
@@ -382,7 +397,7 @@ const char *KiWanFrameDescriptor::getProperty(const char *propertyName) const
 int KiWanFrameDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 8+base->getFieldCount() : 8;
+    return base ? 9+base->getFieldCount() : 9;
 }
 
 unsigned int KiWanFrameDescriptor::getFieldTypeFlags(int field) const
@@ -402,8 +417,9 @@ unsigned int KiWanFrameDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,    // FIELD_SNIR
         FD_ISEDITABLE,    // FIELD_queuedAt
         FD_ISEDITABLE,    // FIELD_sentAt
+        FD_ISEDITABLE,    // FIELD_repetitionML
     };
-    return (field >= 0 && field < 8) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 9) ? fieldTypeFlags[field] : 0;
 }
 
 const char *KiWanFrameDescriptor::getFieldName(int field) const
@@ -423,8 +439,9 @@ const char *KiWanFrameDescriptor::getFieldName(int field) const
         "SNIR",
         "queuedAt",
         "sentAt",
+        "repetitionML",
     };
-    return (field >= 0 && field < 8) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 9) ? fieldNames[field] : nullptr;
 }
 
 int KiWanFrameDescriptor::findField(const char *fieldName) const
@@ -439,6 +456,7 @@ int KiWanFrameDescriptor::findField(const char *fieldName) const
     if (strcmp(fieldName, "SNIR") == 0) return baseIndex + 5;
     if (strcmp(fieldName, "queuedAt") == 0) return baseIndex + 6;
     if (strcmp(fieldName, "sentAt") == 0) return baseIndex + 7;
+    if (strcmp(fieldName, "repetitionML") == 0) return baseIndex + 8;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -459,8 +477,9 @@ const char *KiWanFrameDescriptor::getFieldTypeString(int field) const
         "double",    // FIELD_SNIR
         "double",    // FIELD_queuedAt
         "double",    // FIELD_sentAt
+        "int",    // FIELD_repetitionML
     };
-    return (field >= 0 && field < 8) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 9) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **KiWanFrameDescriptor::getFieldPropertyNames(int field) const
@@ -559,6 +578,7 @@ std::string KiWanFrameDescriptor::getFieldValueAsString(omnetpp::any_ptr object,
         case FIELD_SNIR: return double2string(pp->getSNIR());
         case FIELD_queuedAt: return double2string(pp->getQueuedAt());
         case FIELD_sentAt: return double2string(pp->getSentAt());
+        case FIELD_repetitionML: return long2string(pp->getRepetitionML());
         default: return "";
     }
 }
@@ -583,6 +603,7 @@ void KiWanFrameDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int fi
         case FIELD_SNIR: pp->setSNIR(string2double(value)); break;
         case FIELD_queuedAt: pp->setQueuedAt(string2double(value)); break;
         case FIELD_sentAt: pp->setSentAt(string2double(value)); break;
+        case FIELD_repetitionML: pp->setRepetitionML(string2long(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'KiWanFrame'", field);
     }
 }
@@ -605,6 +626,7 @@ omnetpp::cValue KiWanFrameDescriptor::getFieldValue(omnetpp::any_ptr object, int
         case FIELD_SNIR: return pp->getSNIR();
         case FIELD_queuedAt: return pp->getQueuedAt();
         case FIELD_sentAt: return pp->getSentAt();
+        case FIELD_repetitionML: return pp->getRepetitionML();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'KiWanFrame' as cValue -- field index out of range?", field);
     }
 }
@@ -629,6 +651,7 @@ void KiWanFrameDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int
         case FIELD_SNIR: pp->setSNIR(value.doubleValue()); break;
         case FIELD_queuedAt: pp->setQueuedAt(value.doubleValue()); break;
         case FIELD_sentAt: pp->setSentAt(value.doubleValue()); break;
+        case FIELD_repetitionML: pp->setRepetitionML(omnetpp::checked_int_cast<int>(value.intValue())); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'KiWanFrame'", field);
     }
 }

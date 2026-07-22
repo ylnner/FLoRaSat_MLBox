@@ -62,7 +62,8 @@ def create_sequences_data(df, scaler, seq_length):
             time_target     = window_times[target_idx]
                         
             # Si un paquete ocurrió en el mismo segundo que el objetivo, delta_t = 0        
-            delta_t = (window_times - time_target).reshape(-1, 1)
+            #delta_t = (window_times - time_target).reshape(-1, 1)
+            delta_t = (time_target - window_times).reshape(-1, 1)
             #delta_t =  time_target - window_times
             #print('delta_t: ', delta_t)
             

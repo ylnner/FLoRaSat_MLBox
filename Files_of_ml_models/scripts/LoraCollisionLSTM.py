@@ -20,7 +20,7 @@ import time
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 class LoraCollisionLSTM(nn.Module):
-    def __init__(self, num_features=9, hidden_size=64, num_layers=2, dropout=0.1, is_bidirectional=True):
+    def __init__(self, num_features=9, hidden_size=64, num_layers=2, dropout=0.1, is_bidirectional=True, add_sigmoidal=True):
         super().__init__()
         
         # Bidirectional LSTM Bidireccional        
@@ -37,14 +37,22 @@ class LoraCollisionLSTM(nn.Module):
         direction_factor = 2 if is_bidirectional else 1
 
         # Classifier, similar to Transformer model        
-        # Como es Bidireccional, genera el doble de características (hidden_size * 2) # porque concatena lo que aprendió yendo hacia adelante y hacia atrás.        
-        self.classifier = nn.Sequential(
-            nn.Linear(hidden_size * direction_factor, 32),            
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(32, 1),
-            nn.Sigmoid()
-        )
+        # Como es Bidireccional, genera el doble de características (hidden_size * 2) # porque concatena lo que aprendió yendo hacia adelante y hacia atrás.
+        if add_sigmoidal:
+            self.classifier = nn.Sequential(
+                nn.Linear(hidden_size * direction_factor, 32),            
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(32, 1),
+                nn.Sigmoid()
+            )
+        else:
+            self.classifier = nn.Sequential(
+                nn.Linear(hidden_size * direction_factor, 32),            
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(32, 1)
+            )
 
     def forward(self, x):
         # Doc oficial.

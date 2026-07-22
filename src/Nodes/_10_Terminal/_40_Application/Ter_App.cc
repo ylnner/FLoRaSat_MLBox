@@ -44,12 +44,6 @@ void Ter_App::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {
         cModule *containing = getContainingNode(this);
         receivedPackets = 0;
-
-        //mlbox = check_and_cast<Transmission_Predictor*>(getSubmodule("mlBox"));
-        //mlbox = check_and_cast<Transmission_Predictor*>(getSystemModule()->getSubmodule("transmissionPredictor"));
-
-        // load model
-        //mlbox->loadModel();
     }
 
 

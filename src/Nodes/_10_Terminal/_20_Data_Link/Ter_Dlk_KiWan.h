@@ -16,6 +16,8 @@
 #include "Global/Utilities/libnorad/cEcef.h"
 //#include "Global/Transmission_Predictor/Transmission_Predictor.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.h"
+#include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_Analytical.h"
+#include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h"
 
 using namespace mlbox;
 using namespace omnetpp;
@@ -119,6 +121,9 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         static int globalPacketID;  // Shared packet ID for all nodes
         int currentTwCount;         // Current transmission window count
         int currentTxCount;         // Current transmission count in the window
+        // ACHF
+        int currentTxCountML;
+
         double ttxStart;            // Time to start transmission
         double ttxIdle;             // Idle time between transmissions
         simtime_t windowStartTime;  // Start time of current transmission window
@@ -144,10 +149,20 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
 
         // statistics for ML
         int numTransmissionsApproved = 0;
+        //int numTransmissionsApprovedTransformer = 0;
+        //int numTransmissionsApprovedBiLSTM = 0;
+
+        cOutVector vector_preds_BiLSTM;
+        cOutVector vector_preds_Transformer;
+        cOutVector vector_preds_Analytical;
     protected:
         Transmission_Predictor *mlBox;
+        Transmission_Predictor_BiLSTM *mlBoxBiLSTM;
+        Transmission_Predictor_Analytical *predAnalytical;
 
         bool mlBoxAvailable = false;
+        bool mlBoxAvailableBiLSTM = false;
+        bool analyticalAvailable = false;
 
 }; // namespace mac
 

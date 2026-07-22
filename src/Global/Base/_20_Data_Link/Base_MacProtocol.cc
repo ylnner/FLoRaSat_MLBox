@@ -243,6 +243,12 @@ void Base_MacProtocol::receiveSignal(cComponent *source, simsignal_t signalID, c
 
 double Base_MacProtocol::computeTimeOnAir(int packetLenBits, int SF, int BW, int CR)
 {
+    EV << "Base_MacProtocol::computeTimeOnAir" <<endl;
+    EV << "packetLenBits : " << packetLenBits <<endl;
+    EV << "SF : " << SF <<endl;
+    EV << "BW : " << BW <<endl;
+    EV << "CR : " << CR <<endl;
+
     const int nPreamble = 8;
     const double payloadBytes = static_cast<double>(packetLenBits) / 8.0;
 
@@ -250,11 +256,13 @@ double Base_MacProtocol::computeTimeOnAir(int packetLenBits, int SF, int BW, int
     payloadSymbNb += std::ceil((8 * payloadBytes - 4 * SF + 28 + 16 - 20 * 0) / (4 * (SF - 2 * 0))) * (CR + 4);
     if (payloadSymbNb < 8)
         payloadSymbNb = 8;
+    EV << "payloadSymbNb : " << payloadSymbNb <<endl;
 
     const double Tsym = std::pow(2, SF) / BW;
     const double Tpreamble = (nPreamble + 4.25) * Tsym;
     const double Theader = 0.5 * (8 + payloadSymbNb) * Tsym;
     const double Tpayload = 0.5 * (8 + payloadSymbNb) * Tsym;
+    EV << "Tpayload : " << Tpayload <<endl;
 
     return Tpreamble + Theader + Tpayload;
 }

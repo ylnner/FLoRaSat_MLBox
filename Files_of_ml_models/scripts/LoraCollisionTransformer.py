@@ -14,10 +14,9 @@ import time
 from TimePositionalEncoding import TimePositionalEncoding
 
 class LoraCollisionTransformer(nn.Module):        
-    def __init__(self, num_numerical_features, d_model=64, n_heads=4, n_layers=2, dropout=0.1):
+    def __init__(self, num_numerical_features, d_model=64, n_heads=4, n_layers=2, dropout=0.1, add_sigmoid=True):
         # num_numerical_features- cantidad de variables fisicas (features)    
-        # d_model               - Es la dimensión de representación interna del Transformer. Piensa en esto como la cantidad de "canales de información" que el modelo 
-        #                         usará internamente para describir cada paquete. Todo el procesamiento profundo se hará en esta dimensión.
+        # d_model               - Es la dimensión de representación interna del Transformer. 
         # n_heads               - Le dice al Transformer en cuántas perspectivas diferentes debe dividir su atención.
         # n_layers              - Cuántas veces se repite el proceso de análisis (cuántos bloques Transformer se apilan).
         # dropout               - 
@@ -39,13 +38,22 @@ class LoraCollisionTransformer(nn.Module):
                                                    dim_feedforward=d_model*4, dropout=dropout, batch_first=True)        
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
         
-        self.classifier = nn.Sequential(
-            nn.Linear(d_model, 32),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(32, 1),
-            nn.Sigmoid()
-        )
+        if add_sigmoid:
+            self.classifier = nn.Sequential(
+                nn.Linear(d_model, 32),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(32, 1),
+                nn.Sigmoid()
+            )
+        else:            
+            self.classifier = nn.Sequential(
+                nn.Linear(d_model, 32),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(32, 1)
+            )
+
 
     def forward(self, x):
         # x shape: (Batch, Seq_Length, Features = 7) -> 6 físicas + 1 Delta_t

@@ -79,6 +79,12 @@ void Sat_Dsl_Dlk_kMac::initialize(int stage) {
         repetitionPositionVector = new cOutVector("Satellite Position when Repetition Received");
         duplicationPositionVector = new cOutVector("Satellite Position when Duplication Received");
 
+        // vector for ML metric
+        vectorMethod_ReceptionResult.setName("VectorTransmitMethod_ReceptionResult");
+
+        successfulRepetitionVector.setName("Successful Repetition Number counted for MAC protocol");
+        successfulRepetitionVectorML.setName("Successful Repetition Number counted for the Model");
+
         scheduleAt(simTime(), this->eventStartListening);
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
@@ -87,7 +93,7 @@ void Sat_Dsl_Dlk_kMac::initialize(int stage) {
 }
 
 void Sat_Dsl_Dlk_kMac::finish() {
-    
+
     sendingDelayVectors.clear();
     generationDelayVectors.clear();
     repSendingDelayVectors.clear();
@@ -198,6 +204,10 @@ void Sat_Dsl_Dlk_kMac::handleLowerMessage(cMessage *msg) {
         
         // for ML Box metric
         this->numReceptions++;
+        // Encpasulate the Id Frame x 100 + Repetition
+        double itemVectorReceptionResult  = (frame->getId() * 100) + (frame->getRepetition());
+        vectorMethod_ReceptionResult.record(itemVectorReceptionResult);
+
 
         // Track per-node statistics
         int nodeId = frame->getSrcId();
@@ -284,6 +294,20 @@ void Sat_Dsl_Dlk_kMac::handleLowerMessage(cMessage *msg) {
                         << ", generation delay: " << packetDelayFromGeneration
                         << ", satellite position: (" << satLatitude << ", " << satLongitude << ")" << endl;
                 
+                // ACHF
+                // Save the number of repetition in the reception
+                int successfulRep = frame->getRepetition();
+                successfulRepetitionVector.record(successfulRep);
+
+                int successfulRepML = frame->getRepetitionML();
+                successfulRepetitionVectorML.record(successfulRepML);
+
+                if (successfulRepML < successfulRep){
+                    EV << "successfulRepML < successfulRep"<<endl;
+                }
+                EV_INFO << "Received frame: " << frameId << " successfully at repetition: " << successfulRep << " repetitioML: " << successfulRepML << endl;
+
+
                 // Create unique frame vectors if not exists
                 if (sendingDelayVectors.find(nodeId) == sendingDelayVectors.end()) {
                     std::string vectorName = "Message Sending Delay for Node " + std::to_string(nodeId) + " at Satellite";

@@ -97,6 +97,9 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         ttxIdle = 0;
         windowStartTime = 0;
         
+        //ACHF
+        currentTxCountML = 0;
+
         // Initialize detection state
         currentDetectCount = 0;
         currentSyncCount = 0;
@@ -122,9 +125,23 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         currentState = KIWAN_IDLE;
 
         //mlBox = check_and_cast<Transmission_Predictor*>(getSystemModule()->getSubmodule("transmissionPredictor"));
+        vector_preds_BiLSTM.setName("vector_preds_BiLSTM");
+        vector_preds_Transformer.setName("vector_preds_Transformer");
+        vector_preds_Analytical.setName("vector_preds_Analytical");
+
         mlBoxAvailable = par("useMLBox").boolValue();
         if( mlBoxAvailable ){
             mlBox = check_and_cast<mlbox::Transmission_Predictor *>(getSubmodule("mlBox"));
+        }
+
+        mlBoxAvailableBiLSTM = par("useMLBoxBiLSTM").boolValue();
+        if(mlBoxAvailableBiLSTM){
+            mlBoxBiLSTM = check_and_cast<mlbox::Transmission_Predictor_BiLSTM *>(getSubmodule("mlBoxBiLSTM"));
+        }
+
+        analyticalAvailable = par("useAnalytical").boolValue();
+        if(analyticalAvailable){
+            predAnalytical = check_and_cast<Transmission_Predictor_Analytical *>(getSubmodule("predAnalytical"));
         }
 
     }
@@ -140,6 +157,8 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("successfulDetections", this->numSuccessfulDetections);
 
     recordScalar("numTransmissionsApproved", this->numTransmissionsApproved);
+    //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
+    //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
 
 }
 
@@ -309,7 +328,7 @@ void Ter_Dlk_KiWan::startTransmissionWindow() {
         
         // Reset transmission counter for this window
         currentTxCount = 0;
-        
+        currentTxCountML = 0;
         // Check if satellite detection is enabled for this window
         if (enableSatDetect) {
             // Start satellite detection phase for this window
@@ -364,6 +383,7 @@ void Ter_Dlk_KiWan::startTransmissionsInWindow() {
     
     // Reset transmission counter for this window
     currentTxCount = 0;
+    currentTxCountML = 0;
     
     // Schedule the first transmission after ttxStart delay randomly within ttxStart_min and ttxStart_max
     ttxStart = uniform(ttxStart_min, ttxStart_max);
@@ -397,6 +417,8 @@ void Ter_Dlk_KiWan::sendData() {
             std::cout << "Node " << address << " at time " << simTime() << ": sending transmission #" << (currentTxCount + 1) 
                     << " in window #" << currentTwCount << endl;
         }
+        EV << "Node " << address << " at time " << simTime() << ": sending transmission #" << (currentTxCount + 1)
+                << " in window #" << currentTwCount << endl;
         
         EV << "Ter_Dlk_KiWan::sendData" <<endl;
         EV << "time_1= " << simTime().dbl() <<endl;
@@ -413,7 +435,15 @@ void Ter_Dlk_KiWan::sendData() {
         
         // Update the transmission-specific fields
         int repetitionNumber = ((currentTwCount - 1) * Ntx) + (currentTxCount + 1);
+        EV << "repetitionNumber: " << repetitionNumber <<endl;
         newFrame->setRepetition(repetitionNumber);
+
+        //ACHF
+        int repetitionNumberML = ((currentTwCount - 1) * Ntx) + (currentTxCountML + 1);
+        EV << "repetitionNumberML: " << repetitionNumberML <<endl;
+        newFrame->setRepetitionML(repetitionNumberML);
+
+
         newFrame->setSentAt(simTime().dbl());
         
         // Insert the frame
@@ -433,6 +463,8 @@ void Ter_Dlk_KiWan::sendData() {
             std::cout << "Node " << address << " at time " << simTime()
                       << ": sending frame with ID: " << newFrame->getId() << endl;
         }
+        EV << "Node " << address << " at time " << simTime()
+                  << ": sending frame with ID: " << newFrame->getId() << endl;
 
         EV << "Ter_Dlk_KiWan::sendData" <<endl;
 
@@ -455,6 +487,7 @@ void Ter_Dlk_KiWan::sendData() {
         Ter *ter             = check_and_cast<Ter *>(getParentModule()->getParentModule());
         double loRaTP        = ter->getSubmodule("app")->par("initialLoRaTP").doubleValue();
         int loRaSF           = ter->getSubmodule("app")->par("initialLoRaSF");
+        double timeToNextPacket = ter->getSubmodule("app")->par("timeToNextPacket").doubleValue();
 
         float latDev  = float(ter->getLatitude());
         float longDev = float(ter->getLongitude());
@@ -541,30 +574,77 @@ void Ter_Dlk_KiWan::sendData() {
         //std::vector<float> myFeatures = std::vector<float>({latDev, longDev, elevSat, loraTP, loraSF, doppler, alt, raan});
 
         EV << "elevSat_temp= " << elevSat_temp <<endl;
+        double transmissionId = (newFrame->getId() * 100) + (newFrame->getRepetition());
+
+
 
         bool transmit = true;
         if(mlBoxAvailable){
+            /*
+             * Transformer-Encoder
+             * */
+
+            std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
+            // For Transformer
+            std::vector<double> myFeatures_2 = mlBox->scaleFeatures(myFeatures);
+
+            myFeatures_2.push_back(simTime().dbl());
+
+            std::vector<double> output = mlBox->predict(myFeatures_2);
+            transmit = static_cast<bool>(output[0]);
+
+            EV << "After execute model transmit: " << transmit <<endl;
+            double element_vector = transmissionId;
+            if (transmit)
+                element_vector = element_vector + 0.1;
+
+            EV << "Transformer element_vector: " << element_vector <<endl;
+            vector_preds_Transformer.record(element_vector);
+        }else if (analyticalAvailable){
+            /*
+             * Analytical
+             * */
+
+            double pred_analytical = predAnalytical->predict(loraSF, dopplerShift, timeToNextPacket);
+            EV <<"pred_analytical: " << pred_analytical <<endl;
+            transmit = static_cast<bool>(pred_analytical);
+
+            EV << "After execute model: " << transmit <<endl;
+        }else if(mlBoxAvailableBiLSTM){
+            /*
+             * Bi-LSTM
+             * */
+
+            bool transmitBiLSTM = false;
             std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
 
-            // For Transformer
-            //std::vector<double> output = mlBox->predict(mlBox->scaleFeatures(myFeatures));
-
             // For LSTM
-            std::vector<double> myFeatures_2 = mlBox->scaleFeatures(myFeatures);
+            std::vector<double> myFeatures_2 = mlBoxBiLSTM->scaleFeatures(myFeatures);
             myFeatures_2.push_back(simTime().dbl());
-            std::vector<double> output = mlBox->predict(myFeatures_2);
+            std::vector<double> output = mlBoxBiLSTM->predict(myFeatures_2);
 
 
             transmit = static_cast<bool>(output[0]);
             EV << "After execute model: " << transmit <<endl;
+
+            double element_vector = transmissionId;
+            if (transmit)
+                element_vector = element_vector + 0.1;
+
+            EV << "BiLSTM element_vector: " << element_vector <<endl;
+            vector_preds_BiLSTM.record(element_vector);
+
+
         }
+
 
         if(transmit){
             sendDown(frameCopy);
-
             this->numTransmissionsApproved++;
+            currentTxCountML++;
         }
 
+        //sendDown(frameCopy);
 
         this->numTransmissions++;
 
@@ -579,6 +659,8 @@ void Ter_Dlk_KiWan::sendData() {
                 std::cout << "Node " << address << " at time " << simTime() << ": scheduling next transmission in window #" << currentTwCount
                         << " after " << ttxIdle << " seconds" << endl;
             }
+            EV << "Node " << address << " at time " << simTime() << ": scheduling next transmission in window #" << currentTwCount
+                    << " after " << ttxIdle << " seconds" << endl;
             scheduleAt(simTime() + ttxIdle, this->eventTransmitData);
         }
 
@@ -593,6 +675,7 @@ void Ter_Dlk_KiWan::sendDown(cMessage *message)
 
 
 Packet *Ter_Dlk_KiWan::encapsulate(Packet *msg) {
+    EV << "Ter_Dlk_KiWan::encapsulate"<<endl;
     auto frame = makeShared<KiWanFrame>();
     frame->setKind(UL_DATA);
     frame->setId(globalPacketID); // Use the shared global packet ID

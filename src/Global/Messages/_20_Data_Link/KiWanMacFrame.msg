@@ -29,4 +29,6 @@ class KiWanFrame extends Base_MacFrame {
     // Use to compute delay
     double queuedAt;
     double sentAt;
+    
+    int repetitionML;
 }

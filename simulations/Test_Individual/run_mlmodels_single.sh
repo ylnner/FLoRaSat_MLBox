@@ -20,11 +20,12 @@ opp_run -m -f "Test_MLModel_1.ini" -u Cmdenv \
 --image-path="../../images:../../../../samples/inet4.5_2/images" \
 -l "../../src/florasat" \
 -l "../../../../samples/inet4.5_2/src/INET" \
-"--*.satellite[0].NoradModule.raan=185" \
 "--*.stats_raan=185" \
 "--*.stats_altitude=670"
-#--output-scalar-file="\${resultdir}/\${configname}-raan$raan-\${runnumber}.sca" \
-#--output-vector-file="\${resultdir}/\${configname}-raan$raan-\${runnumber}.vec"
+#"--*.satellite[0].NoradModule.raan=185" \
+
+#--output-scalar-file="\${resultdir}/\${configname}-transformer-\${runnumber}.sca" \
+#--output-vector-file="\${resultdir}/\${configname}-transformer-\${runnumber}.vec"
 
 
 echo "Todas las simulaciones han terminado."

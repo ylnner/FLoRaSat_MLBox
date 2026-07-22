@@ -209,6 +209,9 @@ void Ter_Phy_LoRaRadio::handleUpperPacket(Packet *packet)
 
     // ACHF
     //loraTag->setPower(W(math::dBmW2mW(loRaTP)));
+    EV << "Ter_Phy_LoRaRadio::handleUpperPacket" <<endl;
+    EV << "frame->getLoRaTP(): " << frame->getLoRaTP() <<endl;
+    EV << "mW(frame->getLoRaTP()): " << mW(frame->getLoRaTP()) <<endl;
     preamble->setPower(mW(frame->getLoRaTP())); // Equal to Benoit MIgration
     //preamble->setPower(W(math::dBmW2mW(frame->getLoRaTP())));
 

@@ -12,7 +12,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/ylnner/Documents/omnet++/omnetpp-6
 for raan in "${RAAN_VALUES[@]}"
 do
     echo "====================================================="
-    echo "Iniciando simulacion MLMoedl con raan = $raan"
+    echo "Iniciando simulacion for model con raan = $raan"
     echo "====================================================="
 
 opp_run -m -f "Test_MLModel_1.ini" -u Cmdenv \
@@ -24,8 +24,8 @@ opp_run -m -f "Test_MLModel_1.ini" -u Cmdenv \
     "--*.satellite[0].NoradModule.raan=$raan" \
     "--*.stats_raan=$raan" \
     "--*.stats_altitude=670" \
-    --output-scalar-file="\${resultdir}/\${configname}-raan$raan-\${runnumber}.sca" \
-    --output-vector-file="\${resultdir}/\${configname}-raan$raan-\${runnumber}.vec"
+    #--output-scalar-file="\${resultdir}/\${configname}-raan$raan-\${runnumber}.sca" \
+    #--output-vector-file="\${resultdir}/\${configname}-raan$raan-\${runnumber}.vec"
 done
 
 echo "Todas las simulaciones han terminado."
