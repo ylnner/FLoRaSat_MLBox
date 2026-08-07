@@ -67,7 +67,6 @@ OBJS = \
     $O/Global/Transceiver/LoRaReception.o \
     $O/Global/Transceiver/LoRaTransmission.o \
     $O/Global/Transceiver/LoRaTransmitter.o \
-    $O/Global/Transmission_Predictor/Transmission_Predictor.o \
     $O/Global/Utilities/CSVReader.o \
     $O/Global/Utilities/FloraSignals.o \
     $O/Global/Utilities/ISLDirection.o \
@@ -100,6 +99,8 @@ OBJS = \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.o \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_Analytical.o \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.o \
+    $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.o \
+    $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.o \
     $O/Nodes/_10_Terminal/_30_Network/GroundForwardingTable.o \
     $O/Nodes/_10_Terminal/_30_Network/Ter_Net_TerminalRouting.o \
     $O/Nodes/_10_Terminal/_30_Network/routing/ddra/Ter_Net_DDRARouting.o \

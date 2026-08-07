@@ -1,0 +1,4399 @@
+version 3
+run General-136-20260805-18:04:52-87901
+attr configname General
+attr datetime 20260805-18:04:52
+attr datetimef 20260805-180452
+attr experiment General
+attr inifile Test_MLModel_8.ini
+attr iterationvars "$myraan=175, $threshold=0.40, $0=27456"
+attr iterationvarsd myraan=175/threshold=0.40/27456
+attr iterationvarsf myraan=175,threshold=0.40,27456-
+attr measurement "$myraan=175, $threshold=0.40, $0=27456"
+attr network Florasat.Test_Individual.Florasat_Individual_Sats
+attr processid 87901
+attr repetition 6
+attr replication #6
+attr resultdir results
+attr runnumber 136
+attr seedset 136
+itervar myraan 175
+itervar threshold 0.40
+config *.stats_altitude 670
+config *.stats_raan 185
+config image-path ../../images:../../../../samples/inet4.5_2/images
+config network Florasat.Test_Individual.Florasat_Individual_Sats
+config rng-class cMersenneTwister
+config *.**.result-recording-modes -
+config **.result-recording-modes -
+config **.statistic-recording true
+config **.scalar-recording true
+config **.vector-recording true
+config **.vector-record-eventnumbers true
+config repeat 10
+config seed-0-mt 27456
+config sim-time-limit 749s
+config simtime-resolution -11
+config **.stats_altitude 670
+config **.stats_raan 185
+config *.radioMedium.backgroundNoise.power -110dBm
+config *.radioMedium.mediumLimitCache.centerFrequency 868MHz
+config *.radioMedium.mediumLimitCache.maxTransmissionDuration 4s
+config *.radioMedium.mediumLimitCache.minInterferenceTime 0s
+config **.numSatellites 1
+config *.satellite[*].mobilityType "\"Sat_Mob_SatelliteMobility_Standalone\""
+config *.satellite[*].noradModuleType "\"Sat_Mob_NoradA\""
+config **.satellite[*].**.initFromDisplayString false
+config *.satellite[*].mobility.faceForward true
+config *.satellite[*].mobility.updateInterval 20s
+config *.satellite[*].NoradModule.satName "\"FLoRaSat\""
+config *.satellite[*].NoradModule.satIndex -1
+config *.satellite[*].NoradModule.baseYear 20
+config *.satellite[*].NoradModule.baseDay 1.5
+config *.satellite[*].NoradModule.planes 1
+config *.satellite[*].NoradModule.satPerPlane 1
+config *.satellite[*].NoradModule.eccentricity 0.000001
+config *.satellite[*].NoradModule.inclination 98
+config *.satellite[*].NoradModule.altitude 670
+config *.satellite[0].NoradModule.raan 175
+config *.satellite[0].NoradModule.meanAnomaly 195
+config *.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap true
+config *.satellite[*].phyDSL.radio.receiver.minCollisionOverlap 0s
+config *.satellite[*].phyDSL.radio.antenna.typename ConstantGainAntenna
+config *.satellite[*].phyDSL.radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config *.satellite[*].phyISL.radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config *.satellite[*].phyGSL.radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config *.satellite[*].phyDSL.radio.antenna.gain 12dB
+config *.satellite[*].net.routingType "\"Null_Routing\""
+config *.terminal[*].net.routingType "\"Ter_Null_Routing\""
+config *.**.numGroundLinks 40
+config *.satellite[*].**.interfaceTableModule "\"\""
+config **.radioMedium.typename LoRaMedium
+config **.radioMedium.analogModel.typename LoRaAnalogModel
+config **.intraPlaneIslDisabled false
+config **.interPlaneIslDisabled false
+config **.numTerminals 60
+config *.terminal[*].phy.radio.antenna.mobilityModule "\"^.^.^.mob\""
+config *.terminal[*].dlk.mac.interfaceTableModule "\"\""
+config *.terminal[*].dlk.energySourceModule "\"\""
+config *.terminal[*].dlk.mac.LoRaTP "intuniform(12, 14)"
+config *.terminal[*].dlk.mac.LoRaSF "intuniform(10, 12)"
+config *.terminal[*].dlk.mac.useMLBox true
+config *.terminal[*].dlk.mac.mlBox.modelPath "\"/home/ylnner/Documents/omnet++/omnetpp-6.3.0/projects/florasat_v4_ult_routing/simulations/Test_Individual/mlmodels/transformer_scripted.pt\""
+config *.terminal[*].dlk.mac.mlBox.threshold 0.40
+config *.terminal[*].dlk.mac.mlBox.coldStart true
+config **.numberOfPacketsToSend 0
+config **.timeToFirstPacket 1s
+config **.timeToNextPacket 115s
+config *.terminal[0].mob.radius 0.0
+config *.terminal[0].mob.centerLatitude 54.978
+config *.terminal[0].mob.centerLongitude -1.617
+config *.terminal[1].mob.radius 0.0
+config *.terminal[1].mob.centerLatitude 52.630
+config *.terminal[1].mob.centerLongitude -1.139
+config *.terminal[2].mob.radius 0.0
+config *.terminal[2].mob.centerLatitude 52.612
+config *.terminal[2].mob.centerLongitude -6.295
+config *.terminal[3].mob.radius 0.0
+config *.terminal[3].mob.centerLatitude 47.243
+config *.terminal[3].mob.centerLongitude 6.024
+config *.terminal[4].mob.radius 0.0
+config *.terminal[4].mob.centerLatitude 43.610
+config *.terminal[4].mob.centerLongitude 3.876
+config *.terminal[5].mob.radius 0.0
+config *.terminal[5].mob.centerLatitude 49.443
+config *.terminal[5].mob.centerLongitude 1.099
+config *.terminal[6].mob.radius 0.0
+config *.terminal[6].mob.centerLatitude 37.992
+config *.terminal[6].mob.centerLongitude -1.130
+config *.terminal[7].mob.radius 0.0
+config *.terminal[7].mob.centerLatitude 40.965
+config *.terminal[7].mob.centerLongitude -5.664
+config *.terminal[8].mob.radius 0.0
+config *.terminal[8].mob.centerLatitude 40.657
+config *.terminal[8].mob.centerLongitude -7.914
+config *.terminal[9].mob.radius 0.0
+config *.terminal[9].mob.centerLatitude 51.340
+config *.terminal[9].mob.centerLongitude 12.373
+config *.terminal[10].mob.radius 0.0
+config *.terminal[10].mob.centerLatitude 51.455
+config *.terminal[10].mob.centerLongitude 7.011
+config *.terminal[11].mob.radius 0.0
+config *.terminal[11].mob.centerLatitude 49.452
+config *.terminal[11].mob.centerLongitude 11.076
+config *.terminal[12].mob.radius 0.0
+config *.terminal[12].mob.centerLatitude 43.769
+config *.terminal[12].mob.centerLongitude 11.255
+config *.terminal[13].mob.radius 0.0
+config *.terminal[13].mob.centerLatitude 41.117
+config *.terminal[13].mob.centerLongitude 16.871
+config *.terminal[14].mob.radius 0.0
+config *.terminal[14].mob.centerLatitude 52.132
+config *.terminal[14].mob.centerLongitude 5.291
+config *.terminal[15].mob.radius 0.0
+config *.terminal[15].mob.centerLatitude 50.411
+config *.terminal[15].mob.centerLongitude 4.444
+config *.terminal[16].mob.radius 0.0
+config *.terminal[16].mob.centerLatitude 47.559
+config *.terminal[16].mob.centerLongitude 7.588
+config *.terminal[17].mob.radius 0.0
+config *.terminal[17].mob.centerLatitude 55.403
+config *.terminal[17].mob.centerLongitude 10.402
+config *.terminal[18].mob.radius 0.0
+config *.terminal[18].mob.centerLatitude 59.858
+config *.terminal[18].mob.centerLongitude 17.638
+config *.terminal[19].mob.radius 0.0
+config *.terminal[19].mob.centerLatitude 60.451
+config *.terminal[19].mob.centerLongitude 22.266
+config *.terminal[20].mob.radius 0.0
+config *.terminal[20].mob.centerLatitude 56.325
+config *.terminal[20].mob.centerLongitude 22.349
+config *.terminal[21].mob.radius 0.0
+config *.terminal[21].mob.centerLatitude 49.883
+config *.terminal[21].mob.centerLongitude 18.568
+config *.terminal[22].mob.radius 0.0
+config *.terminal[22].mob.centerLatitude 47.531
+config *.terminal[22].mob.centerLongitude 21.627
+config *.terminal[23].mob.radius 0.0
+config *.terminal[23].mob.centerLatitude 44.179
+config *.terminal[23].mob.centerLongitude 28.649
+config *.terminal[24].mob.radius 0.0
+config *.terminal[24].mob.centerLatitude 45.327
+config *.terminal[24].mob.centerLongitude 14.442
+config *.terminal[25].mob.radius 0.0
+config *.terminal[25].mob.centerLatitude 40.694
+config *.terminal[25].mob.centerLongitude 30.400
+config *.terminal[26].mob.radius 0.0
+config *.terminal[26].mob.centerLatitude 37.066
+config *.terminal[26].mob.centerLongitude 37.383
+config *.terminal[27].mob.radius 0.0
+config *.terminal[27].mob.centerLatitude 64.836
+config *.terminal[27].mob.centerLongitude -23.708
+config *.terminal[28].mob.radius 0.0
+config *.terminal[28].mob.centerLatitude 28.099
+config *.terminal[28].mob.centerLongitude -17.113
+config *.terminal[29].mob.radius 0.0
+config *.terminal[29].mob.centerLatitude 34.921
+config *.terminal[29].mob.centerLongitude 33.623
+config *.terminal[30].mob.radius 0.0
+config *.terminal[30].mob.centerLatitude 55.953
+config *.terminal[30].mob.centerLongitude -3.188
+config *.terminal[31].mob.radius 0.0
+config *.terminal[31].mob.centerLatitude 51.481
+config *.terminal[31].mob.centerLongitude -3.179
+config *.terminal[32].mob.radius 0.0
+config *.terminal[32].mob.centerLatitude 53.349
+config *.terminal[32].mob.centerLongitude -6.260
+config *.terminal[33].mob.radius 0.0
+config *.terminal[33].mob.centerLatitude 45.764
+config *.terminal[33].mob.centerLongitude 4.835
+config *.terminal[34].mob.radius 0.0
+config *.terminal[34].mob.centerLatitude 48.573
+config *.terminal[34].mob.centerLongitude 7.752
+config *.terminal[35].mob.radius 0.0
+config *.terminal[35].mob.centerLatitude 44.837
+config *.terminal[35].mob.centerLongitude -0.579
+config *.terminal[36].mob.radius 0.0
+config *.terminal[36].mob.centerLatitude 41.385
+config *.terminal[36].mob.centerLongitude 2.173
+config *.terminal[37].mob.radius 0.0
+config *.terminal[37].mob.centerLatitude 41.157
+config *.terminal[37].mob.centerLongitude -8.629
+config *.terminal[38].mob.radius 0.0
+config *.terminal[38].mob.centerLatitude 37.389
+config *.terminal[38].mob.centerLongitude -5.984
+config *.terminal[39].mob.radius 0.0
+config *.terminal[39].mob.centerLatitude 53.551
+config *.terminal[39].mob.centerLongitude 9.993
+config *.terminal[40].mob.radius 0.0
+config *.terminal[40].mob.centerLatitude 48.135
+config *.terminal[40].mob.centerLongitude 11.582
+config *.terminal[41].mob.radius 0.0
+config *.terminal[41].mob.centerLatitude 50.110
+config *.terminal[41].mob.centerLongitude 8.682
+config *.terminal[42].mob.radius 0.0
+config *.terminal[42].mob.centerLatitude 45.464
+config *.terminal[42].mob.centerLongitude 9.190
+config *.terminal[43].mob.radius 0.0
+config *.terminal[43].mob.centerLatitude 40.851
+config *.terminal[43].mob.centerLongitude 14.268
+config *.terminal[44].mob.radius 0.0
+config *.terminal[44].mob.centerLatitude 51.209
+config *.terminal[44].mob.centerLongitude 3.224
+config *.terminal[45].mob.radius 0.0
+config *.terminal[45].mob.centerLatitude 48.208
+config *.terminal[45].mob.centerLongitude 16.373
+config *.terminal[46].mob.radius 0.0
+config *.terminal[46].mob.centerLatitude 52.229
+config *.terminal[46].mob.centerLongitude 21.012
+config *.terminal[47].mob.radius 0.0
+config *.terminal[47].mob.centerLatitude 59.913
+config *.terminal[47].mob.centerLongitude 10.752
+config *.terminal[48].mob.radius 0.0
+config *.terminal[48].mob.centerLatitude 56.949
+config *.terminal[48].mob.centerLongitude 24.105
+config *.terminal[49].mob.radius 0.0
+config *.terminal[49].mob.centerLatitude 59.437
+config *.terminal[49].mob.centerLongitude 24.753
+config *.terminal[50].mob.radius 0.0
+config *.terminal[50].mob.centerLatitude 50.075
+config *.terminal[50].mob.centerLongitude 14.437
+config *.terminal[51].mob.radius 0.0
+config *.terminal[51].mob.centerLatitude 42.697
+config *.terminal[51].mob.centerLongitude 23.321
+config *.terminal[52].mob.radius 0.0
+config *.terminal[52].mob.centerLatitude 45.815
+config *.terminal[52].mob.centerLongitude 15.981
+config *.terminal[53].mob.radius 0.0
+config *.terminal[53].mob.centerLatitude 40.640
+config *.terminal[53].mob.centerLongitude 22.944
+config *.terminal[54].mob.radius 0.0
+config *.terminal[54].mob.centerLatitude 39.933
+config *.terminal[54].mob.centerLongitude 32.859
+config *.terminal[55].mob.radius 0.0
+config *.terminal[55].mob.centerLatitude 38.419
+config *.terminal[55].mob.centerLongitude 27.128
+config *.terminal[56].mob.radius 0.0
+config *.terminal[56].mob.centerLatitude 35.898
+config *.terminal[56].mob.centerLongitude 14.514
+config *.terminal[57].mob.radius 0.0
+config *.terminal[57].mob.centerLatitude 65.683
+config *.terminal[57].mob.centerLongitude -18.087
+config *.terminal[58].mob.radius 0.0
+config *.terminal[58].mob.centerLatitude 28.463
+config *.terminal[58].mob.centerLongitude -16.251
+config *.terminal[59].mob.radius 0.0
+config *.terminal[59].mob.centerLatitude 35.185
+config *.terminal[59].mob.centerLongitude 33.382
+config **.numStations 3
+config **.numStations 3
+config *.station[0].mobility.latitude 55.752
+config *.station[0].mobility.longitude 37.616
+config *.station[0].cityName "\"Moscow\""
+config *.station[0].groundStationId 7
+config *.station[0].routerAddr "\"10.0.0.29\""
+config *.station[0].serving "\"10.0.0.29\""
+config *.station[1].mobility.latitude 28.652
+config *.station[1].mobility.longitude 77.231
+config *.station[1].cityName "\"Delhi\""
+config *.station[1].groundStationId 11
+config *.station[1].routerAddr "\"10.0.0.45\""
+config *.station[1].serving "\"10.0.0.45\""
+config *.station[2].mobility.latitude 25.35
+config *.station[2].mobility.longitude 51.24
+config *.station[2].cityName "\"Katar\""
+config *.station[2].groundStationId 19
+config *.station[2].routerAddr "\"10.0.0.77\""
+config *.station[2].serving "\"10.0.0.77\""
+config *.visualizer.canvasVisualizer.mediumVisualizer.typename ""
+config *.visualizer.*.radioVisualizer.displayAntennaLobes true
+config *.visualizer.*.dataLinkVisualizer.displayLinks true
+config *.visualizer.*.mobilityVisualizer.displayMovementTrails true
+config *.visualizer.*.mobilityVisualizer.movementTrailLineWidth 1
+config *.visualizer.*.mobilityVisualizer.trailLength 3000
+config **.ttxStart_max 1s
+config **.ttxIdle_min 10s
+config **.ttxIdle_max 15s
+config **.Ntw 1
+config **.Ntx 5
+config **.ttwDuration 100s
+config output-scalar-file results/results_florasat_ml_trf_no_buffer/transformer-raan-175-th-0.40-General-6.sca
+config output-vector-file results/results_florasat_ml_trf_no_buffer/transformer-raan-175-th-0.40-General-6.vec
+
+vector 0 Florasat_Individual_Sats.terminal[56].dlk.mac vector_preds_Transformer ETV
+vector 1 Florasat_Individual_Sats.terminal[39].dlk.mac vector_preds_Transformer ETV
+vector 2 Florasat_Individual_Sats.terminal[34].dlk.mac vector_preds_Transformer ETV
+vector 3 Florasat_Individual_Sats.terminal[0].dlk.mac vector_preds_Transformer ETV
+vector 4 Florasat_Individual_Sats.terminal[49].dlk.mac vector_preds_Transformer ETV
+vector 5 Florasat_Individual_Sats.terminal[42].dlk.mac vector_preds_Transformer ETV
+vector 6 Florasat_Individual_Sats.terminal[11].dlk.mac vector_preds_Transformer ETV
+vector 7 Florasat_Individual_Sats.terminal[55].dlk.mac vector_preds_Transformer ETV
+vector 8 Florasat_Individual_Sats.terminal[26].dlk.mac vector_preds_Transformer ETV
+vector 9 Florasat_Individual_Sats.terminal[29].dlk.mac vector_preds_Transformer ETV
+vector 10 Florasat_Individual_Sats.terminal[31].dlk.mac vector_preds_Transformer ETV
+vector 11 Florasat_Individual_Sats.terminal[2].dlk.mac vector_preds_Transformer ETV
+vector 12 Florasat_Individual_Sats.terminal[12].dlk.mac vector_preds_Transformer ETV
+vector 13 Florasat_Individual_Sats.terminal[46].dlk.mac vector_preds_Transformer ETV
+vector 14 Florasat_Individual_Sats.terminal[16].dlk.mac vector_preds_Transformer ETV
+vector 15 Florasat_Individual_Sats.terminal[7].dlk.mac vector_preds_Transformer ETV
+vector 16 Florasat_Individual_Sats.terminal[45].dlk.mac vector_preds_Transformer ETV
+vector 17 Florasat_Individual_Sats.terminal[32].dlk.mac vector_preds_Transformer ETV
+vector 18 Florasat_Individual_Sats.terminal[15].dlk.mac vector_preds_Transformer ETV
+vector 19 Florasat_Individual_Sats.terminal[33].dlk.mac vector_preds_Transformer ETV
+vector 20 Florasat_Individual_Sats.terminal[13].dlk.mac vector_preds_Transformer ETV
+vector 21 Florasat_Individual_Sats.terminal[44].dlk.mac vector_preds_Transformer ETV
+vector 22 Florasat_Individual_Sats.terminal[36].dlk.mac vector_preds_Transformer ETV
+vector 23 Florasat_Individual_Sats.terminal[40].dlk.mac vector_preds_Transformer ETV
+vector 24 Florasat_Individual_Sats.terminal[51].dlk.mac vector_preds_Transformer ETV
+vector 25 Florasat_Individual_Sats.terminal[3].dlk.mac vector_preds_Transformer ETV
+vector 26 Florasat_Individual_Sats.terminal[41].dlk.mac vector_preds_Transformer ETV
+vector 27 Florasat_Individual_Sats.terminal[48].dlk.mac vector_preds_Transformer ETV
+vector 28 Florasat_Individual_Sats.terminal[22].dlk.mac vector_preds_Transformer ETV
+vector 29 Florasat_Individual_Sats.terminal[43].dlk.mac vector_preds_Transformer ETV
+vector 30 Florasat_Individual_Sats.terminal[20].dlk.mac vector_preds_Transformer ETV
+vector 31 Florasat_Individual_Sats.terminal[58].dlk.mac vector_preds_Transformer ETV
+vector 32 Florasat_Individual_Sats.terminal[18].dlk.mac vector_preds_Transformer ETV
+vector 33 Florasat_Individual_Sats.terminal[10].dlk.mac vector_preds_Transformer ETV
+vector 34 Florasat_Individual_Sats.terminal[17].dlk.mac vector_preds_Transformer ETV
+vector 35 Florasat_Individual_Sats.terminal[59].dlk.mac vector_preds_Transformer ETV
+vector 36 Florasat_Individual_Sats.terminal[25].dlk.mac vector_preds_Transformer ETV
+vector 37 Florasat_Individual_Sats.terminal[52].dlk.mac vector_preds_Transformer ETV
+vector 38 Florasat_Individual_Sats.terminal[6].dlk.mac vector_preds_Transformer ETV
+vector 39 Florasat_Individual_Sats.terminal[53].dlk.mac vector_preds_Transformer ETV
+vector 40 Florasat_Individual_Sats.terminal[24].dlk.mac vector_preds_Transformer ETV
+vector 41 Florasat_Individual_Sats.terminal[21].dlk.mac vector_preds_Transformer ETV
+vector 42 Florasat_Individual_Sats.terminal[27].dlk.mac vector_preds_Transformer ETV
+vector 43 Florasat_Individual_Sats.terminal[50].dlk.mac vector_preds_Transformer ETV
+vector 44 Florasat_Individual_Sats.terminal[14].dlk.mac vector_preds_Transformer ETV
+vector 45 Florasat_Individual_Sats.terminal[35].dlk.mac vector_preds_Transformer ETV
+vector 46 Florasat_Individual_Sats.terminal[19].dlk.mac vector_preds_Transformer ETV
+vector 47 Florasat_Individual_Sats.terminal[37].dlk.mac vector_preds_Transformer ETV
+vector 48 Florasat_Individual_Sats.terminal[57].dlk.mac vector_preds_Transformer ETV
+vector 49 Florasat_Individual_Sats.terminal[4].dlk.mac vector_preds_Transformer ETV
+vector 50 Florasat_Individual_Sats.terminal[54].dlk.mac vector_preds_Transformer ETV
+vector 51 Florasat_Individual_Sats.terminal[5].dlk.mac vector_preds_Transformer ETV
+vector 52 Florasat_Individual_Sats.terminal[9].dlk.mac vector_preds_Transformer ETV
+vector 53 Florasat_Individual_Sats.terminal[30].dlk.mac vector_preds_Transformer ETV
+vector 54 Florasat_Individual_Sats.terminal[8].dlk.mac vector_preds_Transformer ETV
+vector 55 Florasat_Individual_Sats.terminal[47].dlk.mac vector_preds_Transformer ETV
+vector 56 Florasat_Individual_Sats.terminal[23].dlk.mac vector_preds_Transformer ETV
+vector 57 Florasat_Individual_Sats.terminal[38].dlk.mac vector_preds_Transformer ETV
+vector 58 Florasat_Individual_Sats.terminal[28].dlk.mac vector_preds_Transformer ETV
+vector 59 Florasat_Individual_Sats.terminal[1].dlk.mac vector_preds_Transformer ETV
+vector 60 Florasat_Individual_Sats.satellite[0].dlkDSL.mac VectorTransmitMethod_ReceptionResult ETV
+vector 61 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Satellite Position when Repetition Received" ETV
+vector 62 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 87 at Satellite" ETV
+vector 63 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "All Nodes Repetition Generation Delay at Satellite" ETV
+vector 64 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 87 at Satellite" ETV
+vector 65 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Successful Repetition Number counted for MAC protocol" ETV
+vector 66 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Successful Repetition Number counted for the Model" ETV
+vector 67 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "All Nodes Message Generation Delay at Satellite" ETV
+vector 68 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 87 at Satellite" ETV
+vector 69 Florasat_Individual_Sats.satellite[0].net.packetHandler "packets received" ETV
+vector 70 Florasat_Individual_Sats.satellite[0].net.packetHandler "dropped unroutable" ETV
+vector 71 Florasat_Individual_Sats.satellite[0].net.packetHandler "packets dropped" ETV
+vector 72 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 372 at Satellite" ETV
+vector 73 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 372 at Satellite" ETV
+vector 74 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 372 at Satellite" ETV
+vector 75 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 222 at Satellite" ETV
+vector 76 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 222 at Satellite" ETV
+vector 77 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 222 at Satellite" ETV
+vector 78 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 342 at Satellite" ETV
+vector 79 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 342 at Satellite" ETV
+vector 80 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 342 at Satellite" ETV
+vector 81 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 537 at Satellite" ETV
+vector 82 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 537 at Satellite" ETV
+vector 83 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 537 at Satellite" ETV
+vector 84 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 357 at Satellite" ETV
+vector 85 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 357 at Satellite" ETV
+vector 86 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 357 at Satellite" ETV
+vector 87 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 822 at Satellite" ETV
+vector 88 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 822 at Satellite" ETV
+vector 89 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 822 at Satellite" ETV
+vector 90 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 567 at Satellite" ETV
+vector 91 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 567 at Satellite" ETV
+vector 92 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 567 at Satellite" ETV
+vector 93 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 807 at Satellite" ETV
+vector 94 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 807 at Satellite" ETV
+vector 95 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 807 at Satellite" ETV
+vector 96 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 387 at Satellite" ETV
+vector 97 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 387 at Satellite" ETV
+vector 98 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 387 at Satellite" ETV
+vector 99 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 312 at Satellite" ETV
+vector 100 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 312 at Satellite" ETV
+vector 101 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 312 at Satellite" ETV
+vector 102 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 792 at Satellite" ETV
+vector 103 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 792 at Satellite" ETV
+vector 104 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 792 at Satellite" ETV
+vector 105 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 492 at Satellite" ETV
+vector 106 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 492 at Satellite" ETV
+vector 107 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 492 at Satellite" ETV
+vector 108 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 702 at Satellite" ETV
+vector 109 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 702 at Satellite" ETV
+vector 110 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 702 at Satellite" ETV
+vector 111 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 117 at Satellite" ETV
+vector 112 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 117 at Satellite" ETV
+vector 113 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 117 at Satellite" ETV
+vector 114 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 102 at Satellite" ETV
+vector 115 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 102 at Satellite" ETV
+vector 116 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 102 at Satellite" ETV
+vector 117 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 552 at Satellite" ETV
+vector 118 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 552 at Satellite" ETV
+vector 119 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 552 at Satellite" ETV
+vector 120 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 942 at Satellite" ETV
+vector 121 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 942 at Satellite" ETV
+vector 122 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 942 at Satellite" ETV
+vector 123 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 747 at Satellite" ETV
+vector 124 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 747 at Satellite" ETV
+vector 125 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 747 at Satellite" ETV
+vector 126 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 837 at Satellite" ETV
+vector 127 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 837 at Satellite" ETV
+vector 128 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 837 at Satellite" ETV
+vector 129 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 252 at Satellite" ETV
+vector 130 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 252 at Satellite" ETV
+vector 131 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 252 at Satellite" ETV
+vector 132 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 297 at Satellite" ETV
+vector 133 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 297 at Satellite" ETV
+vector 134 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 297 at Satellite" ETV
+vector 135 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 867 at Satellite" ETV
+vector 136 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 867 at Satellite" ETV
+vector 137 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 867 at Satellite" ETV
+vector 138 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 672 at Satellite" ETV
+vector 139 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 672 at Satellite" ETV
+vector 140 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 672 at Satellite" ETV
+vector 141 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 687 at Satellite" ETV
+vector 142 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 687 at Satellite" ETV
+vector 143 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 687 at Satellite" ETV
+vector 144 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 597 at Satellite" ETV
+vector 145 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 597 at Satellite" ETV
+vector 146 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 597 at Satellite" ETV
+vector 147 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 447 at Satellite" ETV
+vector 148 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 447 at Satellite" ETV
+vector 149 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 447 at Satellite" ETV
+vector 150 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 162 at Satellite" ETV
+vector 151 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 162 at Satellite" ETV
+vector 152 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 162 at Satellite" ETV
+vector 153 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 147 at Satellite" ETV
+vector 154 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 147 at Satellite" ETV
+vector 155 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 147 at Satellite" ETV
+vector 156 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 192 at Satellite" ETV
+vector 157 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 192 at Satellite" ETV
+vector 158 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 192 at Satellite" ETV
+vector 159 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 132 at Satellite" ETV
+vector 160 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 132 at Satellite" ETV
+vector 161 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 132 at Satellite" ETV
+vector 162 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 717 at Satellite" ETV
+vector 163 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 717 at Satellite" ETV
+vector 164 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 717 at Satellite" ETV
+vector 165 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 267 at Satellite" ETV
+vector 166 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 267 at Satellite" ETV
+vector 167 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 267 at Satellite" ETV
+vector 168 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 612 at Satellite" ETV
+vector 169 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 612 at Satellite" ETV
+vector 170 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 612 at Satellite" ETV
+vector 171 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 627 at Satellite" ETV
+vector 172 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 627 at Satellite" ETV
+vector 173 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 627 at Satellite" ETV
+vector 174 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 177 at Satellite" ETV
+vector 175 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 177 at Satellite" ETV
+vector 176 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 177 at Satellite" ETV
+vector 177 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 207 at Satellite" ETV
+vector 178 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 207 at Satellite" ETV
+vector 179 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 207 at Satellite" ETV
+vector 180 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 237 at Satellite" ETV
+vector 181 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 237 at Satellite" ETV
+vector 182 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 237 at Satellite" ETV
+vector 183 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 582 at Satellite" ETV
+vector 184 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 582 at Satellite" ETV
+vector 185 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 582 at Satellite" ETV
+vector 186 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 927 at Satellite" ETV
+vector 187 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 927 at Satellite" ETV
+vector 188 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 927 at Satellite" ETV
+vector 189 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 642 at Satellite" ETV
+vector 190 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 642 at Satellite" ETV
+vector 191 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 642 at Satellite" ETV
+vector 192 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 657 at Satellite" ETV
+vector 193 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 657 at Satellite" ETV
+vector 194 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 657 at Satellite" ETV
+vector 195 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 507 at Satellite" ETV
+vector 196 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 507 at Satellite" ETV
+vector 197 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 507 at Satellite" ETV
+vector 198 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 957 at Satellite" ETV
+vector 199 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 957 at Satellite" ETV
+vector 200 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 957 at Satellite" ETV
+0	242	1.00015169778	5717601
+0	407	12.46553701651	5717602
+0	525	23.05140778143	5717603
+0	663	33.58087417507	5717604
+0	809	43.85997989867	5717605
+0	1299	116.01733570802	5723601
+0	1534	128.97629615501	5723602
+0	1702	141.15163144073	5723603
+0	1855	151.59330343012	5723604
+0	2052	163.12458272673	5723605
+0	2571	231.24345947569	5729601
+0	2817	244.29175274377	5729602
+0	3059	257.03789713956	5729603
+0	3229	267.97419499537	5729604
+0	3437	279.28739692132	5729605
+0	3997	346.4995259759	5735601
+0	4273	359.65043570055	5735602
+0	4507	373.24839904229	5735603
+0	4645	383.35807457822	5735604
+0	4907	396.85764547344	5735605
+0	5374	461.30369488103	5741601
+0	5619	474.45875566872	5741602
+0	5862	489.04246233823	5741603
+0	6019	501.1088526547	5741604.1
+0	6149	511.62629636424	5741605.1
+0	6644	576.94055553502	5747601.1
+0	6765	589.59201183496	5747602.1
+0	6929	604.01512783347	5747603.1
+0	7040	614.325934547	5747604.1
+0	7153	625.33582897135	5747605.1
+0	7594	691.73080295068	5753601.1
+0	7683	703.54063277226	5753602.1
+0	7833	717.45174066606	5753603.1
+0	7944	730.04362027952	5753604
+0	8074	744.20951160113	5753605
+1	243	1.02417600551	5715901.1
+1	433	13.77833251003	5715902.1
+1	561	24.87449218961	5715903.1
+1	683	35.29695722134	5715904.1
+1	831	47.65198183455	5715905.1
+1	1325	116.43435371667	5721901.1
+1	1584	130.45982817048	5721902.1
+1	1781	143.85363775631	5721903.1
+1	1991	157.33957366761	5721904.1
+1	2134	167.38523183017	5721905.1
+1	2626	231.66439687368	5727901.1
+1	2895	245.90947694844	5727902.1
+1	3135	259.02067812626	5727903.1
+1	3285	269.46249192814	5727904.1
+1	3578	283.30379269203	5727905.1
+1	4080	346.99104266125	5733901.1
+1	4338	361.84594824445	5733902.1
+1	4544	374.72130097799	5733903.1
+1	4782	389.00649137679	5733904.1
+1	5011	402.30424331734	5733905.1
+1	5363	461.23731782427	5739901
+1	5587	474.13823391311	5739902
+1	5823	488.03000371787	5739903
+1	5959	499.17359945132	5739904
+1	6140	511.11376006972	5739905
+1	6629	576.76044191653	5745901
+1	6790	590.44007079862	5745902
+1	6928	603.87061433354	5745903
+1	7096	617.86038671922	5745904
+1	7229	632.4425778638	5745905
+1	7573	691.47564907349	5751901
+1	7732	705.81647963287	5751902
+1	7801	716.04816068803	5751903
+1	7951	730.55115368009	5751904
+1	8076	744.61131386716	5751905
+2	246	1.03911379701	5715401
+2	400	12.36319256597	5715402
+2	594	26.47687661461	5715403
+2	710	37.75041929562	5715404
+2	880	50.91446888982	5715405
+2	1359	116.59661704535	5721401
+2	1570	130.00856080302	5721402
+2	1760	142.8417563017	5721403
+2	1979	156.53881359939	5721404
+2	2197	170.06374959113	5721405.1
+2	2609	231.51759576448	5727401.1
+2	2862	245.29763838672	5727402.1
+2	3089	257.77206703019	5727403.1
+2	3377	272.6308222434	5727404.1
+2	3599	284.12592801428	5727405.1
+2	4065	346.9424189534	5733401.1
+2	4288	360.00665895058	5733402.1
+2	4548	374.84126258408	5733403.1
+2	4740	386.61110464716	5733404.1
+2	4925	397.42189106997	5733405.1
+2	5378	461.357090245	5739401.1
+2	5575	473.83103546337	5739402.1
+2	5824	488.11917006504	5739403.1
+2	5993	500.26165437652	5739404.1
+2	6195	514.26214337233	5739405.1
+2	6632	576.79052276304	5745401
+2	6770	589.70879495027	5745402
+2	6857	599.96408099075	5745403
+2	7000	611.73592996317	5745404
+2	7121	622.82590720685	5745405
+2	7553	691.14321382088	5751401
+2	7672	703.09367566789	5751402
+2	7787	714.95161682321	5751403
+2	7906	727.3074126821	5751404
+2	8010	737.60124502773	5751405
+3	247	1.05964113772	5712001.1
+3	474	15.59338372597	5712002.1
+3	589	26.38071393641	5712003.1
+3	757	39.88135676645	5712004.1
+3	923	53.15339054377	5712005.1
+3	1322	116.41597735253	5718001.1
+3	1537	129.07153010741	5718002.1
+3	1717	141.54207728477	5718003.1
+3	1875	152.70473368722	5718004.1
+3	2096	165.27750325762	5718005.1
+3	2548	231.10009762412	5724001.1
+3	2856	245.12093034294	5724002.1
+3	3031	256.39375941549	5724003.1
+3	3302	269.75474692835	5724004.1
+3	3583	283.48945573974	5724005.1
+3	3979	346.37871275912	5730001.1
+3	4298	360.36635166407	5730002.1
+3	4533	374.0861747067	5730003.1
+3	4661	384.30895513762	5730004.1
+3	4870	395.32027421426	5730005.1
+3	5402	461.56062228116	5736001.1
+3	5604	474.26455435902	5736002.1
+3	5735	485.06230343692	5736003
+3	5963	499.56724647526	5736004
+3	6186	513.59808759508	5736005
+3	6576	576.24338667095	5742001
+3	6741	588.77862983803	5742002
+3	6885	601.23436487234	5742003
+3	6997	611.59227260459	5742004
+3	7172	626.32415839541	5742005
+3	7601	691.77233015234	5748001
+3	7651	701.78624633979	5748002
+3	7815	716.39339570468	5748003
+3	7916	727.98525133333	5748004
+3	8011	738.11737143947	5748005
+4	250	1.07588872663	5716901.1
+4	424	13.02506657434	5716902.1
+4	613	27.84380342812	5716903.1
+4	734	39.03585275636	5716904.1
+4	893	51.42681687955	5716905.1
+4	1301	116.08517207508	5722901.1
+4	1556	129.60689982702	5722902.1
+4	1671	139.88527606078	5722903.1
+4	1849	151.22279334999	5722904.1
+4	2038	162.46554672205	5722905.1
+4	2661	231.92850481719	5728901.1
+4	2912	246.28775049816	5728902.1
+4	3109	258.18367742817	5728903.1
+4	3355	271.26600567252	5728904.1
+4	3614	285.1477807283	5728905.1
+4	3954	346.12133113062	5734901
+4	4168	357.09252412058	5734902
+4	4400	370.01773921633	5734903
+4	4644	383.1697943001	5734904
+4	4911	397.06064198724	5734905
+4	5421	461.69049375947	5740901
+4	5582	474.00049439422	5740902
+4	5776	486.85018367041	5740903
+4	6017	501.08345187875	5740904
+4	6148	511.58349066764	5740905
+4	6647	576.94872363517	5746901
+4	6788	590.28512491309	5746902
+4	6878	600.74026723322	5746903
+4	7045	614.46417283196	5746904
+4	7213	628.99437575297	5746905
+4	7592	691.72536284733	5752901
+4	7735	705.91691751336	5752902
+4	7842	717.62734981557	5752903
+4	7971	731.59655079665	5752904
+4	8058	743.43382393779	5752905
+5	253	1.08689643396	5716201
+5	479	15.76247555041	5716202
+5	648	29.75603152486	5716203
+5	804	42.36370256474	5716204
+5	970	55.57276919205	5716205
+5	1333	116.4972500836	5722201
+5	1546	129.27646660199	5722202
+5	1664	139.68959713424	5722203
+5	1874	152.62436077883	5722204
+5	2059	163.30821855994	5722205
+5	2604	231.45752422744	5728201
+5	2825	244.6304367017	5728202
+5	3104	258.10042061377	5728203
+5	3247	268.56658747419	5728204
+5	3463	279.83145297621	5728205
+5	4017	346.5887706452	5734201.1
+5	4264	359.43557173176	5734202.1
+5	4490	372.60399685287	5734203.1
+5	4699	385.50850659538	5734204.1
+5	4896	396.38711029476	5734205.1
+5	5436	461.76922216569	5740201.1
+5	5663	475.43779237452	5740202.1
+5	5866	489.20824027061	5740203.1
+5	6056	503.5710574584	5740204.1
+5	6217	515.28934385068	5740205.1
+5	6633	576.80000086944	5746201.1
+5	6749	588.87391253421	5746202.1
+5	6875	600.72419040534	5746203.1
+5	7037	614.31889156858	5746204
+5	7168	625.98853215506	5746205
+5	7539	691.01857295749	5752201
+5	7712	705.08596741734	5752202
+5	7857	718.50493678963	5752203
+5	7967	731.3852695413	5752204
+5	8091	746.14182077256	5752205
+6	254	1.09027383127	5713101
+6	480	15.77877799025	5713102
+6	604	26.96406204346	5713103
+6	764	40.05634818202	5713104
+6	869	50.34349359897	5713105.1
+6	1334	116.50502896612	5719101.1
+6	1507	128.17530416162	5719102.1
+6	1708	141.27118543349	5719103.1
+6	1943	155.44922752166	5719104.1
+6	2189	169.65482203848	5719105.1
+6	2595	231.41429057042	5725101.1
+6	2739	242.10635450715	5725102.1
+6	2954	252.20794865559	5725103.1
+6	3167	262.35143965506	5725104.1
+6	3381	272.72827367578	5725105.1
+6	3988	346.43245581095	5731101.1
+6	4302	360.4389718934	5731102.1
+6	4520	373.66050079954	5731103.1
+6	4664	384.40331300977	5731104.1
+6	4861	394.90709664324	5731105.1
+6	5433	461.76729894802	5737101.1
+6	5607	474.26953595458	5737102.1
+6	5820	488.00644067559	5737103.1
+6	5943	498.5474255411	5737104
+6	6134	510.74385593157	5737105
+6	6560	576.06838463503	5743101
+6	6724	588.03993259836	5743102
+6	6843	598.85527737369	5743103
+6	6989	611.0597190219	5743104
+6	7157	625.35564461537	5743105
+6	7576	691.56327749346	5749101
+6	7737	706.21885402919	5749102
+6	7829	716.88001592969	5749103
+6	7950	730.51271767099	5749104
+6	8057	743.31625809986	5749105
+7	255	1.10636231583	5717501
+7	461	14.98552755197	5717502
+7	605	27.09265380493	5717503
+7	745	39.55119430647	5717504
+7	946	54.38209704217	5717505
+7	1358	116.59512498928	5723501
+7	1506	128.09724569134	5723502
+7	1755	142.69418958155	5723503
+7	1983	156.63919929927	5723504
+7	2148	167.97481293487	5723505
+7	2557	231.18511931528	5729501
+7	2909	246.13167130062	5729502
+7	3134	258.98835536465	5729503
+7	3389	273.50429462874	5729504
+7	3627	287.42495299224	5729505
+7	4016	346.55347479717	5735501
+7	4286	359.91992153204	5735502
+7	4454	371.59441872127	5735503
+7	4726	386.34484395943	5735504
+7	4895	396.36222834442	5735505
+7	5454	461.86999431672	5741501
+7	5545	472.93587623607	5741502
+7	5753	485.91595080193	5741503
+7	5896	496.26711108466	5741504
+7	6074	506.73880969151	5741505
+7	6640	576.90246389899	5747501
+7	6764	589.49751760182	5747502
+7	6889	601.3124260651	5747503
+7	7009	612.01100632037	5747504
+7	7118	622.71233647667	5747505
+7	7588	691.70468146517	5753501
+7	7695	703.87076557335	5753502
+7	7826	716.61605414656	5753503
+7	7896	726.63763278468	5753504
+7	7999	736.76114205459	5753505
+8	256	1.20825966494	5714601
+8	446	14.42402024078	5714602
+8	629	29.0213775835	5714603
+8	803	42.31562238792	5714604
+8	985	56.49682245008	5714605
+8	1397	116.85828013835	5720601
+8	1476	127.16802369012	5720602
+8	1650	138.44514899794	5720603
+8	1834	149.27903520083	5720604
+8	2066	164.19934195257	5720605
+8	2612	231.5285513557	5726601
+8	2790	243.76238641748	5726602
+8	3007	255.8372867417	5726603
+8	3221	267.77535193902	5726604
+8	3559	282.60417962283	5726605
+8	4049	346.81184270373	5732601
+8	4176	357.6497851389	5732602
+8	4470	372.03576254379	5732603
+8	4739	386.58597789891	5732604
+8	4931	397.60359975113	5732605
+8	5405	461.56909801275	5738601
+8	5570	473.69517141697	5738602
+8	5736	485.16555591347	5738603
+8	5939	498.0875601722	5738604
+8	6104	508.37508756063	5738605
+8	6650	576.96045972942	5744601
+8	6816	591.58412455883	5744602
+8	6967	606.31793849123	5744603
+8	7099	618.19103666534	5744604
+8	7226	631.55886550037	5744605
+8	7577	691.56709181867	5750601
+8	7708	704.9535684092	5750602
+8	7864	719.12486050185	5750603
+8	7954	730.73136704997	5750604
+8	8052	742.7676916637	5750605
+9	257	1.22111819591	5714901
+9	436	13.78839132632	5714902
+9	602	26.94918400631	5714903
+9	726	38.66715454054	5714904
+9	922	53.10621013306	5714905
+9	1341	116.53393743769	5720901
+9	1553	129.59438423952	5720902
+9	1730	141.96142292209	5720903
+9	1947	155.63490574574	5720904
+9	2207	170.38488102704	5720905
+9	2642	231.85124686244	5726901
+9	2773	243.19598614727	5726902
+9	3086	257.7375644797	5726903
+9	3374	272.15179133252	5726904
+9	3607	284.47609968972	5726905
+9	3994	346.47772382689	5732901
+9	4232	358.80624075979	5732902
+9	4512	373.37872314593	5732903
+9	4765	388.18087236816	5732904
+9	4999	400.79401162779	5732905
+9	5338	461.03082100884	5738901
+9	5528	471.17740006675	5738902
+9	5748	485.72594383056	5738903
+9	5983	499.99291859939	5738904
+9	6136	510.79702480253	5738905
+9	6648	576.94934580638	5744901
+9	6725	588.09478012077	5744902
+9	6879	600.86695437599	5744903
+9	7008	611.98955553281	5744904
+9	7173	626.34403296094	5744905
+9	7537	691.0017954323	5750901
+9	7701	704.0420534215	5750902
+9	7855	718.24130739761	5750903
+9	7924	728.52268765658	5750904
+9	8028	740.53789370554	5750905
+10	258	1.22549206368	5715101
+10	373	11.48455102579	5715102
+10	520	22.32772748452	5715103
+10	680	34.72177966615	5715104
+10	813	44.73637038261	5715105
+10	1316	116.33432096872	5721101.1
+10	1466	126.64416342346	5721102.1
+10	1651	138.56975063869	5721103.1
+10	1830	149.05552479859	5721104.1
+10	2045	162.73692156725	5721105.1
+10	2601	231.45543313446	5727101.1
+10	2760	242.698764398	5727102.1
+10	2982	254.84703055444	5727103.1
+10	3223	267.86674947805	5727104.1
+10	3497	280.93207671052	5727105.1
+10	3971	346.25881516025	5733101.1
+10	4314	360.84474954987	5733102.1
+10	4478	372.28133985191	5733103.1
+10	4736	386.57039863291	5733104.1
+10	4940	398.03659059457	5733105.1
+10	5348	461.11303966702	5739101.1
+10	5555	473.24963940517	5739102.1
+10	5757	486.17370401137	5739103.1
+10	5907	497.07785997168	5739104.1
+10	6095	507.79016567837	5739105.1
+10	6607	576.623941347	5745101
+10	6757	589.14522539032	5745102
+10	6932	604.02983749424	5745103
+10	7033	614.10061105526	5745104
+10	7137	624.33648102241	5745105
+10	7560	691.19808155787	5751101
+10	7654	701.9035234591	5751102
+10	7797	715.38548140414	5751103
+10	7898	726.78343325132	5751104
+10	8005	737.16301567597	5751105
+11	259	1.2312055768	5712201
+11	432	13.74747214187	5712202
+11	547	23.89396336326	5712203
+11	718	38.38439076371	5712204
+11	886	51.22236439772	5712205
+11	1365	116.60723159276	5718201
+11	1515	128.5196914298	5718202
+11	1693	140.78317602002	5718203
+11	1909	153.87101472076	5718204.1
+11	2156	168.35632185987	5718205.1
+11	2572	231.2890390472	5724201.1
+11	2906	246.10499594384	5724202.1
+11	3041	256.61886813957	5724203.1
+11	3360	271.2918273001	5724204.1
+11	3528	281.44337660424	5724205.1
+11	4009	346.54326673341	5730201.1
+11	4274	359.72963025305	5730202.1
+11	4509	373.35742892093	5730203.1
+11	4770	388.19548355044	5730204.1
+11	5017	403.02564530611	5730205.1
+11	5375	461.31894887588	5736201.1
+11	5621	474.4778080557	5736202.1
+11	5808	487.47770343022	5736203.1
+11	5927	497.66867532674	5736204.1
+11	6124	510.20601701038	5736205.1
+11	6615	576.64689354226	5742201
+11	6791	590.56492414302	5742202
+11	6906	602.14325257903	5742203
+11	7035	614.19685815088	5742204
+11	7176	626.65672678011	5742205
+11	7548	691.1202125717	5748201
+11	7716	705.23795562098	5748202
+11	7813	716.32975476096	5748203
+11	7923	728.3892852394	5748204
+11	8030	741.07306334424	5748205
+12	260	1.24539948651	5713201
+12	427	13.05663751089	5713202
+12	548	23.96433276124	5713203
+12	700	36.86112409224	5713204
+12	882	51.13327958271	5713205
+12	1386	116.81648050551	5719201
+12	1490	127.42631551344	5719202
+12	1726	141.7673738848	5719203
+12	1861	151.88021992101	5719204
+12	2060	163.53171285592	5719205
+12	2613	231.55999844265	5725201
+12	2905	245.98559424467	5725202
+12	3057	256.98748641484	5725203
+12	3271	269.02578776073	5725204
+12	3438	279.35855620261	5725205
+12	4046	346.81042676303	5731201.1
+12	4187	357.85728927097	5731202.1
+12	4439	371.18821141986	5731203.1
+12	4705	385.67001653463	5731204.1
+12	4928	397.57832315378	5731205.1
+12	5422	461.71722832089	5737201.1
+12	5699	476.51450033951	5737202.1
+12	5840	488.44392633368	5737203.1
+12	6003	500.51650781487	5737204.1
+12	6171	512.72164100967	5737205.1
+12	6637	576.82405297575	5743201
+12	6743	588.81837206358	5743202
+12	6867	600.28954567086	5743203
+12	7038	614.31901322376	5743204
+12	7138	624.56913765684	5743205
+12	7572	691.47170956945	5749201
+12	7670	702.97807484516	5749202
+12	7770	713.62363921595	5749203
+12	7894	726.51451553684	5749204
+12	8000	736.83227433008	5749205
+13	261	1.29916226584	5716601.1
+13	469	15.50732747046	5716602.1
+13	645	29.63213421963	5716603.1
+13	760	39.99480857723	5716604.1
+13	957	54.63855270738	5716605.1
+13	1373	116.6770926977	5722601.1
+13	1576	130.34072836255	5722602.1
+13	1773	143.54127638717	5722603.1
+13	1954	155.72592562041	5722604.1
+13	2140	167.44027567771	5722605.1
+13	2575	231.30022982671	5728601.1
+13	2784	243.45323002734	5728602.1
+13	2966	254.27209547907	5728603.1
+13	3214	267.32714523165	5728604.1
+13	3543	281.92232384998	5728605.1
+13	4050	346.81709256186	5734601.1
+13	4183	357.81453736755	5734602.1
+13	4371	367.89226098731	5734603
+13	4616	381.66527150245	5734604
+13	4868	395.22021722328	5734605
+13	5351	461.12530413433	5740601
+13	5610	474.35254612938	5740602
+13	5755	486.05841186713	5740603
+13	5955	498.87818583521	5740604
+13	6120	509.66884834809	5740605
+13	6638	576.84376656776	5746601
+13	6776	589.92751359124	5746602
+13	6901	601.86603760113	5746603
+13	7076	616.61225389455	5746604
+13	7210	628.54278969228	5746605
+13	7542	691.06263106945	5752601
+13	7675	703.24150549388	5752602
+13	7789	714.95891097491	5752603
+13	7935	729.42268981389	5752604
+13	8055	742.99841419817	5752605
+14	264	1.30001080688	5713601
+14	392	12.12404669961	5713602
+14	587	26.0715068609	5713603
+14	743	39.3891465629	5713604
+14	926	53.2084562548	5713605
+14	1382	116.75147925736	5719601
+14	1470	126.87744925962	5719602
+14	1704	141.21909550856	5719603
+14	1883	152.8072994016	5719604
+14	2063	163.75250606214	5719605
+14	2539	231.05050508236	5725601
+14	2879	245.64789802139	5725602.1
+14	3014	255.91600434692	5725603.1
+14	3278	269.22989159776	5725604.1
+14	3451	279.56405781629	5725605.1
+14	3985	346.41639310005	5731601.1
+14	4277	359.78056843579	5731602.1
+14	4416	370.43475531228	5731603.1
+14	4686	385.12028258364	5731604.1
+14	4932	397.69112446299	5731605.1
+14	5357	461.19486731058	5737601.1
+14	5542	472.79434901942	5737602.1
+14	5794	487.21371854935	5737603.1
+14	5987	500.06731055607	5737604.1
+14	6179	513.12414384144	5737605.1
+14	6577	576.24563722708	5743601.1
+14	6710	587.43200574955	5743602.1
+14	6905	602.14231458679	5743603
+14	7030	613.90038080234	5743604
+14	7161	625.60232840199	5743605
+14	7543	691.06428468344	5749601
+14	7664	702.38150945143	5749602
+14	7814	716.37936155172	5749603
+14	7959	731.16092531802	5749604
+14	8070	744.06668903516	5749605
+15	265	1.34622976603	5712701
+15	409	12.51478603994	5712702
+15	574	25.1202493913	5712703
+15	703	37.07570077572	5712704
+15	885	51.21290472522	5712705
+15	1385	116.80401148181	5718701
+15	1493	127.7503277224	5718702
+15	1638	138.00416018604	5718703
+15	1823	148.11213383358	5718704
+15	2034	162.36136448593	5718705
+15	2646	231.86447201017	5724701
+15	2753	242.54835409182	5724702
+15	2957	252.56118769245	5724703
+15	3189	265.68554648384	5724704
+15	3442	279.41077493201	5724705
+15	4024	346.66880416474	5730701
+15	4329	361.50473515177	5730702
+15	4453	371.57264677132	5730703
+15	4646	383.63372445711	5730704.1
+15	4892	396.25740516371	5730705.1
+15	5425	461.72468832997	5736701.1
+15	5598	474.22879934498	5736702.1
+15	5791	487.19312701678	5736703.1
+15	5924	497.61103052717	5736704.1
+15	6111	509.02087052657	5736705.1
+15	6626	576.7345293432	5742701.1
+15	6813	591.46238234546	5742702.1
+15	6953	605.15760374325	5742703.1
+15	7093	617.68846543808	5742704.1
+15	7218	630.80510697164	5742705.1
+15	7605	691.78734287177	5748701.1
+15	7678	703.49554644804	5748702.1
+15	7777	714.50864100502	5748703.1
+15	7909	727.5677059011	5748704.1
+15	8048	742.44928425783	5748705.1
+16	266	1.38447386678	5716501
+16	481	15.84903995972	5716502
+16	588	26.19276600191	5716503
+16	733	38.96072409581	5716504
+16	853	49.44331959355	5716505
+16	1360	116.60006494424	5722501
+16	1593	130.72268119245	5722502
+16	1756	142.76333730249	5722503.1
+16	1923	154.92291834951	5722504.1
+16	2163	168.512945781	5722505.1
+16	2664	231.93057610258	5728501.1
+16	2834	244.72987770639	5728502.1
+16	3127	258.66696477938	5728503.1
+16	3325	270.48900481035	5728504.1
+16	3507	281.07341700071	5728505.1
+16	4056	346.88442332391	5734501.1
+16	4295	360.30381892645	5734502.1
+16	4481	372.32362957159	5734503.1
+16	4668	384.69843734242	5734504.1
+16	4877	395.62790538487	5734505.1
+16	5396	461.50968087884	5740501.1
+16	5572	473.7425721197	5740502
+16	5771	486.67723854003	5740503
+16	5936	497.88768822258	5740504
+16	6147	511.53305420932	5740505
+16	6595	576.50467245304	5746501
+16	6699	586.82185635017	5746502
+16	6830	597.4869997187	5746503
+16	6969	608.24843557248	5746504
+16	7104	619.42445982759	5746505
+16	7590	691.72340971208	5752501
+16	7731	705.68195500201	5752502
+16	7844	717.80377795128	5752503
+16	7968	731.46136776218	5752504
+16	8085	745.4581672363	5752505
+17	267	1.39715534914	5715201.1
+17	375	11.78614691528	5715202.1
+17	539	23.72951736953	5715203.1
+17	668	34.08331198315	5715204.1
+17	814	45.03268126212	5715205.1
+17	1376	116.69768109592	5721201.1
+17	1590	130.68435152551	5721202.1
+17	1793	144.62823812757	5721203.1
+17	2000	157.91277107457	5721204.1
+17	2216	171.19435002934	5721205.1
+17	2617	231.61410891195	5727201.1
+17	2898	245.91137406277	5727202.1
+17	3038	256.46783099254	5727203.1
+17	3308	270.02540131077	5727204.1
+17	3504	281.04734736472	5727205.1
+17	3944	346.0452413545	5733201.1
+17	4162	356.96041343361	5733202.1
+17	4431	370.95845011971	5733203.1
+17	4601	381.09549312596	5733204.1
+17	4829	393.04087475384	5733205.1
+17	5443	461.78680290142	5739201.1
+17	5675	475.66800468857	5739202.1
+17	5882	490.01888905558	5739203
+17	5996	500.28419738891	5739204
+17	6205	514.74602180439	5739205
+17	6585	576.34795952053	5745201
+17	6748	588.84051227407	5745202
+17	6927	603.80619950872	5745203
+17	7028	613.80641714134	5745204
+17	7135	623.95635270211	5745205
+17	7612	691.90777524514	5751201
+17	7734	705.90000574151	5751202
+17	7852	718.05897614127	5751203
+17	7953	730.71274580923	5751204
+17	8036	741.43258247897	5751205
+18	270	1.40845982567	5713501
+18	447	14.47728013596	5713502
+18	595	26.54188437014	5713503
+18	778	40.77027775905	5713504.1
+18	950	54.46985446125	5713505.1
+18	1305	116.12969851866	5719501.1
+18	1477	127.17256589257	5719502.1
+18	1639	138.01791225141	5719503.1
+18	1824	148.56419042614	5719504.1
+18	2016	158.84029068332	5719505.1
+18	2634	231.74848383293	5725501.1
+18	2791	243.86415438611	5725502.1
+18	3074	257.50012483099	5725503.1
+18	3340	270.8489013149	5725504.1
+18	3564	282.68804757624	5725505.1
+18	4062	346.91721244203	5731501.1
+18	4165	357.07249144628	5731502.1
+18	4386	369.63691976806	5731503.1
+18	4637	383.01616211841	5731504.1
+18	4917	397.28849283606	5731505.1
+18	5339	461.03353971429	5737501.1
+18	5635	474.74548940244	5737502.1
+18	5835	488.29419829463	5737503.1
+18	5979	499.81463691848	5737504.1
+18	6128	510.2891054207	5737505
+18	6584	576.33400721918	5743501
+18	6753	588.90289098583	5743502
+18	6923	603.18209473835	5743503
+18	7039	614.32056232798	5743504
+18	7143	624.88717829203	5743505
+18	7581	691.61371990433	5749501
+18	7704	704.3460794047	5749502
+18	7810	716.21531212214	5749503
+18	7892	726.36723267707	5749504
+18	8029	740.99193457259	5749505
+19	271	1.4109521287	5715301
+19	397	12.30442267353	5715302
+19	603	26.96100427396	5715303
+19	711	38.05571546871	5715304
+19	879	50.84927072609	5715305
+19	1312	116.26147016673	5721301
+19	1545	129.27425040304	5721302
+19	1723	141.58663314091	5721303
+19	1971	156.36892120376	5721304
+19	2143	167.50034957564	5721305
+19	2543	231.06901120208	5727301
+19	2783	243.41032746178	5727302
+19	3021	256.04746287968	5727303
+19	3252	268.6753334587	5727304
+19	3575	283.15192962345	5727305.1
+19	3998	346.53147038445	5733301.1
+19	4236	359.01906177658	5733302.1
+19	4501	373.05181374913	5733303.1
+19	4719	386.08590312442	5733304.1
+19	5000	400.80519231991	5733305.1
+19	5371	461.30309667555	5739301.1
+19	5561	473.42005304178	5739302.1
+19	5765	486.53445778182	5739303.1
+19	5910	497.08543032059	5739304.1
+19	6153	511.66324783466	5739305.1
+19	6599	576.57226466411	5745301.1
+19	6707	587.39984122175	5745302.1
+19	6833	597.71077958355	5745303.1
+19	6974	610.06662800513	5745304.1
+19	7123	622.94451738662	5745305.1
+19	7591	691.7244566814	5751301
+19	7686	703.58589607523	5751302
+19	7788	714.95405978406	5751303
+19	7901	727.18762817326	5751304
+19	8046	742.15279501396	5751305
+20	272	1.43473352445	5713301
+20	416	12.74127174541	5713302
+20	597	26.71896879235	5713303
+20	751	39.70011506253	5713304
+20	896	51.49844161724	5713305
+20	1366	116.61663555377	5719301
+20	1484	127.34886870906	5719302
+20	1662	139.31051941542	5719303
+20	1847	150.32087282115	5719304
+20	2065	164.18904301781	5719305
+20	2641	231.82071171887	5725301
+20	2870	245.45735282078	5725302
+20	3157	260.42441777023	5725303
+20	3385	272.86032021581	5725304
+20	3589	283.71536881267	5725305
+20	3960	346.21558100684	5731301
+20	4157	356.75553579699	5731302
+20	4372	368.38962175535	5731303
+20	4568	378.51224157611	5731304
+20	4792	390.50041017706	5731305
+20	5414	461.64927126863	5737301
+20	5554	473.24736262578	5737302
+20	5800	487.22898037312	5737303
+20	5930	497.82106973836	5737304
+20	6114	509.06784553104	5737305
+20	6624	576.70146832662	5743301
+20	6774	589.84278633911	5743302
+20	6866	600.22805227851	5743303
+20	7022	613.16076737199	5743304
+20	7188	627.15306936949	5743305
+20	7585	691.66259325668	5749301
+20	7746	706.55484908237	5749302
+20	7848	718.01421759045	5749303
+20	7921	728.08289155574	5749304
+20	8045	741.93567887391	5749305
+21	273	1.45584026538	5716401
+21	429	13.22454250488	5716402
+21	553	24.345913111	5716403
+21	704	37.32298668427	5716404
+21	888	51.30711469985	5716405
+21	1298	116.00064349407	5722401
+21	1469	126.86109093763	5722402
+21	1711	141.28470613435	5722403.1
+21	1852	151.44023108925	5722404.1
+21	2081	164.58929887205	5722405.1
+21	2582	231.36645517033	5728401.1
+21	2768	243.1348137518	5728402.1
+21	3051	256.9574266912	5728403.1
+21	3211	267.23316595611	5728404.1
+21	3501	281.03274889594	5728405.1
+21	4043	346.80907681864	5734401.1
+21	4203	358.28293832764	5734402.1
+21	4377	369.17926898156	5734403.1
+21	4613	381.57981979241	5734404.1
+21	4821	392.84624435752	5734405.1
+21	5360	461.21099100355	5740401.1
+21	5546	472.96649644873	5740402.1
+21	5787	487.02959881537	5740403.1
+21	5971	499.62410503789	5740404.1
+21	6198	514.27390814084	5740405.1
+21	6561	576.08573575458	5746401
+21	6720	588.03211092437	5746402
+21	6903	602.00490870118	5746403
+21	7044	614.40372888768	5746404
+21	7212	628.76501553763	5746405
+21	7565	691.3226733522	5752401
+21	7653	701.88113593636	5752402
+21	7758	712.43451680662	5752403
+21	7908	727.40011226991	5752404
+21	8042	741.74531647726	5752405
+22	274	1.45677625178	5715601
+22	485	16.32276704278	5715602
+22	599	26.77832685038	5715603
+22	765	40.07416666345	5715604
+22	887	51.28978866943	5715605
+22	1389	116.82774936291	5721601
+22	1536	129.02606792142	5721602
+22	1716	141.41150399087	5721603
+22	1904	153.72765195183	5721604
+22	2114	166.12777001899	5721605
+22	2581	231.36383431265	5727601
+22	2754	242.5945128547	5727602
+22	2964	253.8999508135	5727603
+22	3209	267.09886234603	5727604
+22	3537	281.66337352712	5727605
+22	3955	346.18162465864	5733601
+22	4254	359.24603967578	5733602
+22	4465	371.85480032465	5733603.1
+22	4675	384.89295361796	5733604.1
+22	4971	399.11705499631	5733605.1
+22	5406	461.58112745429	5739601.1
+22	5534	472.46332980156	5739602.1
+22	5739	485.33084874087	5739603.1
+22	5913	497.11116019682	5739604.1
+22	6083	507.34078063093	5739605.1
+22	6581	576.29747666023	5745601.1
+22	6802	591.03699538345	5745602.1
+22	6914	602.89326435957	5745603.1
+22	7086	617.28081593244	5745604.1
+22	7221	631.03239105503	5745605.1
+22	7618	691.9587307102	5751601.1
+22	7658	702.10350510012	5751602.1
+22	7791	715.03087804932	5751603.1
+22	7889	726.27854230744	5751604.1
+22	8001	736.92152513005	5751605.1
+23	275	1.47071029525	5716001
+23	393	12.17771453084	5716002
+23	524	22.80430823331	5716003
+23	696	36.65401245234	5716004
+23	864	50.1967343362	5716005
+23	1332	116.48280584696	5722001
+23	1572	130.12779679243	5722002
+23	1789	144.39057276445	5722003
+23	2021	159.10127919494	5722004
+23	2227	172.90013751691	5722005
+23	2585	231.38319672388	5728001.1
+23	2808	244.12216500682	5728002.1
+23	2988	255.08264698624	5728003.1
+23	3218	267.49033881189	5728004.1
+23	3469	280.01494774433	5728005.1
+23	4072	346.97805897379	5734001.1
+23	4222	358.61849164404	5734002.1
+23	4408	370.3149564534	5734003.1
+23	4679	384.9528190312	5734004.1
+23	4865	395.202396743	5734005.1
+23	5385	461.433707244	5740001.1
+23	5537	472.63459173148	5740002.1
+23	5772	486.7151931359	5740003.1
+23	5956	498.90929098358	5740004.1
+23	6123	510.12484400534	5740005
+23	6591	576.47608834156	5746001
+23	6805	591.06464030058	5746002
+23	6962	605.97381593613	5746003
+23	7106	620.42659851909	5746004
+23	7227	631.81261849078	5746005
+23	7593	691.72804327216	5752001
+23	7661	702.12110153283	5752002
+23	7782	714.66658915742	5752003
+23	7888	726.10041870386	5752004
+23	8004	736.95132235763	5752005
+24	276	1.50496639148	5717101
+24	482	15.85050726728	5717102
+24	622	28.47533477307	5717103
+24	790	41.53283069678	5717104
+24	898	51.74397140461	5717105
+24	1309	116.16946148151	5723101
+24	1573	130.19935973268	5723102
+24	1697	141.04241997283	5723103
+24	1946	155.45587705844	5723104
+24	2161	168.43653486273	5723105
+24	2625	231.65808603354	5729101
+24	2807	244.06355763623	5729102
+24	2981	254.77182538435	5729103
+24	3207	266.7120093999	5729104
+24	3428	278.38124507177	5729105
+24	3974	346.28847131622	5735101
+24	4291	360.00987986219	5735102
+24	4538	374.43731306121	5735103
+24	4735	386.54743162566	5735104
+24	4950	398.20920973085	5735105
+24	5467	461.99929170124	5741101
+24	5659	475.37489131954	5741102
+24	5877	489.70501577993	5741103
+24	6028	501.37720552668	5741104
+24	6221	515.31468802992	5741105
+24	6631	576.770798065	5747101
+24	6801	590.89419470914	5747102
+24	6926	603.53662943631	5747103
+24	7032	613.94174473407	5747104
+24	7152	625.31701879739	5747105
+24	7561	691.22897458472	5753101
+24	7689	703.61197174503	5753102
+24	7773	713.87196316476	5753103
+24	7878	724.00516889965	5753104
+24	7988	734.07386949727	5753105
+25	277	1.51464803703	5712301
+25	408	12.48087553168	5712302
+25	606	27.09332757024	5712303
+25	717	38.20183126465	5712304
+25	852	49.40563971968	5712305
+25	1337	116.5055497773	5718301
+25	1615	131.47461703885	5718302
+25	1796	144.64021158428	5718303
+25	2014	158.61658261181	5718304
+25	2229	172.9976510678	5718305
+25	2558	231.1861790535	5724301
+25	2794	243.87969892635	5724302.1
+25	3077	257.51498464541	5724303.1
+25	3236	268.29339642822	5724304.1
+25	3432	278.95969410938	5724305.1
+25	4001	346.53748168307	5730301.1
+25	4219	358.58271919819	5730302.1
+25	4401	370.14629438566	5730303.1
+25	4630	382.95295711304	5730304.1
+25	4855	394.74969629128	5730305.1
+25	5429	461.75725454534	5736301.1
+25	5601	474.24862281256	5736302.1
+25	5816	487.84422826557	5736303.1
+25	6039	501.86070366832	5736304.1
+25	6238	516.61270274152	5736305.1
+25	6573	576.24267959269	5742301.1
+25	6736	588.42257991666	5742302.1
+25	6908	602.36617621966	5742303.1
+25	7068	616.30282813451	5742304.1
+25	7189	627.43208916276	5742305
+25	7566	691.34891347867	5748301
+25	7727	705.43817728898	5748302
+25	7868	719.95837707213	5748303
+25	7949	730.16639614851	5748304
+25	8059	743.56402973552	5748305
+26	278	1.5147253226	5716101
+26	394	12.19387462432	5716102
+26	601	26.88289290713	5716103
+26	749	39.64720882545	5716104
+26	904	51.93960981862	5716105.1
+26	1390	116.82942572027	5722101.1
+26	1550	129.57913509664	5722102.1
+26	1786	144.30459484668	5722103.1
+26	2005	158.32155455696	5722104.1
+26	2186	169.55323240697	5722105.1
+26	2631	231.71524421428	5728101.1
+26	2885	245.81618936499	5728102.1
+26	3101	258.02180106402	5728103.1
+26	3318	270.29034358915	5728104.1
+26	3520	281.35486118845	5728105.1
+26	4028	346.71885348274	5734101.1
+26	4330	361.57970617408	5734102.1
+26	4523	373.74550425796	5734103.1
+26	4672	384.87118663615	5734104.1
+26	4982	399.73096472211	5734105.1
+26	5344	461.06425910234	5740101.1
+26	5579	473.9772547395	5740102.1
+26	5725	484.41936284746	5740103.1
+26	5948	498.80817371281	5740104.1
+26	6146	511.44125667727	5740105
+26	6649	576.95493408223	5746101
+26	6783	590.13121021889	5746102
+26	6952	605.04707045831	5746103
+26	7080	617.07267407422	5746104
+26	7206	628.32501394885	5746105
+26	7587	691.69271230907	5752101
+26	7717	705.24315037625	5752102
+26	7828	716.81141184038	5752103
+26	7958	730.89568295726	5752104
+26	8075	744.54631055682	5752105
+27	279	1.53920453903	5716801.1
+27	410	12.52279119496	5716802.1
+27	554	24.48113556183	5716803.1
+27	707	37.55769837578	5716804.1
+27	841	48.65055506397	5716805.1
+27	1346	116.57443871326	5722801.1
+27	1527	128.94683855656	5722802.1
+27	1667	139.77409698139	5722803.1
+27	1884	152.85964391963	5722804.1
+27	2126	166.82048768108	5722805.1
+27	2540	231.06217463338	5728801.1
+27	2750	242.42824480008	5728802.1
+27	3044	256.66628019955	5728803.1
+27	3266	269.00407501334	5728804.1
+27	3572	282.95891819592	5728805.1
+27	3965	346.23178739008	5734801.1
+27	4301	360.40514349845	5734802
+27	4444	371.33373794053	5734803
+27	4718	386.08063815651	5734804
+27	4989	400.3911896681	5734805
+27	5355	461.13716001669	5740801
+27	5658	475.28913567937	5740802
+27	5807	487.39143103524	5740803
+27	5942	498.5186056518	5740804
+27	6132	510.46207416966	5740805
+27	6588	576.37935805949	5746801
+27	6742	588.79135147784	5746802
+27	6911	602.3738000309	5746803
+27	7029	613.82661523879	5746804
+27	7151	625.29707320383	5746805
+27	7583	691.62436843943	5752801
+27	7745	706.40920309676	5752802
+27	7872	720.77351519116	5752803
+27	7979	732.51071150391	5752804
+27	8064	744.01674907514	5752805
+28	282	1.62333907071	5714201
+28	374	11.74023495499	5714202
+28	598	26.72757399595	5714203
+28	697	36.79641861329	5714204
+28	836	48.09280049848	5714205
+28	1407	116.93990809983	5720201
+28	1618	131.50168712624	5720202
+28	1749	142.23991074158	5720203
+28	1938	155.29434987834	5720204
+28	2118	166.36985331798	5720205
+28	2556	231.16895089182	5726201
+28	2780	243.21695497632	5726202
+28	2972	254.31096463371	5726203
+28	3274	269.11080366606	5726204
+28	3483	280.71031034947	5726205
+28	3976	346.31844068738	5732201
+28	4199	358.00281552342	5732202
+28	4399	369.99397423212	5732203
+28	4660	384.16201291117	5732204
+28	4864	395.03505011415	5732205
+28	5342	461.05150094372	5738201
+28	5689	475.95767990802	5738202
+28	5873	489.47081392048	5738203
+28	6018	501.08864120207	5738204
+28	6170	512.70952375954	5738205
+28	6590	576.43856959231	5744201
+28	6693	586.46193517418	5744202
+28	6849	599.65612496412	5744203
+28	6995	611.3743838882	5744204
+28	7145	625.01414225948	5744205
+28	7564	691.27981382166	5750201
+28	7705	704.55139238248	5750202
+28	7811	716.25654004957	5750203
+28	7937	729.63297837158	5750204
+28	8060	743.56485514064	5750205
+29	283	1.64576866548	5716301
+29	467	15.44970441726	5716302
+29	582	25.9125024348	5716303
+29	769	40.15653612092	5716304
+29	899	51.75114908488	5716305
+29	1311	116.25957871228	5722301
+29	1492	127.55224729678	5722302
+29	1649	138.20540721435	5722303
+29	1873	152.47098044283	5722304
+29	2105	165.57803312806	5722305
+29	2655	231.900836332	5728301
+29	2915	246.29147180379	5728302
+29	3062	257.26234535942	5728303
+29	3334	270.61154178483	5728304
+29	3558	282.28699236782	5728305
+29	3991	346.43885028549	5734301
+29	4231	358.74923156924	5734302
+29	4376	369.13211801672	5734303
+29	4612	381.55889790622	5734304
+29	4860	394.84450414195	5734305
+29	5347	461.09794179141	5740301
+29	5571	473.72294432647	5740302
+29	5819	487.86944891955	5740303
+29	5951	498.81847643922	5740304
+29	6185	513.52907749056	5740305
+29	6620	576.6886512388	5746301
+29	6798	590.86736029945	5746302
+29	6883	601.13359394949	5746303
+29	6994	611.3563929766	5746304
+29	7116	622.51226513298	5746305
+29	7600	691.75816851179	5752301
+29	7743	706.40072890534	5752302
+29	7856	718.34826312703	5752303
+29	7970	731.59289871086	5752304
+29	8093	746.33626808505	5752305
+30	284	1.68156019598	5714001.1
+30	417	12.7856813611	5714002.1
+30	542	23.82331532729	5714003.1
+30	693	36.48682698328	5714004.1
+30	890	51.40891692904	5714005.1
+30	1313	116.27113671578	5720001.1
+30	1606	131.16519107903	5720002.1
+30	1790	144.59371810151	5720003.1
+30	1972	156.41116214987	5720004.1
+30	2180	169.3191197673	5720005.1
+30	2588	231.39505468635	5726001.1
+30	2814	244.24716334883	5726002.1
+30	2998	255.24895869638	5726003.1
+30	3226	267.94023764529	5726004.1
+30	3423	278.05580840772	5726005.1
+30	4040	346.7979455993	5732001.1
+30	4292	360.05430256458	5732002
+30	4449	371.40666051976	5732003
+30	4627	382.66542544797	5732004
+30	4923	397.31168079748	5732005
+30	5343	461.06418331387	5738001
+30	5529	471.25572609134	5738002
+30	5717	481.62082901109	5738003
+30	5892	494.77396632546	5738004
+30	6070	505.15212171945	5738005
+30	6589	576.4183550789	5744001
+30	6806	591.08892412693	5744002
+30	6936	604.39878094662	5744003
+30	7058	615.66803754959	5744004
+30	7209	628.43617376825	5744005
+30	7552	691.13442082237	5750001
+30	7693	703.73093235935	5750002
+30	7843	717.79618149437	5750003
+30	7927	728.90015297034	5750004
+30	8043	741.78798514698	5750005
+31	287	1.68934233044	5717801
+31	415	12.62992622354	5717802
+31	596	26.57912189281	5717803
+31	789	41.317819739	5717804
+31	974	55.7738044872	5717805
+31	1393	116.83862312371	5723801
+31	1583	130.45858635474	5723802
+31	1798	144.81069690222	5723803
+31	1984	156.89336622506	5723804
+31	2211	170.81661487603	5723805
+31	2544	231.08962502866	5729801
+31	2779	243.21511327708	5729802
+31	2978	254.67667886708	5729803
+31	3246	268.56516382145	5729804
+31	3456	279.69942501234	5729805
+31	4069	346.96538413176	5735801
+31	4218	358.51214286056	5735802
+31	4495	372.8254791256	5735803
+31	4757	387.41933370474	5735804
+31	4949	398.14723141258	5735805
+31	5367	461.26406358858	5741801
+31	5655	475.19489636133	5741802
+31	5858	488.90898710769	5741803
+31	6055	503.03862456419	5741804
+31	6216	515.25499099354	5741805
+31	6592	576.50442979601	5747801.1
+31	6807	591.15150663256	5747802.1
+31	6948	604.68123823124	5747803.1
+31	7064	616.08084050542	5747804.1
+31	7182	626.77476919209	5747805.1
+31	7569	691.44219279126	5753801.1
+31	7655	701.95560784382	5753802.1
+31	7755	711.96097312449	5753803.1
+31	7879	724.36428851751	5753804.1
+31	7990	734.4543456689	5753805.1
+32	288	1.69583272119	5713801.1
+32	450	14.6196879195	5713802.1
+32	625	28.6790044913	5713803.1
+32	773	40.58995766728	5713804.1
+32	930	53.25994254253	5713805.1
+32	1398	116.85892856936	5719801.1
+32	1510	128.33570558601	5719802.1
+32	1720	141.56534462492	5719803.1
+32	1870	152.29430236528	5719804.1
+32	2078	164.47409973736	5719805.1
+32	2562	231.21146653662	5725801.1
+32	2844	244.94315578485	5725802.1
+32	2991	255.13057235744	5725803.1
+32	3195	266.01515289395	5725804.1
+32	3414	276.8179655657	5725805.1
+32	4013	346.54649471329	5731801.1
+32	4233	358.82620563195	5731802.1
+32	4419	370.43896380276	5731803
+32	4683	385.07246864656	5731804
+32	4891	396.25006041884	5731805
+32	5446	461.80457096384	5737801
+32	5620	474.46653938224	5737802
+32	5865	489.17939480814	5737803
+32	6061	503.6617522461	5737804
+32	6249	518.25089954144	5737805
+32	6572	576.2123266221	5743801
+32	6787	590.20540068717	5743802
+32	6868	600.44319804152	5743803
+32	6981	610.65494846296	5743804
+32	7156	625.34943912737	5743805
+32	7580	691.58569119638	5749801
+32	7673	703.09467181796	5749802
+32	7775	714.11232874845	5749803
+32	7912	727.76082953787	5749804
+32	8018	739.44829482818	5749805
+33	291	1.72511961474	5713001
+33	428	13.09032877604	5713002
+33	538	23.63419599062	5713003
+33	687	35.51315894047	5713004
+33	844	49.14282087748	5713005.1
+33	1338	116.52950812154	5719001.1
+33	1485	127.3773632457	5719002.1
+33	1646	138.15683823568	5719003.1
+33	1843	150.08271575696	5719004.1
+33	2071	164.40335267713	5719005.1
+33	2668	231.97958234744	5725001.1
+33	2876	245.60759140225	5725002.1
+33	3022	256.16971801314	5725003.1
+33	3275	269.1147370059	5725004.1
+33	3569	282.90081160771	5725005.1
+33	4035	346.77438494633	5731001.1
+33	4310	360.74134025723	5731002.1
+33	4426	370.86379336776	5731003.1
+33	4604	381.26059595962	5731004.1
+33	4835	393.18801385584	5731005.1
+33	5440	461.77301392821	5737001.1
+33	5696	476.41376101692	5737002.1
+33	5797	487.21686155583	5737003.1
+33	6001	500.3896057238	5737004
+33	6220	515.29664591818	5737005
+33	6651	576.96469394001	5743001
+33	6719	587.88253196259	5743002
+33	6912	602.44126134878	5743003
+33	7085	617.1953772984	5743004
+33	7194	627.64262858406	5743005
+33	7584	691.64186871005	5749001
+33	7688	703.60711405263	5749002
+33	7798	715.41344238887	5749003
+33	7915	727.94985654042	5749004
+33	8026	740.26274351962	5749005
+34	292	1.74637196003	5713701.1
+34	389	12.12232072837	5713702.1
+34	526	23.19437599158	5713703.1
+34	665	34.06454995739	5713704.1
+34	825	47.33623903709	5713705.1
+34	1352	116.58794271224	5719701.1
+34	1597	130.7783593894	5719702.1
+34	1769	143.43379937625	5719703.1
+34	1965	155.97643008968	5719704.1
+34	2137	167.4069491569	5719705.1
+34	2605	231.47020833753	5725701.1
+34	2736	241.80615115166	5725702.1
+34	3018	256.02706654999	5725703.1
+34	3298	269.66145931697	5725704.1
+34	3477	280.4301457766	5725705.1
+34	3956	346.21147365496	5731701.1
+34	4239	359.03400069057	5731702.1
+34	4462	371.81592165098	5731703.1
+34	4713	385.96091443744	5731704.1
+34	4886	396.08320128127	5731705.1
+34	5428	461.74245844595	5737701
+34	5578	473.90187799232	5737702
+34	5742	485.41071298765	5737703
+34	5895	496.03035221342	5737704
+34	6127	510.25083454326	5737705
+34	6559	576.00196363521	5743701
+34	6692	586.38319128775	5743702
+34	6842	598.54240077431	5743703
+34	6972	608.65922887111	5743704
+34	7128	623.64117717137	5743705
+34	7544	691.10848529032	5749701
+34	7676	703.29268161208	5749702
+34	7853	718.11937953462	5749703
+34	7952	730.69342558622	5749704
+34	8056	743.06790398434	5749705
+35	295	1.74913411867	5717901
+35	378	11.84610458696	5717902
+35	560	24.70206635562	5717903
+35	706	37.5429531713	5717904
+35	851	49.31112845568	5717905
+35	1364	116.60611020075	5723901
+35	1596	130.74597071647	5723902
+35	1809	145.1754534829	5723903
+35	2027	159.81579671871	5723904
+35	2225	171.84946820513	5723905
+35	2551	231.11658972665	5729901
+35	2884	245.73013496795	5729902
+35	3149	259.83329727524	5729903
+35	3380	272.67006927263	5729904
+35	3595	283.73713762593	5729905
+35	4027	346.70721307001	5735901
+35	4169	357.21253468143	5735902
+35	4443	371.2457174419	5735903
+35	4682	384.97759460542	5735904
+35	4882	395.71861197777	5735905
+35	5418	461.65075937752	5741901
+35	5567	473.63111258601	5741902
+35	5724	484.23452858115	5741903
+35	5893	495.7186532137	5741904
+35	6105	508.44390166691	5741905
+35	6580	576.26709027449	5747901
+35	6777	589.95827192674	5747902
+35	6893	601.61448326195	5747903
+35	7034	614.13425727398	5747904
+35	7159	625.44862417038	5747905
+35	7567	691.35245313845	5753901
+35	7652	701.8104333987	5753902
+35	7781	714.59926497983	5753903
+35	7905	727.2914121158	5753904
+35	8021	739.9116711875	5753905
+36	296	1.76280742208	5714501
+36	423	12.85111934808	5714502
+36	529	23.30989655154	5714503
+36	686	35.48843763117	5714504
+36	837	48.21060078265	5714505
+36	1345	116.55975839519	5720501
+36	1569	130.00195799442	5720502
+36	1698	141.08578247298	5720503
+36	1866	152.0660812622	5720504
+36	2041	162.63228616142	5720505
+36	2667	231.94217191916	5726501
+36	2781	243.25060140598	5726502
+36	2962	253.44683262776	5726503
+36	3244	268.3754954245	5726504
+36	3523	281.36440548953	5726505
+36	4020	346.6230827074	5732501
+36	4263	359.4245493079	5732502
+36	4496	372.86824138415	5732503
+36	4730	386.35680248075	5732504
+36	4906	396.75930998217	5732505
+36	5439	461.77262123465	5738501
+36	5566	473.54641298904	5738502
+36	5756	486.06864258205	5738503
+36	5902	496.88718899643	5738504
+36	6119	509.53782273713	5738505
+36	6606	576.60304713156	5744501
+36	6726	588.13473183755	5744502
+36	6850	599.6694317027	5744503
+36	7010	612.35760655697	5744504
+36	7134	623.84139582376	5744505
+36	7615	691.93058921816	5750501
+36	7728	705.4952221117	5750502
+36	7800	715.82215903187	5750503
+36	7922	728.17288889759	5750504
+36	8019	739.5146126193	5750505
+37	297	1.76419249363	5717201
+37	443	14.21550870617	5717202
+37	573	25.08825683361	5717203
+37	756	39.83732921863	5717204
+37	878	50.78218396031	5717205
+37	1320	116.35813059076	5723201
+37	1491	127.43096119515	5723202
+37	1752	142.3728610531	5723203
+37	1964	155.96542851325	5723204
+37	2166	168.89796326543	5723205
+37	2552	231.15552392951	5729201.1
+37	2859	245.23245958425	5729202.1
+37	3146	259.66602585907	5729203.1
+37	3352	271.20182211441	5729204.1
+37	3538	281.72282167757	5729205.1
+37	4032	346.76282550767	5735201.1
+37	4228	358.67033811845	5735202.1
+37	4436	371.16838034452	5735203.1
+37	4617	381.90581696667	5735204.1
+37	4808	392.07181287557	5735205.1
+37	5411	461.64529247861	5741201.1
+37	5588	474.16966063622	5741202.1
+37	5839	488.44009523	5741203
+37	6006	500.55221760016	5741204
+37	6222	515.44436733657	5741205
+37	6587	576.36009916035	5747201
+37	6752	588.892526455	5747202
+37	6924	603.21223725985	5747203
+37	7027	613.72803344579	5747204
+37	7175	626.64365816118	5747205
+37	7563	691.25524449279	5753201
+37	7674	703.11551175663	5753202
+37	7772	713.81421936095	5753203
+37	7877	723.85337416899	5753204
+37	8007	737.43771950949	5753205
+38	298	1.76857742318	5712601
+38	457	14.93407918792	5712602
+38	618	28.20039872848	5712603
+38	737	39.08344991225	5712604
+38	933	53.50770892062	5712605
+38	1413	116.98178983061	5718601
+38	1614	131.43945004675	5718602
+38	1741	142.07513304311	5718603
+38	1914	154.07472352497	5718604
+38	2121	166.66139585315	5718605
+38	2616	231.60526156612	5724601
+38	2742	242.12717525265	5724602
+38	2976	254.4738285949	5724603
+38	3256	268.77538996935	5724604
+38	3482	280.65430547763	5724605
+38	3978	346.37351295259	5730601
+38	4313	360.78387999023	5730602
+38	4508	373.29492463195	5730603
+38	4747	386.74428313202	5730604
+38	4935	397.9162745031	5730605
+38	5389	461.47850593133	5736601.1
+38	5616	474.43186715758	5736602.1
+38	5750	485.8974547328	5736603.1
+38	5990	500.18677037838	5736604.1
+38	6167	512.50059954287	5736605.1
+38	6612	576.64348140638	5742601.1
+38	6716	587.80830364371	5742602.1
+38	6854	599.74375477456	5742603.1
+38	6983	610.83836723747	5742604.1
+38	7146	625.20599479251	5742605.1
+38	7602	691.78604634246	5748601.1
+38	7709	704.98015483609	5748602.1
+38	7830	717.04620838166	5748603.1
+38	7955	730.73925239384	5748604.1
+38	8061	743.61987080193	5748605.1
+39	299	1.78119902429	5717301
+39	477	15.70829557883	5717302
+39	584	26.04593458399	5717303
+39	725	38.64637028822	5717304
+39	881	51.11761807977	5717305
+39	1308	116.16203709086	5723301
+39	1568	129.97152449726	5723302
+39	1768	143.2144380901	5723303
+39	1963	155.87502082623	5723304
+39	2106	165.88477399246	5723305
+39	2538	231.03152753576	5729301
+39	2865	245.34911942575	5729302
+39	3010	255.85545030446	5729303
+39	3230	268.10970003857	5729304
+39	3427	278.28962628637	5729305
+39	4012	346.54393308517	5735301
+39	4158	356.90726609738	5735302
+39	4365	367.35404276709	5735303
+39	4597	380.88981370629	5735304
+39	4828	393.03934329493	5735305
+39	5356	461.16031966871	5741301
+39	5653	475.12490647612	5741302
+39	5743	485.47720023431	5741303
+39	5897	496.34696073481	5741304
+39	6086	507.54588019801	5741305
+39	6630	576.76622149651	5747301
+39	6811	591.23459771392	5747302
+39	6904	602.01831469196	5747303
+39	7043	614.32855227846	5747304
+39	7199	627.93906861218	5747305
+39	7589	691.72077211761	5753301
+39	7677	703.48733977508	5753302
+39	7827	716.64522870654	5753303
+39	7899	726.85741744797	5753304
+39	8035	741.39819254727	5753305
+40	300	1.78681135504	5714401
+40	382	11.92422474828	5714402
+40	580	25.80234938744	5714403
+40	705	37.43822111143	5714404
+40	889	51.35435953597	5714405
+40	1387	116.82322708005	5720401
+40	1496	127.79672806896	5720402
+40	1637	137.93953108065	5720403
+40	1842	149.9751122347	5720404
+40	2064	164.16291741933	5720405
+40	2545	231.09123990987	5726401.1
+40	2747	242.41210252395	5726402.1
+40	2977	254.55157443182	5726403
+40	3180	264.88323071389	5726404.1
+40	3402	274.95865375152	5726405.1
+40	3947	346.04595259787	5732401.1
+40	4177	357.69247840182	5732402.1
+40	4459	371.66102125449	5732403.1
+40	4691	385.28072055452	5732404.1
+40	4920	397.29687019856	5732405.1
+40	5456	461.9108778704	5738401.1
+40	5541	472.75565248914	5738402
+40	5760	486.26309011131	5738403
+40	5931	497.86642595194	5738404
+40	6106	508.63254121504	5738405
+40	6616	576.6616106045	5744401
+40	6775	589.86056463328	5744402
+40	6917	602.91685124511	5744403
+40	7089	617.5592261844	5744404
+40	7200	628.03011995276	5744405
+40	7540	691.01944533316	5750401
+40	7733	705.894482987	5750402
+40	7865	719.27642220422	5750403
+40	7938	729.75271946309	5750404
+40	8025	740.12170314114	5750405
+41	301	1.79041893454	5714101.1
+41	403	12.38068961538	5714102.1
+41	521	22.4057030573	5714103.1
+41	671	34.08428309602	5714104.1
+41	828	47.63180532027	5714105.1
+41	1367	116.61852566944	5720101.1
+41	1561	129.64314771886	5720102.1
+41	1694	141.01842906512	5720103.1
+41	1949	155.71248969948	5720104.1
+41	2152	168.24453063612	5720105.1
+41	2643	231.85218304629	5726101.1
+41	2851	245.04991037539	5726102.1
+41	3054	256.95788552287	5726103.1
+41	3343	270.91513768072	5726104.1
+41	3514	281.22054684559	5726105.1
+41	4083	346.99726001406	5732101.1
+41	4193	357.89256551349	5732102.1
+41	4393	369.76631676941	5732103.1
+41	4651	383.75420304411	5732104.1
+41	4908	396.95118415449	5732105.1
+41	5455	461.88831837336	5738101
+41	5591	474.18590547936	5738102
+41	5754	486.05753030931	5738103
+41	5962	499.48548143101	5738104
+41	6190	514.12210207502	5738105
+41	6566	576.14130865852	5744101
+41	6701	587.10704209702	5744102
+41	6890	601.31728089135	5744103
+41	7036	614.27675977303	5744104
+41	7201	628.16014606459	5744105
+41	7562	691.23814569646	5750101
+41	7707	704.95279970904	5750102
+41	7812	716.3049658141	5750103
+41	7926	728.80205408879	5750104
+41	8044	741.86984178936	5750105
+42	304	1.80433448078	5714701.1
+42	420	12.80618235026	5714702.1
+42	531	23.45002343319	5714703.1
+42	690	36.40550951147	5714704.1
+42	861	50.05445769662	5714705.1
+42	1355	116.59476793325	5720701.1
+42	1481	127.31417256245	5720702.1
+42	1634	137.59273108165	5720703.1
+42	1827	148.97696337383	5720704.1
+42	2035	162.3774070288	5720705.1
+42	2676	231.99342596275	5726701.1
+42	2800	243.98039800395	5726702.1
+42	3124	258.64687115583	5726703.1
+42	3315	270.16442305455	5726704.1
+42	3472	280.17236070056	5726705.1
+42	3961	346.22771238605	5732701
+42	4317	360.95431153476	5732702
+42	4543	374.58100687526	5732703
+42	4777	388.91458256449	5732704
+42	4985	399.99748566234	5732705
+42	5409	461.58489562082	5738701
+42	5540	472.73497694149	5738702
+42	5720	483.31442532107	5738703
+42	5906	497.06098784437	5738704
+42	6133	510.55597737642	5738705
+42	6586	576.35525334673	5744701
+42	6739	588.47578728385	5744702
+42	6900	601.84356164583	5744703
+42	7079	616.79589078575	5744704
+42	7195	627.64592947601	5744705
+42	7568	691.4048354018	5750701
+42	7667	702.44504783	5750702
+42	7816	716.420764721	5750703
+42	7895	726.58205605508	5750704
+42	8016	738.64664638578	5750705
+43	307	1.80699582724	5717001
+43	386	12.01702379435	5717002
+43	564	24.95744005241	5717003
+43	732	38.92331661353	5717004
+43	928	53.2436705199	5717005
+43	1361	116.60321601015	5723001.1
+43	1600	131.06055888045	5723002.1
+43	1765	143.14940521657	5723003.1
+43	1935	155.29247352086	5723004.1
+43	2130	167.10645478383	5723005.1
+43	2598	231.43964432343	5729001.1
+43	2822	244.46621876722	5729002.1
+43	3067	257.39033435168	5729003.1
+43	3248	268.57006053603	5729004.1
+43	3489	280.81330686388	5729005.1
+43	4004	346.53841934586	5735001.1
+43	4196	357.99194253818	5735002.1
+43	4396	369.8670794717	5735003.1
+43	4624	382.53901829547	5735004.1
+43	4818	392.83861128101	5735005.1
+43	5399	461.5464210154	5741001
+43	5553	473.21008301619	5741002
+43	5749	485.80128335324	5741003
+43	5901	496.4403460843	5741004
+43	6078	506.90243804292	5741005
+43	6567	576.18773720553	5747001
+43	6756	589.0902458909	5747002
+43	6902	601.88548050332	5747003
+43	7017	612.76181579777	5747004
+43	7144	624.89830829413	5747005
+43	7575	691.5550055129	5753001
+43	7669	702.92087751161	5753002
+43	7774	714.0074421938	5753003
+43	7882	724.89388308674	5753004
+43	8006	737.30733461166	5753005
+44	308	1.80797764612	5713401.1
+44	379	11.9172127957	5713402.1
+44	569	25.06731354562	5713403.1
+44	727	38.79010172841	5713404.1
+44	858	49.9893569206	5713405.1
+44	1410	116.96558017354	5719401.1
+44	1517	128.72512966814	5719402.1
+44	1699	141.15156265744	5719403.1
+44	1929	155.01216005138	5719404.1
+44	2183	169.51016437332	5719405.1
+44	2638	231.82034450164	5725401.1
+44	2916	246.32380093378	5725402.1
+44	3083	257.72720160941	5725403.1
+44	3261	268.85072406079	5725404.1
+44	3533	281.52829367132	5725405.1
+44	4059	346.89890835062	5731401.1
+44	4225	358.65589901898	5731402.1
+44	4517	373.63138326188	5731403.1
+44	4761	387.87335633161	5731404.1
+44	4951	398.35796863167	5731405.1
+44	5463	461.94940233789	5737401.1
+44	5626	474.57274798723	5737402
+44	5872	489.44522787887	5737403
+44	5982	499.81842140737	5737404
+44	6166	512.47892118595	5737405
+44	6639	576.84482155275	5743401
+44	6782	590.06164830318	5743402
+44	6951	604.7364888133	5743403
+44	7067	616.29333467595	5743404
+44	7214	629.35503017879	5743405
+44	7541	691.03189534019	5749401
+44	7700	704.02359158709	5749402
+44	7776	714.1291236165	5749403
+44	7883	725.58436649246	5749404
+44	8017	739.36782447132	5749405
+45	311	1.81968371733	5715501
+45	387	12.08825199632	5715502
+45	530	23.33466838114	5715503
+45	674	34.15261394344	5715504
+45	824	47.14901185245	5715505
+45	1388	116.82514007762	5721501
+45	1480	127.28232019092	5721502
+45	1737	142.03431143984	5721503
+45	1915	154.16919716494	5721504
+45	2115	166.16256083106	5721505
+45	2594	231.4121437592	5727501
+45	2894	245.90457046009	5727502
+45	3063	257.3146937585	5727503
+45	3231	268.15037078876	5727504
+45	3436	279.23966702726	5727505
+45	3968	346.24882662622	5733501.1
+45	4208	358.38339290069	5733502.1
+45	4471	372.2004841764	5733503.1
+45	4727	386.34863981349	5733504.1
+45	5003	401.08356522932	5733505.1
+45	5368	461.29293806059	5739501.1
+45	5558	473.39960075472	5739502.1
+45	5729	484.71229018201	5739503.1
+45	5964	499.56751836021	5739504.1
+45	6187	513.98717547091	5739505.1
+45	6617	576.6737329883	5745501.1
+45	6771	589.84147577709	5745502.1
+45	6869	600.49398963269	5745503.1
+45	7004	611.88207849906	5745504.1
+45	7113	622.00603452208	5745505.1
+45	7557	691.18536799913	5751501.1
+45	7648	701.60409781034	5751502.1
+45	7759	712.75191564462	5751503.1
+45	7902	727.24824323319	5751504.1
+45	8024	740.08980209823	5751505
+46	314	1.83446132694	5713901.1
+46	458	14.96545891976	5713902.1
+46	619	28.41185830534	5713903.1
+46	766	40.15139446361	5713904.1
+46	954	54.61549923639	5713905.1
+46	1394	116.84128911537	5719901.1
+46	1503	128.05302220234	5719902.1
+46	1678	140.51012608176	5719903.1
+46	1858	151.72604233678	5719904.1
+46	2093	165.20352635718	5719905.1
+46	2578	231.31062127836	5725901.1
+46	2787	243.519074474	5725902.1
+46	3080	257.65725987801	5725903.1
+46	3363	271.60921602697	5725904.1
+46	3549	282.13990643808	5725905.1
+46	4031	346.75213937508	5731901
+46	4172	357.43975621508	5731902
+46	4367	367.52909085922	5731903
+46	4589	380.31685560801	5731904
+46	4869	395.29352116258	5731905
+46	5419	461.66711995634	5737901
+46	5532	472.26666299416	5737902
+46	5728	484.66514898836	5737903
+46	5944	498.5882646453	5737904
+46	6137	510.80702593805	5737905
+46	6605	576.59289406287	5743901
+46	6698	586.72678798927	5743902
+46	6836	597.94517637022	5743903
+46	6973	609.48479829264	5743904
+46	7108	620.95415891638	5743905
+46	7579	691.5826707771	5749901
+46	7668	702.63675281731	5749902
+46	7817	716.46442709211	5749903
+46	7925	728.73758489219	5749904
+46	8037	741.58588204369	5749905
+47	319	1.85954234214	5715701
+47	406	12.42771833088	5715702
+47	600	26.86691763928	5715703
+47	742	39.28685868276	5715704
+47	855	49.56131088781	5715705
+47	1300	116.05253924849	5721701
+47	1535	128.9890801278	5721702
+47	1772	143.51569142659	5721703
+47	1998	157.5163579255	5721704
+47	2204	170.26645626525	5721705
+47	2555	231.16566578578	5727701
+47	2893	245.86120186792	5727702
+47	3017	256.01680543925	5727703
+47	3222	267.80454709729	5727704
+47	3422	277.8825822526	5727705
+47	4023	346.6514541388	5733701
+47	4215	358.45868181251	5733702
+47	4374	368.5647051495	5733703
+47	4576	379.71314103971	5733704
+47	4789	390.10387928039	5733705
+47	5364	461.24730380345	5739701.1
+47	5632	474.67459552782	5739702.1
+47	5843	488.60839017877	5739703.1
+47	6052	503.01861688472	5739704.1
+47	6211	514.87250779151	5739705.1
+47	6652	576.99180167122	5745701.1
+47	6713	587.52193908859	5745702.1
+47	6837	598.3098368505	5745703.1
+47	7018	612.77510193828	5745704.1
+47	7190	627.46543497266	5745705.1
+47	7608	691.7942124696	5751701.1
+47	7724	705.4364836074	5751702.1
+47	7849	718.01884482243	5751703.1
+47	7964	731.33630759992	5751704.1
+47	8081	745.32402888151	5751705.1
+48	320	1.86355978902	5717701.1
+48	492	16.45396803575	5717702.1
+48	609	27.64612587238	5717703.1
+48	712	38.06110504735	5717704.1
+48	838	48.36278331186	5717705.1
+48	1342	116.55434612534	5723701.1
+48	1542	129.16345134727	5723702.1
+48	1659	139.18194807833	5723703.1
+48	1867	152.29140078649	5723704.1
+48	2042	162.7331034781	5723705.1
+48	2565	231.21152035566	5729701.1
+48	2890	245.83510704711	5729702.1
+48	3025	256.20006720093	5729703.1
+48	3295	269.60034877667	5729704.1
+48	3460	279.80293982685	5729705.1
+48	3977	346.33229683153	5735701
+48	4322	361.19388044462	5735702
+48	4554	375.73680650326	5735703
+48	4790	390.2634068334	5735704
+48	5030	404.30342450039	5735705
+48	5388	461.47234077705	5741701
+48	5552	473.02807730762	5741702
+48	5815	487.73221668461	5741703
+48	5961	499.26756674098	5741704
+48	6135	510.7739326465	5741705
+48	6643	576.91362630296	5747701
+48	6702	587.17498241644	5747702
+48	6832	597.71040343865	5747703
+48	7007	611.92582152737	5747704
+48	7117	622.55176036339	5747705
+48	7538	691.01737764082	5753701
+48	7703	704.22050553956	5753702
+48	7790	715.00900525716	5753703
+48	7928	729.19864841038	5753704
+48	8047	742.29148823884	5753705
+49	325	1.86676045042	5712401
+49	484	16.28489786387	5712402
+49	636	29.31996474485	5712403
+49	810	44.16742527485	5712404
+49	988	57.00812580972	5712405
+49	1319	116.35543187778	5718401
+49	1516	128.55111788423	5718402
+49	1663	139.39634810481	5718403
+49	1848	150.33455116022	5718404
+49	2099	165.33207838586	5718405
+49	2620	231.62403426319	5724401
+49	2910	246.20848482661	5724402
+49	3028	256.21843761718	5724403
+49	3208	267.04599822941	5724404
+49	3536	281.61996899941	5724405
+49	3962	346.22976689413	5730401.1
+49	4173	357.56267879787	5730402.1
+49	4368	367.62432465376	5730403.1
+49	4572	378.98289380525	5730404.1
+49	4824	392.95303484471	5730405.1
+49	5352	461.13337715506	5736401.1
+49	5611	474.3622188957	5736402.1
+49	5827	488.22890925338	5736403.1
+49	6025	501.34401197429	5736404.1
+49	6232	516.07654660824	5736405.1
+49	6602	576.58700669976	5742401.1
+49	6760	589.30510727782	5742402.1
+49	6859	600.06211037026	5742403.1
+49	6977	610.13859101781	5742404.1
+49	7110	621.88688210887	5742405.1
+49	7545	691.11616953346	5748401.1
+49	7687	703.59619106934	5748402
+49	7780	714.520532188	5748403
+49	7897	726.68867174023	5748404
+49	8009	737.56958466907	5748405
+50	326	1.87053431734	5717401
+50	468	15.47160579218	5717402
+50	583	26.00300471508	5717403
+50	744	39.50099755521	5717404
+50	944	54.16616305919	5717405
+50	1408	116.94313236745	5723401
+50	1589	130.67077466287	5723402
+50	1813	145.60926273	5723403
+50	2012	158.44716883149	5723404
+50	2162	168.47789142165	5723405
+50	2629	231.68417531857	5729401
+50	2765	243.01545396424	5729402
+50	2965	254.20260442281	5729403
+50	3217	267.38196214056	5729404
+50	3546	281.96000525705	5729405
+50	3959	346.21369425091	5735401
+50	4307	360.5238187965	5735402
+50	4528	373.8612304593	5735403
+50	4678	384.93699892308	5735404
+50	4966	398.82998755435	5735405
+50	5432	461.76152764703	5741401
+50	5662	475.43172164936	5741402
+50	5838	488.38998908526	5741403
+50	6002	500.39106882526	5741404
+50	6157	511.98584513389	5741405
+50	6596	576.51950012799	5747401
+50	6763	589.46766583039	5747402
+50	6925	603.36363045522	5747403
+50	7031	613.92094595847	5747404
+50	7149	625.2467921332	5747405
+50	7624	691.99534945912	5753401
+50	7718	705.36891365913	5753402
+50	7799	715.42188681802	5753403
+50	7907	727.35475182557	5753404
+50	8020	739.52402539459	5753405
+51	327	1.87974011013	5712501
+51	464	15.12576558697	5712502
+51	575	25.36216749647	5712503
+51	746	39.6171554639	5712504
+51	953	54.48960952298	5712505
+51	1331	116.47189602302	5718501
+51	1571	130.10546271735	5718502
+51	1685	140.62578132073	5718503
+51	1890	153.09747001319	5718504
+51	2075	164.45669292169	5718505.1
+51	2568	231.21650205716	5724501.1
+51	2873	245.53686772264	5724502.1
+51	3064	257.3764368021	5724503.1
+51	3290	269.4999127721	5724504.1
+51	3592	283.73621489294	5724505.1
+51	3951	346.10324282805	5730501.1
+51	4200	358.01120251208	5730502.1
+51	4383	369.27890903573	5730503.1
+51	4577	379.84505926865	5730504.1
+51	4801	391.32629575465	5730505.1
+51	5392	461.48328966461	5736501.1
+51	5678	475.68641713122	5736502.1
+51	5777	486.89833931974	5736503.1
+51	5974	499.62653336115	5736504.1
+51	6192	514.25314018037	5736505.1
+51	6636	576.81041368679	5742501
+51	6789	590.38273699395	5742502
+51	6874	600.5584450548	5742503
+51	6988	611.030601267	5742504
+51	7160	625.46082258503	5742505
+51	7586	691.68060746975	5748501
+51	7736	706.17926564184	5748502
+51	7870	720.34134389483	5748503
+51	7969	731.58439477905	5748504
+51	8092	746.24755973578	5748505
+52	328	1.88159198593	5712901
+52	495	16.4950638751	5712902.1
+52	639	29.44076787308	5712903.1
+52	770	40.4531568368	5712904.1
+52	947	54.46406129958	5712905.1
+52	1328	116.45307402825	5718901.1
+52	1499	128.0067747843	5718902.1
+52	1675	140.16806609347	5718903.1
+52	1926	154.9262352055	5718904.1
+52	2107	165.94532667776	5718905.1
+52	2673	231.99132386642	5724901.1
+52	2757	242.65608849517	5724902.1
+52	2985	255.07905431488	5724903.1
+52	3192	266.01302381419	5724904.1
+52	3443	279.42035214091	5724905.1
+52	4075	346.9793271753	5730901.1
+52	4242	359.05007609888	5730902.1
+52	4411	370.40522689489	5730903.1
+52	4598	380.97281285236	5730904.1
+52	4845	393.66044371878	5730905.1
+52	5466	461.99168610107	5736901
+52	5531	472.22875646618	5736902
+52	5732	484.83911095024	5736903
+52	5960	499.17696975008	5736904
+52	6145	511.40202071471	5736905
+52	6625	576.72955774819	5742901
+52	6700	586.99861819623	5742902
+52	6848	599.25525269238	5742903
+52	7021	613.10812008101	5742904
+52	7158	625.40727398241	5742905
+52	7623	691.99311723816	5748901
+52	7694	703.83294207277	5748902
+52	7809	716.15350523964	5748903
+52	7900	727.10584660992	5748904
+52	8027	740.52087153192	5748905
+53	329	1.90001227218	5715001.1
+53	383	11.94440288027	5715002.1
+53	557	24.58083613217	5715003.1
+53	719	38.48248269665	5715004.1
+53	901	51.80652384669	5715005.1
+53	1379	116.73311045743	5721001.1
+53	1471	126.94402463385	5721002.1
+53	1727	141.79337008973	5721003.1
+53	1894	153.4070169332	5721004.1
+53	2090	164.93964579888	5721005.1
+53	2658	231.92124496959	5727001.1
+53	2797	243.96482612053	5727002.1
+53	2969	254.28120592889	5727003.1
+53	3198	266.18041453814	5727004.1
+53	3484	280.74236626202	5727005.1
+53	3941	346.0151896365	5733001.1
+53	4150	356.17365910858	5733002.1
+53	4358	366.77997812349	5733003.1
+53	4581	380.26463396102	5733004.1
+53	4832	393.05232501426	5733005.1
+53	5381	461.39592767181	5739001
+53	5533	472.30051828851	5739002
+53	5719	482.94199187728	5739003
+53	5894	495.78749842663	5739004
+53	6122	509.94043715601	5739005
+53	6571	576.20420535142	5745001
+53	6810	591.1866042302	5745002
+53	6907	602.23517246591	5745003
+53	7075	616.56705966848	5745004
+53	7174	626.62475186563	5745005
+53	7582	691.62359031523	5751001
+53	7692	703.72494078381	5751002
+53	7854	718.19381007133	5751003
+53	7978	732.33910720586	5751004
+53	8094	746.45622095699	5751005
+54	332	1.90629066294	5712801
+54	453	14.63515751972	5712802
+54	638	29.43184457696	5712803
+54	811	44.39060565177	5712804
+54	986	56.93812478892	5712805
+54	1304	116.12175981584	5718801
+54	1502	128.01066794037	5718802
+54	1690	140.69171052612	5718803
+54	1889	153.08162675658	5718804
+54	2062	163.70538839092	5718805
+54	2637	231.78729254985	5724801
+54	2756	242.63711827341	5724802
+54	2963	253.66920466418	5724803
+54	3186	265.43434882885	5724804
+54	3435	279.02127523091	5724805
+54	3950	346.08696626802	5730801
+54	4186	357.85307679744	5730802
+54	4375	369.04169418686	5730803
+54	4575	379.15232119919	5730804
+54	4811	392.10724881105	5730805
+54	5447	461.80521675968	5736801.1
+54	5666	475.44347690535	5736802.1
+54	5784	486.92279977259	5736803.1
+54	5903	496.95259931032	5736804.1
+54	6080	507.31900428539	5736805.1
+54	6568	576.18918924127	5742801.1
+54	6784	590.16066634911	5742802.1
+54	6933	604.15683402447	5742803.1
+54	7060	615.98062310019	5742804.1
+54	7169	626.25504153083	5742805.1
+54	7597	691.75704220147	5748801.1
+54	7713	705.22691591946	5748802.1
+54	7806	716.13016002533	5748803.1
+54	7932	729.3857542514	5748804.1
+54	8031	741.21476998275	5748805.1
+55	333	1.93270909553	5716701.1
+55	454	14.7314798804	5716702.1
+55	642	29.59400911536	5716703.1
+55	781	40.80112865963	5716704.1
+55	971	55.69565221504	5716705.1
+55	1370	116.67579155252	5722701.1
+55	1547	129.48325699498	5722702.1
+55	1705	141.22783638258	5722703.1
+55	1932	155.05326006981	5722704.1
+55	2149	168.17035943456	5722705.1
+55	2591	231.40946348733	5728701.1
+55	2811	244.15857259719	5728702.1
+55	2973	254.36631699395	5728703.1
+55	3183	265.17420875677	5728704.1
+55	3439	279.40383020858	5728705.1
+55	3938	346.00117783621	5734701.1
+55	4308	360.59837876097	5734702
+55	4500	373.0445939626	5734703
+55	4753	387.05392567068	5734704
+55	4924	397.35414057015	5734705
+55	5420	461.68358408217	5740701
+55	5530	472.15446455008	5740702
+55	5768	486.55720775318	5740703
+55	6007	500.55666504264	5740704
+55	6210	514.81811729911	5740705
+55	6598	576.55143090547	5746701
+55	6697	586.60251597082	5746702
+55	6831	597.49074927438	5746703
+55	6982	610.70762719051	5746704
+55	7150	625.2830888601	5746705
+55	7611	691.8434242052	5752701
+55	7702	704.1382702426	5752702
+55	7841	717.61953608924	5752703
+55	7936	729.48170580761	5752704
+55	8069	744.06310961209	5752705
+56	336	1.93897076859	5714301
+56	388	12.10455661034	5714302
+56	572	25.07355634332	5714303
+56	681	35.09101651003	5714304
+56	823	46.91600988246	5714305
+56	1409	116.95504225371	5720301
+56	1564	129.74779868661	5720302
+56	1703	141.20990878716	5720303
+56	1882	152.80599787878	5720304
+56	2074	164.41298120353	5720305
+56	2537	231.00701979501	5726301
+56	2843	244.92641260405	5726302
+56	3029	256.22806839552	5726303
+56	3251	268.61532577803	5726304
+56	3446	279.44211871503	5726305
+56	3975	346.31009259028	5732301
+56	4182	357.75881220819	5732302
+56	4380	369.18425624026	5732303
+56	4609	381.42271153047	5732304
+56	4840	393.3663554152	5732305
+56	5395	461.48838462587	5738301
+56	5627	474.58091790718	5738302
+56	5790	487.14284053235	5738303
+56	5945	498.6537067818	5738304
+56	6121	509.8407021123	5738305
+56	6562	576.0989444165	5744301
+56	6729	588.19160585035	5744302
+56	6884	601.22355416859	5744303
+56	6996	611.55924182594	5744304
+56	7136	624.01725284266	5744305
+56	7578	691.58254530653	5750301
+56	7671	703.09081876673	5750302
+56	7771	713.70530282868	5750303
+56	7893	726.44369511422	5750304
+56	8034	741.37408168194	5750305
+57	337	1.96990356129	5715801
+57	449	14.58567163721	5715802
+57	612	27.84019521484	5715803
+57	805	42.73810230824	5715804
+57	938	53.72062709578	5715805
+57	1310	116.2270483952	5721801
+57	1465	126.62566211377	5721802
+57	1658	139.1058524996	5721803
+57	1903	153.52859066403	5721804
+57	2100	165.34754717093	5721805
+57	2630	231.69383451133	5727801
+57	2755	242.59663192695	5727802
+57	3013	255.90041025798	5727803
+57	3245	268.4223213119	5727804
+57	3500	281.01037940965	5727805
+57	4055	346.87559608277	5733801
+57	4245	359.05496613146	5733802
+57	4497	372.98206057772	5733803
+57	4759	387.76730726846	5733804
+57	5015	402.6531204281	5733805
+57	5415	461.64959947788	5739801.1
+57	5638	474.76174943358	5739802.1
+57	5830	488.23743921331	5739803.1
+57	5952	498.82537675299	5739804.1
+57	6129	510.43589732935	5739805.1
+57	6621	576.69120873627	5745801.1
+57	6721	588.03897711634	5745802.1
+57	6880	601.02259380812	5745803.1
+57	7001	611.845345414	5745804.1
+57	7131	623.79190215793	5745805.1
+57	7554	691.15242984449	5751801.1
+57	7721	705.43282631739	5751802.1
+57	7858	718.64046403743	5751803.1
+57	7981	732.67599885306	5751804.1
+57	8095	746.58280641726	5751805.1
+58	338	1.98354745284	5714801
+58	448	14.51973794028	5714802
+58	628	28.89845570782	5714803
+58	791	41.54558915295	5714804
+58	917	52.79624924878	5714805
+58	1321	116.40431165183	5720801
+58	1565	129.83684517629	5720802
+58	1670	139.84642916545	5720803
+58	1918	154.57166084158	5720804
+58	2175	169.04789764387	5720805
+58	2608	231.50524625625	5726801
+58	2782	243.27786694584	5726802
+58	3030	256.30699141138	5726803
+58	3243	268.34831369529	5726804
+58	3496	280.88235533052	5726805
+58	4068	346.94551986968	5732801
+58	4192	357.88347477186	5732802
+58	4373	368.52114289393	5732803
+58	4570	378.79578742175	5732804
+58	4788	390.01848341408	5732805
+58	5410	461.60229618987	5738801
+58	5654	475.17443611612	5738802
+58	5775	486.8135073278	5738803
+58	6008	500.60464051179	5738804
+58	6191	514.16280715819	5738805
+58	6563	576.11647019372	5744801.1
+58	6694	586.55196284852	5744802.1
+58	6851	599.72353331372	5744803.1
+58	7046	614.59354436817	5744804.1
+58	7185	627.12038919656	5744805.1
+58	7549	691.12155301962	5750801.1
+58	7645	701.54205889325	5750802.1
+58	7794	715.31270554988	5750803.1
+58	7929	729.28901581792	5750804.1
+58	8071	744.11898674094	5750805.1
+59	339	1.98361586523	5712101
+59	478	15.72421701019	5712102
+59	581	25.87645050231	5712103
+59	722	38.51123469858	5712104
+59	897	51.54494156339	5712105
+59	1349	116.58224059851	5718101.1
+59	1524	128.81423953106	5718102.1
+59	1744	142.12473807624	5718103.1
+59	1980	156.5712113306	5718104.1
+59	2200	170.11900725775	5718105.1
+59	2559	231.19447762729	5724101.1
+59	2776	243.20316209575	5724102.1
+59	3098	257.83189641313	5724103.1
+59	3253	268.69587636903	5724104.1
+59	3429	278.70093244595	5724105.1
+59	3982	346.39007453085	5730101.1
+59	4159	356.92089106632	5730102.1
+59	4450	371.54633245525	5730103.1
+59	4710	385.94868681721	5730104.1
+59	4960	398.57421689063	5730105.1
+59	5382	461.4163855277	5736101.1
+59	5549	472.97531925491	5736102.1
+59	5721	484.1430198634	5736103.1
+59	5898	496.39966478105	5736104.1
+59	6075	506.85602966695	5736105.1
+59	6597	576.53988102917	5742101
+59	6740	588.5209893575	5742102
+59	6888	601.29549031263	5742103
+59	7063	616.02528711432	5742104
+59	7181	626.7073445872	5742105
+59	7574	691.49147468852	5748101
+59	7706	704.80409493437	5748102
+59	7847	717.90614890167	5748103
+59	7980	732.52205037279	5748104
+59	8084	745.35335478373	5748105
+60	489	16.38391172597	5712002
+60	500	16.54651491976	5713902
+60	505	16.9312878751	5712902
+60	536	23.63059999158	5713703
+60	567	25.01706013217	5715003
+60	632	29.1152284913	5713803
+60	651	29.87699187308	5712903
+60	754	39.82638075636	5716904
+60	800	41.73245046361	5713904
+60	819	45.46890526212	5715205
+60	867	50.23161106397	5716805
+60	909	52.21734487955	5716905
+60	913	52.24274784669	5715005
+60	920	52.98997292904	5714005
+60	936	53.69616654253	5713805
+60	941	53.94391854377	5712005
+60	963	54.90028529958	5712905
+60	968	55.26038246125	5713505
+60	977	56.19655523639	5713905
+60	983	56.48618021504	5716705
+60	1522	128.77192958601	5719802
+60	1644	138.02895508165	5720703
+60	1683	140.60429009347	5718903
+60	1688	140.67580406078	5722903
+60	1733	142.00156862492	5719803
+60	1801	145.06446212757	5721203
+60	1805	145.09512284668	5722103
+60	1864	152.01332134999	5722904
+60	1880	152.73052636528	5719804
+60	1900	153.49526168722	5718004
+60	1907	153.8432409332	5721004
+60	1921	154.66154272076	5718204
+60	1961	155.84378806981	5722704
+60	1977	156.41265408968	5719704
+60	1996	157.3617393306	5718104
+60	2010	158.34899507457	5721204
+60	2055	163.17314556725	5721105
+60	2069	164.3141594781	5723705
+60	2088	164.91032373736	5719805
+60	2103	165.37586979888	5721005
+60	2124	166.78458235718	5719905
+60	2169	168.96088743456	5722705
+60	2221	171.63057402934	5721205
+60	2745	242.24237515166	5725702
+60	2832	244.7158697518	5728402
+60	2839	244.90244276722	5729002
+60	2868	245.37937978485	5725802
+60	2960	252.99847665559	5725103
+60	2996	255.15684499395	5728703
+60	3036	256.46329054999	5725703
+60	3107	258.16342560941	5725403
+60	3155	260.10224985907	5729203
+60	3160	260.60173412626	5727903
+60	3174	263.14196765506	5725104
+60	3234	268.28086681189	5728004
+60	3241	268.30297347805	5727104
+60	3259	268.81422195611	5728404
+60	3283	269.28694806079	5725404
+60	3313	270.09768331697	5725704
+60	3392	273.51880167578	5725105
+60	3397	274.2118782434	5727404
+60	3411	275.74918175152	5726405
+60	3420	277.2541895657	5725805
+60	3449	279.49146044595	5724105
+60	3466	279.85657614091	5724905
+60	3494	280.8663697766	5725705
+60	3562	282.61380489594	5728405
+60	3623	285.9383087283	5728905
+60	4155	356.60988310858	5733002
+60	4284	359.86399432764	5734402
+60	4335	361.58771495058	5733402
+60	4363	367.21620212349	5733003
+60	4391	369.71513303573	5730503
+60	4406	370.3033034717	5735003
+60	4422	370.76032498156	5734403
+60	4476	372.25214565098	5731703
+60	4531	374.06760726188	5731403
+60	4560	376.42231858408	5733403
+60	4586	380.28128326865	5730504
+60	4593	380.56394980525	5730404
+60	4622	382.34204096667	5735204
+60	4635	382.97524229547	5735004
+60	4642	383.16087579241	5734404
+60	4658	384.06994845711	5730704
+60	4768	388.19216064716	5733404
+60	4775	388.30958033161	5731404
+60	4780	388.98601155044	5730204
+60	4795	390.58754737679	5733904
+60	4806	391.76251975465	5730505
+60	4816	392.50803687557	5735205
+60	4875	395.54022429128	5730305
+60	4914	397.17763829476	5734205
+60	4938	398.01454715378	5731205
+60	4945	398.07902083606	5731505
+60	4969	399.00294706997	5733405
+60	4978	399.36474489063	5730105
+60	4993	400.52149272211	5734105
+60	5024	403.81617330611	5730205
+60	5028	403.88529931734	5733905
+60	5474	462.08346606059	5739501
+60	5585	474.04438580156	5739602
+60	5594	474.19012875472	5739502
+60	5645	474.86809115758	5736602
+60	5683	475.87970090535	5736802
+60	5687	475.9432748957	5736402
+60	5704	476.95072433951	5737202
+60	5708	477.99481701692	5737002
+60	5746	485.50281818201	5739503
+60	5763	486.3336787328	5736603
+60	5782	486.91190474087	5739603
+60	5920	497.38882331032	5736804
+60	5934	497.87595832059	5739304
+60	5999	500.35804636021	5739504
+60	6013	500.62299437838	5736604
+60	6033	501.5450766547	5741604
+60	6045	502.65123166832	5736304
+60	6050	502.92506797429	5736404
+60	6065	503.80914488472	5739704
+60	6089	507.64655766695	5736105
+60	6093	507.75522828539	5736805
+60	6101	508.22638967837	5739105
+60	6109	508.92183663093	5739605
+60	6117	509.45709452657	5736705
+60	6143	511.22642532935	5739805
+60	6160	512.06252036424	5741605
+60	6164	512.45377583466	5739305
+60	6177	512.93682354287	5736605
+60	6208	514.77770347091	5739505
+60	6225	515.66303579151	5739705
+60	6245	517.40323074152	5736305
+60	6610	576.62541324127	5742801
+60	6659	577.07970540638	5742601
+60	6671	577.48173673627	5745801
+60	6705	587.34249084852	5744802
+60	6732	588.24452764371	5742602
+60	6746	588.82950511634	5745802
+60	6780	590.02823583496	5747602
+60	6794	590.59689034911	5742802
+60	6846	599.1003648505	5745703
+60	6864	600.17997877456	5742603
+60	6898	601.81312180812	5745803
+60	6921	603.15670421966	5742303
+60	6941	604.47432035957	5745603
+60	6946	604.59305802447	5742803
+60	6958	605.59382774325	5742703
+60	6965	606.26229423124	5747803
+60	6992	611.27459123747	5742604
+60	7013	612.635873414	5745804
+60	7025	613.56562993828	5745704
+60	7051	614.762158547	5747604
+60	7056	615.38407236817	5744804
+60	7073	616.41684710019	5742804
+60	7083	617.09335613451	5742304
+60	7141	624.58243015793	5745805
+60	7164	625.64221879251	5742605
+60	7179	626.69126553083	5742805
+60	7204	628.25596297266	5745705
+60	7764	713.54202912449	5753803
+60	7768	713.54244364462	5751503
+60	7785	714.94486500502	5748703
+60	7804	716.10323354988	5750803
+60	7820	716.56638402533	5748803
+60	7824	716.61193404932	5751603
+60	7838	717.48243238166	5748603
+60	7886	725.94534451751	5753804
+60	7941	729.8219782514	5748804
+60	7947	730.07954381792	5750804
+60	7962	731.17547639384	5748604
+60	7976	732.12683559992	5751704
+60	7986	733.46652685306	5751804
+60	7996	736.0354016689	5753805
+60	8014	738.50258113005	5751605
+60	8040	741.65099398275	5748805
+60	8067	744.05609480193	5748605
+60	8079	744.90951474094	5750805
+60	8089	746.11455688151	5751705
+60	8101	747.37333441726	5751805
+61	489	16.38391172597	180
+61	500	16.54651491976	180
+61	505	16.9312878751	180
+61	536	23.63059999158	180
+61	567	25.01706013217	180
+61	632	29.1152284913	180
+61	651	29.87699187308	180
+61	754	39.82638075636	180
+61	800	41.73245046361	180
+61	819	45.46890526212	180
+61	867	50.23161106397	180
+61	909	52.21734487955	180
+61	913	52.24274784669	180
+61	920	52.98997292904	180
+61	936	53.69616654253	180
+61	941	53.94391854377	180
+61	963	54.90028529958	180
+61	968	55.26038246125	180
+61	977	56.19655523639	180
+61	983	56.48618021504	180
+61	1522	128.77192958601	180
+61	1644	138.02895508165	180
+61	1683	140.60429009347	180
+61	1688	140.67580406078	180
+61	1733	142.00156862492	180
+61	1801	145.06446212757	180
+61	1805	145.09512284668	180
+61	1864	152.01332134999	180
+61	1880	152.73052636528	180
+61	1900	153.49526168722	180
+61	1907	153.8432409332	180
+61	1921	154.66154272076	180
+61	1961	155.84378806981	180
+61	1977	156.41265408968	180
+61	1996	157.3617393306	180
+61	2010	158.34899507457	180
+61	2055	163.17314556725	180
+61	2069	164.3141594781	180
+61	2088	164.91032373736	180
+61	2103	165.37586979888	180
+61	2124	166.78458235718	180
+61	2169	168.96088743456	180
+61	2221	171.63057402934	180
+61	2745	242.24237515166	180
+61	2832	244.7158697518	180
+61	2839	244.90244276722	180
+61	2868	245.37937978485	180
+61	2960	252.99847665559	180
+61	2996	255.15684499395	180
+61	3036	256.46329054999	180
+61	3107	258.16342560941	180
+61	3155	260.10224985907	180
+61	3160	260.60173412626	180
+61	3174	263.14196765506	180
+61	3234	268.28086681189	180
+61	3241	268.30297347805	180
+61	3259	268.81422195611	180
+61	3283	269.28694806079	180
+61	3313	270.09768331697	180
+61	3392	273.51880167578	180
+61	3397	274.2118782434	180
+61	3411	275.74918175152	180
+61	3420	277.2541895657	180
+61	3449	279.49146044595	180
+61	3466	279.85657614091	180
+61	3494	280.8663697766	180
+61	3562	282.61380489594	180
+61	3623	285.9383087283	180
+61	4155	356.60988310858	180
+61	4284	359.86399432764	180
+61	4335	361.58771495058	180
+61	4363	367.21620212349	180
+61	4391	369.71513303573	180
+61	4406	370.3033034717	180
+61	4422	370.76032498156	180
+61	4476	372.25214565098	180
+61	4531	374.06760726188	180
+61	4560	376.42231858408	180
+61	4586	380.28128326865	180
+61	4593	380.56394980525	180
+61	4622	382.34204096667	180
+61	4635	382.97524229547	180
+61	4642	383.16087579241	180
+61	4658	384.06994845711	180
+61	4768	388.19216064716	180
+61	4775	388.30958033161	180
+61	4780	388.98601155044	180
+61	4795	390.58754737679	180
+61	4806	391.76251975465	180
+61	4816	392.50803687557	180
+61	4875	395.54022429128	180
+61	4914	397.17763829476	180
+61	4938	398.01454715378	180
+61	4945	398.07902083606	180
+61	4969	399.00294706997	180
+61	4978	399.36474489063	180
+61	4993	400.52149272211	180
+61	5024	403.81617330611	180
+61	5028	403.88529931734	180
+61	5474	462.08346606059	180
+61	5585	474.04438580156	180
+61	5594	474.19012875472	180
+61	5645	474.86809115758	180
+61	5683	475.87970090535	180
+61	5687	475.9432748957	180
+61	5704	476.95072433951	180
+61	5708	477.99481701692	180
+61	5746	485.50281818201	180
+61	5763	486.3336787328	180
+61	5782	486.91190474087	180
+61	5920	497.38882331032	180
+61	5934	497.87595832059	180
+61	5999	500.35804636021	180
+61	6013	500.62299437838	180
+61	6033	501.5450766547	180
+61	6045	502.65123166832	180
+61	6050	502.92506797429	180
+61	6065	503.80914488472	180
+61	6089	507.64655766695	180
+61	6093	507.75522828539	180
+61	6101	508.22638967837	180
+61	6109	508.92183663093	180
+61	6117	509.45709452657	180
+61	6143	511.22642532935	180
+61	6160	512.06252036424	180
+61	6164	512.45377583466	180
+61	6177	512.93682354287	180
+61	6208	514.77770347091	180
+61	6225	515.66303579151	180
+61	6245	517.40323074152	180
+61	6610	576.62541324127	180
+61	6659	577.07970540638	180
+61	6671	577.48173673627	180
+61	6705	587.34249084852	180
+61	6732	588.24452764371	180
+61	6746	588.82950511634	180
+61	6780	590.02823583496	180
+61	6794	590.59689034911	180
+61	6846	599.1003648505	180
+61	6864	600.17997877456	180
+61	6898	601.81312180812	180
+61	6921	603.15670421966	180
+61	6941	604.47432035957	180
+61	6946	604.59305802447	180
+61	6958	605.59382774325	180
+61	6965	606.26229423124	180
+61	6992	611.27459123747	180
+61	7013	612.635873414	180
+61	7025	613.56562993828	180
+61	7051	614.762158547	180
+61	7056	615.38407236817	180
+61	7073	616.41684710019	180
+61	7083	617.09335613451	180
+61	7141	624.58243015793	180
+61	7164	625.64221879251	180
+61	7179	626.69126553083	180
+61	7204	628.25596297266	180
+61	7764	713.54202912449	180
+61	7768	713.54244364462	180
+61	7785	714.94486500502	180
+61	7804	716.10323354988	180
+61	7820	716.56638402533	180
+61	7824	716.61193404932	180
+61	7838	717.48243238166	180
+61	7886	725.94534451751	180
+61	7941	729.8219782514	180
+61	7947	730.07954381792	180
+61	7962	731.17547639384	180
+61	7976	732.12683559992	180
+61	7986	733.46652685306	180
+61	7996	736.0354016689	180
+61	8014	738.50258113005	180
+61	8040	741.65099398275	180
+61	8067	744.05609480193	180
+61	8079	744.90951474094	180
+61	8089	746.11455688151	180
+61	8101	747.37333441726	180
+62	489	16.38391172597	180
+62	941	53.94391854377	180
+62	1900	153.49526168722	180
+63	489	16.38391172597	15.38391172597
+63	500	16.54651491976	15.54651491976
+63	505	16.9312878751	15.9312878751
+63	536	23.63059999158	22.63059999158
+63	567	25.01706013217	24.01706013217
+63	632	29.1152284913	28.1152284913
+63	651	29.87699187308	28.87699187308
+63	754	39.82638075636	38.82638075636
+63	800	41.73245046361	40.73245046361
+63	819	45.46890526212	44.46890526212
+63	867	50.23161106397	49.23161106397
+63	909	52.21734487955	51.21734487955
+63	913	52.24274784669	51.24274784669
+63	920	52.98997292904	51.98997292904
+63	936	53.69616654253	52.69616654253
+63	941	53.94391854377	52.94391854377
+63	963	54.90028529958	53.90028529958
+63	968	55.26038246125	54.26038246125
+63	977	56.19655523639	55.19655523639
+63	983	56.48618021504	55.48618021504
+63	1522	128.77192958601	12.77192958601
+63	1644	138.02895508165	22.02895508165
+63	1683	140.60429009347	24.60429009347
+63	1688	140.67580406078	24.67580406078
+63	1733	142.00156862492	26.00156862492
+63	1801	145.06446212757	29.06446212757
+63	1805	145.09512284668	29.09512284668
+63	1864	152.01332134999	36.01332134999
+63	1880	152.73052636528	36.73052636528
+63	1900	153.49526168722	37.49526168722
+63	1907	153.8432409332	37.8432409332
+63	1921	154.66154272076	38.66154272076
+63	1961	155.84378806981	39.84378806981
+63	1977	156.41265408968	40.41265408968
+63	1996	157.3617393306	41.3617393306
+63	2010	158.34899507457	42.34899507457
+63	2055	163.17314556725	47.17314556725
+63	2069	164.3141594781	48.3141594781
+63	2088	164.91032373736	48.91032373736
+63	2103	165.37586979888	49.37586979888
+63	2124	166.78458235718	50.78458235718
+63	2169	168.96088743456	52.96088743456
+63	2221	171.63057402934	55.63057402934
+63	2745	242.24237515166	11.24237515166
+63	2832	244.7158697518	13.7158697518
+63	2839	244.90244276722	13.90244276722
+63	2868	245.37937978485	14.37937978485
+63	2960	252.99847665559	21.99847665559
+63	2996	255.15684499395	24.15684499395
+63	3036	256.46329054999	25.46329054999
+63	3107	258.16342560941	27.16342560941
+63	3155	260.10224985907	29.10224985907
+63	3160	260.60173412626	29.60173412626
+63	3174	263.14196765506	32.14196765506
+63	3234	268.28086681189	37.28086681189
+63	3241	268.30297347805	37.30297347805
+63	3259	268.81422195611	37.81422195611
+63	3283	269.28694806079	38.28694806079
+63	3313	270.09768331697	39.09768331697
+63	3392	273.51880167578	42.51880167578
+63	3397	274.2118782434	43.2118782434
+63	3411	275.74918175152	44.74918175152
+63	3420	277.2541895657	46.2541895657
+63	3449	279.49146044595	48.49146044595
+63	3466	279.85657614091	48.85657614091
+63	3494	280.8663697766	49.8663697766
+63	3562	282.61380489594	51.61380489594
+63	3623	285.9383087283	54.9383087283
+63	4155	356.60988310858	10.60988310858
+63	4284	359.86399432764	13.86399432764
+63	4335	361.58771495058	15.58771495058
+63	4363	367.21620212349	21.21620212349
+63	4391	369.71513303573	23.71513303573
+63	4406	370.3033034717	24.3033034717
+63	4422	370.76032498156	24.76032498156
+63	4476	372.25214565098	26.25214565098
+63	4531	374.06760726188	28.06760726188
+63	4560	376.42231858408	30.42231858408
+63	4586	380.28128326865	34.28128326865
+63	4593	380.56394980525	34.56394980525
+63	4622	382.34204096667	36.34204096667
+63	4635	382.97524229547	36.97524229547
+63	4642	383.16087579241	37.16087579241
+63	4658	384.06994845711	38.06994845711
+63	4768	388.19216064716	42.19216064716
+63	4775	388.30958033161	42.30958033161
+63	4780	388.98601155044	42.98601155044
+63	4795	390.58754737679	44.58754737679
+63	4806	391.76251975465	45.76251975465
+63	4816	392.50803687557	46.50803687557
+63	4875	395.54022429128	49.54022429128
+63	4914	397.17763829476	51.17763829476
+63	4938	398.01454715378	52.01454715378
+63	4945	398.07902083606	52.07902083606
+63	4969	399.00294706997	53.00294706997
+63	4978	399.36474489063	53.36474489063
+63	4993	400.52149272211	54.52149272211
+63	5024	403.81617330611	57.81617330611
+63	5028	403.88529931734	57.88529931734
+63	5474	462.08346606059	1.08346606059
+63	5585	474.04438580156	13.04438580156
+63	5594	474.19012875472	13.19012875472
+63	5645	474.86809115758	13.86809115758
+63	5683	475.87970090535	14.87970090535
+63	5687	475.9432748957	14.9432748957
+63	5704	476.95072433951	15.95072433951
+63	5708	477.99481701692	16.99481701692
+63	5746	485.50281818201	24.50281818201
+63	5763	486.3336787328	25.3336787328
+63	5782	486.91190474087	25.91190474087
+63	5920	497.38882331032	36.38882331032
+63	5934	497.87595832059	36.87595832059
+63	5999	500.35804636021	39.35804636021
+63	6013	500.62299437838	39.62299437838
+63	6033	501.5450766547	40.5450766547
+63	6045	502.65123166832	41.65123166832
+63	6050	502.92506797429	41.92506797429
+63	6065	503.80914488472	42.80914488472
+63	6089	507.64655766695	46.64655766695
+63	6093	507.75522828539	46.75522828539
+63	6101	508.22638967837	47.22638967837
+63	6109	508.92183663093	47.92183663093
+63	6117	509.45709452657	48.45709452657
+63	6143	511.22642532935	50.22642532935
+63	6160	512.06252036424	51.06252036424
+63	6164	512.45377583466	51.45377583466
+63	6177	512.93682354287	51.93682354287
+63	6208	514.77770347091	53.77770347091
+63	6225	515.66303579151	54.66303579151
+63	6245	517.40323074152	56.40323074152
+63	6610	576.62541324127	0.62541324126994
+63	6659	577.07970540638	1.07970540638
+63	6671	577.48173673627	1.4817367362699
+63	6705	587.34249084852	11.34249084852
+63	6732	588.24452764371	12.24452764371
+63	6746	588.82950511634	12.82950511634
+63	6780	590.02823583496	14.02823583496
+63	6794	590.59689034911	14.59689034911
+63	6846	599.1003648505	23.1003648505
+63	6864	600.17997877456	24.17997877456
+63	6898	601.81312180812	25.81312180812
+63	6921	603.15670421966	27.15670421966
+63	6941	604.47432035957	28.47432035957
+63	6946	604.59305802447	28.59305802447
+63	6958	605.59382774325	29.59382774325
+63	6965	606.26229423124	30.26229423124
+63	6992	611.27459123747	35.27459123747
+63	7013	612.635873414	36.635873414
+63	7025	613.56562993828	37.56562993828
+63	7051	614.762158547	38.762158547
+63	7056	615.38407236817	39.38407236817
+63	7073	616.41684710019	40.41684710019
+63	7083	617.09335613451	41.09335613451
+63	7141	624.58243015793	48.58243015793
+63	7164	625.64221879251	49.64221879251
+63	7179	626.69126553083	50.69126553083
+63	7204	628.25596297266	52.25596297266
+63	7764	713.54202912449	22.54202912449
+63	7768	713.54244364462	22.54244364462
+63	7785	714.94486500502	23.94486500502
+63	7804	716.10323354988	25.10323354988
+63	7820	716.56638402533	25.56638402533
+63	7824	716.61193404932	25.61193404932
+63	7838	717.48243238166	26.48243238166
+63	7886	725.94534451751	34.94534451751
+63	7941	729.8219782514	38.8219782514
+63	7947	730.07954381792	39.07954381792
+63	7962	731.17547639384	40.17547639384
+63	7976	732.12683559992	41.12683559992
+63	7986	733.46652685306	42.46652685306
+63	7996	736.0354016689	45.0354016689
+63	8014	738.50258113005	47.50258113005
+63	8040	741.65099398275	50.65099398275
+63	8067	744.05609480193	53.05609480193
+63	8079	744.90951474094	53.90951474094
+63	8089	746.11455688151	55.11455688151
+63	8101	747.37333441726	56.37333441726
+64	489	16.38391172597	15.38391172597
+64	941	53.94391854377	52.94391854377
+64	1900	153.49526168722	37.49526168722
+65	489	16.38391172597	2
+65	500	16.54651491976	2
+65	505	16.9312878751	2
+65	536	23.63059999158	3
+65	567	25.01706013217	3
+65	632	29.1152284913	3
+65	754	39.82638075636	4
+65	819	45.46890526212	5
+65	867	50.23161106397	5
+65	920	52.98997292904	5
+65	968	55.26038246125	5
+65	983	56.48618021504	5
+65	1522	128.77192958601	2
+65	1644	138.02895508165	3
+65	1683	140.60429009347	3
+65	1688	140.67580406078	3
+65	1801	145.06446212757	3
+65	1805	145.09512284668	3
+65	1900	153.49526168722	4
+65	1907	153.8432409332	4
+65	1921	154.66154272076	4
+65	1961	155.84378806981	4
+65	1977	156.41265408968	4
+65	1996	157.3617393306	4
+65	2055	163.17314556725	5
+65	2069	164.3141594781	5
+65	2124	166.78458235718	5
+65	2745	242.24237515166	2
+65	2832	244.7158697518	2
+65	2839	244.90244276722	2
+65	2868	245.37937978485	2
+65	2960	252.99847665559	3
+65	2996	255.15684499395	3
+65	3107	258.16342560941	3
+65	3155	260.10224985907	3
+65	3160	260.60173412626	3
+65	3234	268.28086681189	4
+65	3241	268.30297347805	4
+65	3397	274.2118782434	4
+65	3411	275.74918175152	5
+65	3449	279.49146044595	5
+65	3466	279.85657614091	5
+65	3623	285.9383087283	5
+65	4155	356.60988310858	2
+65	4284	359.86399432764	2
+65	4335	361.58771495058	2
+65	4391	369.71513303573	3
+65	4406	370.3033034717	3
+65	4476	372.25214565098	3
+65	4531	374.06760726188	3
+65	4593	380.56394980525	4
+65	4622	382.34204096667	4
+65	4658	384.06994845711	4
+65	4780	388.98601155044	4
+65	4795	390.58754737679	4
+65	4875	395.54022429128	5
+65	4914	397.17763829476	5
+65	4938	398.01454715378	5
+65	4945	398.07902083606	5
+65	4978	399.36474489063	5
+65	4993	400.52149272211	5
+65	5474	462.08346606059	1
+65	5585	474.04438580156	2
+65	5645	474.86809115758	2
+65	5683	475.87970090535	2
+65	5687	475.9432748957	2
+65	5704	476.95072433951	2
+65	5708	477.99481701692	2
+65	5934	497.87595832059	4
+65	6033	501.5450766547	4
+65	6045	502.65123166832	4
+65	6065	503.80914488472	4
+65	6089	507.64655766695	5
+65	6101	508.22638967837	5
+65	6117	509.45709452657	5
+65	6143	511.22642532935	5
+65	6610	576.62541324127	1
+65	6659	577.07970540638	1
+65	6671	577.48173673627	1
+65	6705	587.34249084852	2
+65	6780	590.02823583496	2
+65	6846	599.1003648505	3
+65	6921	603.15670421966	3
+65	6941	604.47432035957	3
+65	6958	605.59382774325	3
+65	6965	606.26229423124	3
+65	7764	713.54202912449	3
+65	7768	713.54244364462	3
+65	7785	714.94486500502	3
+65	7804	716.10323354988	3
+65	7820	716.56638402533	3
+65	7824	716.61193404932	3
+65	7838	717.48243238166	3
+65	7976	732.12683559992	4
+65	7986	733.46652685306	4
+66	489	16.38391172597	2
+66	500	16.54651491976	2
+66	505	16.9312878751	1
+66	536	23.63059999158	3
+66	567	25.01706013217	3
+66	632	29.1152284913	3
+66	754	39.82638075636	4
+66	819	45.46890526212	5
+66	867	50.23161106397	5
+66	920	52.98997292904	5
+66	968	55.26038246125	2
+66	983	56.48618021504	5
+66	1522	128.77192958601	2
+66	1644	138.02895508165	3
+66	1683	140.60429009347	3
+66	1688	140.67580406078	3
+66	1801	145.06446212757	3
+66	1805	145.09512284668	3
+66	1900	153.49526168722	4
+66	1907	153.8432409332	4
+66	1921	154.66154272076	1
+66	1961	155.84378806981	4
+66	1977	156.41265408968	4
+66	1996	157.3617393306	4
+66	2055	163.17314556725	5
+66	2069	164.3141594781	5
+66	2124	166.78458235718	5
+66	2745	242.24237515166	2
+66	2832	244.7158697518	2
+66	2839	244.90244276722	2
+66	2868	245.37937978485	2
+66	2960	252.99847665559	3
+66	2996	255.15684499395	3
+66	3107	258.16342560941	3
+66	3155	260.10224985907	3
+66	3160	260.60173412626	3
+66	3234	268.28086681189	4
+66	3241	268.30297347805	4
+66	3397	274.2118782434	4
+66	3411	275.74918175152	4
+66	3449	279.49146044595	5
+66	3466	279.85657614091	5
+66	3623	285.9383087283	5
+66	4155	356.60988310858	2
+66	4284	359.86399432764	2
+66	4335	361.58771495058	2
+66	4391	369.71513303573	3
+66	4406	370.3033034717	3
+66	4476	372.25214565098	3
+66	4531	374.06760726188	3
+66	4593	380.56394980525	4
+66	4622	382.34204096667	4
+66	4658	384.06994845711	1
+66	4780	388.98601155044	4
+66	4795	390.58754737679	4
+66	4875	395.54022429128	5
+66	4914	397.17763829476	5
+66	4938	398.01454715378	5
+66	4945	398.07902083606	5
+66	4978	399.36474489063	5
+66	4993	400.52149272211	5
+66	5474	462.08346606059	1
+66	5585	474.04438580156	2
+66	5645	474.86809115758	2
+66	5683	475.87970090535	2
+66	5687	475.9432748957	2
+66	5704	476.95072433951	2
+66	5708	477.99481701692	2
+66	5934	497.87595832059	4
+66	6033	501.5450766547	1
+66	6045	502.65123166832	4
+66	6065	503.80914488472	4
+66	6089	507.64655766695	5
+66	6101	508.22638967837	5
+66	6117	509.45709452657	5
+66	6143	511.22642532935	5
+66	6610	576.62541324127	1
+66	6659	577.07970540638	1
+66	6671	577.48173673627	1
+66	6705	587.34249084852	2
+66	6780	590.02823583496	2
+66	6846	599.1003648505	3
+66	6921	603.15670421966	3
+66	6941	604.47432035957	3
+66	6958	605.59382774325	3
+66	6965	606.26229423124	3
+66	7764	713.54202912449	3
+66	7768	713.54244364462	3
+66	7785	714.94486500502	3
+66	7804	716.10323354988	3
+66	7820	716.56638402533	3
+66	7824	716.61193404932	3
+66	7838	717.48243238166	3
+66	7976	732.12683559992	4
+66	7986	733.46652685306	4
+67	489	16.38391172597	15.38391172597
+67	500	16.54651491976	15.54651491976
+67	505	16.9312878751	15.9312878751
+67	536	23.63059999158	22.63059999158
+67	567	25.01706013217	24.01706013217
+67	632	29.1152284913	28.1152284913
+67	754	39.82638075636	38.82638075636
+67	819	45.46890526212	44.46890526212
+67	867	50.23161106397	49.23161106397
+67	920	52.98997292904	51.98997292904
+67	968	55.26038246125	54.26038246125
+67	983	56.48618021504	55.48618021504
+67	1522	128.77192958601	12.77192958601
+67	1644	138.02895508165	22.02895508165
+67	1683	140.60429009347	24.60429009347
+67	1688	140.67580406078	24.67580406078
+67	1801	145.06446212757	29.06446212757
+67	1805	145.09512284668	29.09512284668
+67	1900	153.49526168722	37.49526168722
+67	1907	153.8432409332	37.8432409332
+67	1921	154.66154272076	38.66154272076
+67	1961	155.84378806981	39.84378806981
+67	1977	156.41265408968	40.41265408968
+67	1996	157.3617393306	41.3617393306
+67	2055	163.17314556725	47.17314556725
+67	2069	164.3141594781	48.3141594781
+67	2124	166.78458235718	50.78458235718
+67	2745	242.24237515166	11.24237515166
+67	2832	244.7158697518	13.7158697518
+67	2839	244.90244276722	13.90244276722
+67	2868	245.37937978485	14.37937978485
+67	2960	252.99847665559	21.99847665559
+67	2996	255.15684499395	24.15684499395
+67	3107	258.16342560941	27.16342560941
+67	3155	260.10224985907	29.10224985907
+67	3160	260.60173412626	29.60173412626
+67	3234	268.28086681189	37.28086681189
+67	3241	268.30297347805	37.30297347805
+67	3397	274.2118782434	43.2118782434
+67	3411	275.74918175152	44.74918175152
+67	3449	279.49146044595	48.49146044595
+67	3466	279.85657614091	48.85657614091
+67	3623	285.9383087283	54.9383087283
+67	4155	356.60988310858	10.60988310858
+67	4284	359.86399432764	13.86399432764
+67	4335	361.58771495058	15.58771495058
+67	4391	369.71513303573	23.71513303573
+67	4406	370.3033034717	24.3033034717
+67	4476	372.25214565098	26.25214565098
+67	4531	374.06760726188	28.06760726188
+67	4593	380.56394980525	34.56394980525
+67	4622	382.34204096667	36.34204096667
+67	4658	384.06994845711	38.06994845711
+67	4780	388.98601155044	42.98601155044
+67	4795	390.58754737679	44.58754737679
+67	4875	395.54022429128	49.54022429128
+67	4914	397.17763829476	51.17763829476
+67	4938	398.01454715378	52.01454715378
+67	4945	398.07902083606	52.07902083606
+67	4978	399.36474489063	53.36474489063
+67	4993	400.52149272211	54.52149272211
+67	5474	462.08346606059	1.08346606059
+67	5585	474.04438580156	13.04438580156
+67	5645	474.86809115758	13.86809115758
+67	5683	475.87970090535	14.87970090535
+67	5687	475.9432748957	14.9432748957
+67	5704	476.95072433951	15.95072433951
+67	5708	477.99481701692	16.99481701692
+67	5934	497.87595832059	36.87595832059
+67	6033	501.5450766547	40.5450766547
+67	6045	502.65123166832	41.65123166832
+67	6065	503.80914488472	42.80914488472
+67	6089	507.64655766695	46.64655766695
+67	6101	508.22638967837	47.22638967837
+67	6117	509.45709452657	48.45709452657
+67	6143	511.22642532935	50.22642532935
+67	6610	576.62541324127	0.62541324126994
+67	6659	577.07970540638	1.07970540638
+67	6671	577.48173673627	1.4817367362699
+67	6705	587.34249084852	11.34249084852
+67	6780	590.02823583496	14.02823583496
+67	6846	599.1003648505	23.1003648505
+67	6921	603.15670421966	27.15670421966
+67	6941	604.47432035957	28.47432035957
+67	6958	605.59382774325	29.59382774325
+67	6965	606.26229423124	30.26229423124
+67	7764	713.54202912449	22.54202912449
+67	7768	713.54244364462	22.54244364462
+67	7785	714.94486500502	23.94486500502
+67	7804	716.10323354988	25.10323354988
+67	7820	716.56638402533	25.56638402533
+67	7824	716.61193404932	25.61193404932
+67	7838	717.48243238166	26.48243238166
+67	7976	732.12683559992	41.12683559992
+67	7986	733.46652685306	42.46652685306
+68	489	16.38391172597	15.38391172597
+68	1900	153.49526168722	37.49526168722
+69	490	16.38391172597	1
+69	501	16.54651491976	2
+69	506	16.9312878751	3
+69	537	23.63059999158	4
+69	568	25.01706013217	5
+69	633	29.1152284913	6
+69	652	29.87699187308	7
+69	755	39.82638075636	8
+69	801	41.73245046361	9
+69	820	45.46890526212	10
+69	868	50.23161106397	11
+69	910	52.21734487955	12
+69	914	52.24274784669	13
+69	921	52.98997292904	14
+69	937	53.69616654253	15
+69	942	53.94391854377	16
+69	964	54.90028529958	17
+69	969	55.26038246125	18
+69	978	56.19655523639	19
+69	984	56.48618021504	20
+69	1523	128.77192958601	21
+69	1645	138.02895508165	22
+69	1684	140.60429009347	23
+69	1689	140.67580406078	24
+69	1734	142.00156862492	25
+69	1802	145.06446212757	26
+69	1806	145.09512284668	27
+69	1865	152.01332134999	28
+69	1881	152.73052636528	29
+69	1901	153.49526168722	30
+69	1908	153.8432409332	31
+69	1922	154.66154272076	32
+69	1962	155.84378806981	33
+69	1978	156.41265408968	34
+69	1997	157.3617393306	35
+69	2011	158.34899507457	36
+69	2056	163.17314556725	37
+69	2070	164.3141594781	38
+69	2089	164.91032373736	39
+69	2104	165.37586979888	40
+69	2125	166.78458235718	41
+69	2170	168.96088743456	42
+69	2222	171.63057402934	43
+69	2746	242.24237515166	44
+69	2833	244.7158697518	45
+69	2840	244.90244276722	46
+69	2869	245.37937978485	47
+69	2961	252.99847665559	48
+69	2997	255.15684499395	49
+69	3037	256.46329054999	50
+69	3108	258.16342560941	51
+69	3156	260.10224985907	52
+69	3161	260.60173412626	53
+69	3175	263.14196765506	54
+69	3235	268.28086681189	55
+69	3242	268.30297347805	56
+69	3260	268.81422195611	57
+69	3284	269.28694806079	58
+69	3314	270.09768331697	59
+69	3393	273.51880167578	60
+69	3398	274.2118782434	61
+69	3412	275.74918175152	62
+69	3421	277.2541895657	63
+69	3450	279.49146044595	64
+69	3467	279.85657614091	65
+69	3495	280.8663697766	66
+69	3563	282.61380489594	67
+69	3624	285.9383087283	68
+69	4156	356.60988310858	69
+69	4285	359.86399432764	70
+69	4336	361.58771495058	71
+69	4364	367.21620212349	72
+69	4392	369.71513303573	73
+69	4407	370.3033034717	74
+69	4423	370.76032498156	75
+69	4477	372.25214565098	76
+69	4532	374.06760726188	77
+69	4561	376.42231858408	78
+69	4587	380.28128326865	79
+69	4594	380.56394980525	80
+69	4623	382.34204096667	81
+69	4636	382.97524229547	82
+69	4643	383.16087579241	83
+69	4659	384.06994845711	84
+69	4769	388.19216064716	85
+69	4776	388.30958033161	86
+69	4781	388.98601155044	87
+69	4796	390.58754737679	88
+69	4807	391.76251975465	89
+69	4817	392.50803687557	90
+69	4876	395.54022429128	91
+69	4915	397.17763829476	92
+69	4939	398.01454715378	93
+69	4946	398.07902083606	94
+69	4970	399.00294706997	95
+69	4979	399.36474489063	96
+69	4994	400.52149272211	97
+69	5025	403.81617330611	98
+69	5029	403.88529931734	99
+69	5475	462.08346606059	100
+69	5586	474.04438580156	101
+69	5595	474.19012875472	102
+69	5646	474.86809115758	103
+69	5684	475.87970090535	104
+69	5688	475.9432748957	105
+69	5705	476.95072433951	106
+69	5709	477.99481701692	107
+69	5747	485.50281818201	108
+69	5764	486.3336787328	109
+69	5783	486.91190474087	110
+69	5921	497.38882331032	111
+69	5935	497.87595832059	112
+69	6000	500.35804636021	113
+69	6014	500.62299437838	114
+69	6034	501.5450766547	115
+69	6046	502.65123166832	116
+69	6051	502.92506797429	117
+69	6066	503.80914488472	118
+69	6090	507.64655766695	119
+69	6094	507.75522828539	120
+69	6102	508.22638967837	121
+69	6110	508.92183663093	122
+69	6118	509.45709452657	123
+69	6144	511.22642532935	124
+69	6161	512.06252036424	125
+69	6165	512.45377583466	126
+69	6178	512.93682354287	127
+69	6209	514.77770347091	128
+69	6226	515.66303579151	129
+69	6246	517.40323074152	130
+69	6611	576.62541324127	131
+69	6660	577.07970540638	132
+69	6672	577.48173673627	133
+69	6706	587.34249084852	134
+69	6733	588.24452764371	135
+69	6747	588.82950511634	136
+69	6781	590.02823583496	137
+69	6795	590.59689034911	138
+69	6847	599.1003648505	139
+69	6865	600.17997877456	140
+69	6899	601.81312180812	141
+69	6922	603.15670421966	142
+69	6942	604.47432035957	143
+69	6947	604.59305802447	144
+69	6959	605.59382774325	145
+69	6966	606.26229423124	146
+69	6993	611.27459123747	147
+69	7014	612.635873414	148
+69	7026	613.56562993828	149
+69	7052	614.762158547	150
+69	7057	615.38407236817	151
+69	7074	616.41684710019	152
+69	7084	617.09335613451	153
+69	7142	624.58243015793	154
+69	7165	625.64221879251	155
+69	7180	626.69126553083	156
+69	7205	628.25596297266	157
+69	7765	713.54202912449	158
+69	7769	713.54244364462	159
+69	7786	714.94486500502	160
+69	7805	716.10323354988	161
+69	7821	716.56638402533	162
+69	7825	716.61193404932	163
+69	7839	717.48243238166	164
+69	7887	725.94534451751	165
+69	7942	729.8219782514	166
+69	7948	730.07954381792	167
+69	7963	731.17547639384	168
+69	7977	732.12683559992	169
+69	7987	733.46652685306	170
+69	7997	736.0354016689	171
+69	8015	738.50258113005	172
+69	8041	741.65099398275	173
+69	8068	744.05609480193	174
+69	8080	744.90951474094	175
+69	8090	746.11455688151	176
+69	8102	747.37333441726	177
+70	490	16.38391172597	1
+70	501	16.54651491976	2
+70	506	16.9312878751	3
+70	537	23.63059999158	4
+70	568	25.01706013217	5
+70	633	29.1152284913	6
+70	652	29.87699187308	7
+70	755	39.82638075636	8
+70	801	41.73245046361	9
+70	820	45.46890526212	10
+70	868	50.23161106397	11
+70	910	52.21734487955	12
+70	914	52.24274784669	13
+70	921	52.98997292904	14
+70	937	53.69616654253	15
+70	942	53.94391854377	16
+70	964	54.90028529958	17
+70	969	55.26038246125	18
+70	978	56.19655523639	19
+70	984	56.48618021504	20
+70	1523	128.77192958601	21
+70	1645	138.02895508165	22
+70	1684	140.60429009347	23
+70	1689	140.67580406078	24
+70	1734	142.00156862492	25
+70	1802	145.06446212757	26
+70	1806	145.09512284668	27
+70	1865	152.01332134999	28
+70	1881	152.73052636528	29
+70	1901	153.49526168722	30
+70	1908	153.8432409332	31
+70	1922	154.66154272076	32
+70	1962	155.84378806981	33
+70	1978	156.41265408968	34
+70	1997	157.3617393306	35
+70	2011	158.34899507457	36
+70	2056	163.17314556725	37
+70	2070	164.3141594781	38
+70	2089	164.91032373736	39
+70	2104	165.37586979888	40
+70	2125	166.78458235718	41
+70	2170	168.96088743456	42
+70	2222	171.63057402934	43
+70	2746	242.24237515166	44
+70	2833	244.7158697518	45
+70	2840	244.90244276722	46
+70	2869	245.37937978485	47
+70	2961	252.99847665559	48
+70	2997	255.15684499395	49
+70	3037	256.46329054999	50
+70	3108	258.16342560941	51
+70	3156	260.10224985907	52
+70	3161	260.60173412626	53
+70	3175	263.14196765506	54
+70	3235	268.28086681189	55
+70	3242	268.30297347805	56
+70	3260	268.81422195611	57
+70	3284	269.28694806079	58
+70	3314	270.09768331697	59
+70	3393	273.51880167578	60
+70	3398	274.2118782434	61
+70	3412	275.74918175152	62
+70	3421	277.2541895657	63
+70	3450	279.49146044595	64
+70	3467	279.85657614091	65
+70	3495	280.8663697766	66
+70	3563	282.61380489594	67
+70	3624	285.9383087283	68
+70	4156	356.60988310858	69
+70	4285	359.86399432764	70
+70	4336	361.58771495058	71
+70	4364	367.21620212349	72
+70	4392	369.71513303573	73
+70	4407	370.3033034717	74
+70	4423	370.76032498156	75
+70	4477	372.25214565098	76
+70	4532	374.06760726188	77
+70	4561	376.42231858408	78
+70	4587	380.28128326865	79
+70	4594	380.56394980525	80
+70	4623	382.34204096667	81
+70	4636	382.97524229547	82
+70	4643	383.16087579241	83
+70	4659	384.06994845711	84
+70	4769	388.19216064716	85
+70	4776	388.30958033161	86
+70	4781	388.98601155044	87
+70	4796	390.58754737679	88
+70	4807	391.76251975465	89
+70	4817	392.50803687557	90
+70	4876	395.54022429128	91
+70	4915	397.17763829476	92
+70	4939	398.01454715378	93
+70	4946	398.07902083606	94
+70	4970	399.00294706997	95
+70	4979	399.36474489063	96
+70	4994	400.52149272211	97
+70	5025	403.81617330611	98
+70	5029	403.88529931734	99
+70	5475	462.08346606059	100
+70	5586	474.04438580156	101
+70	5595	474.19012875472	102
+70	5646	474.86809115758	103
+70	5684	475.87970090535	104
+70	5688	475.9432748957	105
+70	5705	476.95072433951	106
+70	5709	477.99481701692	107
+70	5747	485.50281818201	108
+70	5764	486.3336787328	109
+70	5783	486.91190474087	110
+70	5921	497.38882331032	111
+70	5935	497.87595832059	112
+70	6000	500.35804636021	113
+70	6014	500.62299437838	114
+70	6034	501.5450766547	115
+70	6046	502.65123166832	116
+70	6051	502.92506797429	117
+70	6066	503.80914488472	118
+70	6090	507.64655766695	119
+70	6094	507.75522828539	120
+70	6102	508.22638967837	121
+70	6110	508.92183663093	122
+70	6118	509.45709452657	123
+70	6144	511.22642532935	124
+70	6161	512.06252036424	125
+70	6165	512.45377583466	126
+70	6178	512.93682354287	127
+70	6209	514.77770347091	128
+70	6226	515.66303579151	129
+70	6246	517.40323074152	130
+70	6611	576.62541324127	131
+70	6660	577.07970540638	132
+70	6672	577.48173673627	133
+70	6706	587.34249084852	134
+70	6733	588.24452764371	135
+70	6747	588.82950511634	136
+70	6781	590.02823583496	137
+70	6795	590.59689034911	138
+70	6847	599.1003648505	139
+70	6865	600.17997877456	140
+70	6899	601.81312180812	141
+70	6922	603.15670421966	142
+70	6942	604.47432035957	143
+70	6947	604.59305802447	144
+70	6959	605.59382774325	145
+70	6966	606.26229423124	146
+70	6993	611.27459123747	147
+70	7014	612.635873414	148
+70	7026	613.56562993828	149
+70	7052	614.762158547	150
+70	7057	615.38407236817	151
+70	7074	616.41684710019	152
+70	7084	617.09335613451	153
+70	7142	624.58243015793	154
+70	7165	625.64221879251	155
+70	7180	626.69126553083	156
+70	7205	628.25596297266	157
+70	7765	713.54202912449	158
+70	7769	713.54244364462	159
+70	7786	714.94486500502	160
+70	7805	716.10323354988	161
+70	7821	716.56638402533	162
+70	7825	716.61193404932	163
+70	7839	717.48243238166	164
+70	7887	725.94534451751	165
+70	7942	729.8219782514	166
+70	7948	730.07954381792	167
+70	7963	731.17547639384	168
+70	7977	732.12683559992	169
+70	7987	733.46652685306	170
+70	7997	736.0354016689	171
+70	8015	738.50258113005	172
+70	8041	741.65099398275	173
+70	8068	744.05609480193	174
+70	8080	744.90951474094	175
+70	8090	746.11455688151	176
+70	8102	747.37333441726	177
+71	490	16.38391172597	1
+71	501	16.54651491976	2
+71	506	16.9312878751	3
+71	537	23.63059999158	4
+71	568	25.01706013217	5
+71	633	29.1152284913	6
+71	652	29.87699187308	7
+71	755	39.82638075636	8
+71	801	41.73245046361	9
+71	820	45.46890526212	10
+71	868	50.23161106397	11
+71	910	52.21734487955	12
+71	914	52.24274784669	13
+71	921	52.98997292904	14
+71	937	53.69616654253	15
+71	942	53.94391854377	16
+71	964	54.90028529958	17
+71	969	55.26038246125	18
+71	978	56.19655523639	19
+71	984	56.48618021504	20
+71	1523	128.77192958601	21
+71	1645	138.02895508165	22
+71	1684	140.60429009347	23
+71	1689	140.67580406078	24
+71	1734	142.00156862492	25
+71	1802	145.06446212757	26
+71	1806	145.09512284668	27
+71	1865	152.01332134999	28
+71	1881	152.73052636528	29
+71	1901	153.49526168722	30
+71	1908	153.8432409332	31
+71	1922	154.66154272076	32
+71	1962	155.84378806981	33
+71	1978	156.41265408968	34
+71	1997	157.3617393306	35
+71	2011	158.34899507457	36
+71	2056	163.17314556725	37
+71	2070	164.3141594781	38
+71	2089	164.91032373736	39
+71	2104	165.37586979888	40
+71	2125	166.78458235718	41
+71	2170	168.96088743456	42
+71	2222	171.63057402934	43
+71	2746	242.24237515166	44
+71	2833	244.7158697518	45
+71	2840	244.90244276722	46
+71	2869	245.37937978485	47
+71	2961	252.99847665559	48
+71	2997	255.15684499395	49
+71	3037	256.46329054999	50
+71	3108	258.16342560941	51
+71	3156	260.10224985907	52
+71	3161	260.60173412626	53
+71	3175	263.14196765506	54
+71	3235	268.28086681189	55
+71	3242	268.30297347805	56
+71	3260	268.81422195611	57
+71	3284	269.28694806079	58
+71	3314	270.09768331697	59
+71	3393	273.51880167578	60
+71	3398	274.2118782434	61
+71	3412	275.74918175152	62
+71	3421	277.2541895657	63
+71	3450	279.49146044595	64
+71	3467	279.85657614091	65
+71	3495	280.8663697766	66
+71	3563	282.61380489594	67
+71	3624	285.9383087283	68
+71	4156	356.60988310858	69
+71	4285	359.86399432764	70
+71	4336	361.58771495058	71
+71	4364	367.21620212349	72
+71	4392	369.71513303573	73
+71	4407	370.3033034717	74
+71	4423	370.76032498156	75
+71	4477	372.25214565098	76
+71	4532	374.06760726188	77
+71	4561	376.42231858408	78
+71	4587	380.28128326865	79
+71	4594	380.56394980525	80
+71	4623	382.34204096667	81
+71	4636	382.97524229547	82
+71	4643	383.16087579241	83
+71	4659	384.06994845711	84
+71	4769	388.19216064716	85
+71	4776	388.30958033161	86
+71	4781	388.98601155044	87
+71	4796	390.58754737679	88
+71	4807	391.76251975465	89
+71	4817	392.50803687557	90
+71	4876	395.54022429128	91
+71	4915	397.17763829476	92
+71	4939	398.01454715378	93
+71	4946	398.07902083606	94
+71	4970	399.00294706997	95
+71	4979	399.36474489063	96
+71	4994	400.52149272211	97
+71	5025	403.81617330611	98
+71	5029	403.88529931734	99
+71	5475	462.08346606059	100
+71	5586	474.04438580156	101
+71	5595	474.19012875472	102
+71	5646	474.86809115758	103
+71	5684	475.87970090535	104
+71	5688	475.9432748957	105
+71	5705	476.95072433951	106
+71	5709	477.99481701692	107
+71	5747	485.50281818201	108
+71	5764	486.3336787328	109
+71	5783	486.91190474087	110
+71	5921	497.38882331032	111
+71	5935	497.87595832059	112
+71	6000	500.35804636021	113
+71	6014	500.62299437838	114
+71	6034	501.5450766547	115
+71	6046	502.65123166832	116
+71	6051	502.92506797429	117
+71	6066	503.80914488472	118
+71	6090	507.64655766695	119
+71	6094	507.75522828539	120
+71	6102	508.22638967837	121
+71	6110	508.92183663093	122
+71	6118	509.45709452657	123
+71	6144	511.22642532935	124
+71	6161	512.06252036424	125
+71	6165	512.45377583466	126
+71	6178	512.93682354287	127
+71	6209	514.77770347091	128
+71	6226	515.66303579151	129
+71	6246	517.40323074152	130
+71	6611	576.62541324127	131
+71	6660	577.07970540638	132
+71	6672	577.48173673627	133
+71	6706	587.34249084852	134
+71	6733	588.24452764371	135
+71	6747	588.82950511634	136
+71	6781	590.02823583496	137
+71	6795	590.59689034911	138
+71	6847	599.1003648505	139
+71	6865	600.17997877456	140
+71	6899	601.81312180812	141
+71	6922	603.15670421966	142
+71	6942	604.47432035957	143
+71	6947	604.59305802447	144
+71	6959	605.59382774325	145
+71	6966	606.26229423124	146
+71	6993	611.27459123747	147
+71	7014	612.635873414	148
+71	7026	613.56562993828	149
+71	7052	614.762158547	150
+71	7057	615.38407236817	151
+71	7074	616.41684710019	152
+71	7084	617.09335613451	153
+71	7142	624.58243015793	154
+71	7165	625.64221879251	155
+71	7180	626.69126553083	156
+71	7205	628.25596297266	157
+71	7765	713.54202912449	158
+71	7769	713.54244364462	159
+71	7786	714.94486500502	160
+71	7805	716.10323354988	161
+71	7821	716.56638402533	162
+71	7825	716.61193404932	163
+71	7839	717.48243238166	164
+71	7887	725.94534451751	165
+71	7942	729.8219782514	166
+71	7948	730.07954381792	167
+71	7963	731.17547639384	168
+71	7977	732.12683559992	169
+71	7987	733.46652685306	170
+71	7997	736.0354016689	171
+71	8015	738.50258113005	172
+71	8041	741.65099398275	173
+71	8068	744.05609480193	174
+71	8080	744.90951474094	175
+71	8090	746.11455688151	176
+71	8102	747.37333441726	177
+72	500	16.54651491976	180
+72	800	41.73245046361	180
+72	977	56.19655523639	180
+72	2124	166.78458235718	180
+73	500	16.54651491976	15.54651491976
+73	800	41.73245046361	40.73245046361
+73	977	56.19655523639	55.19655523639
+73	2124	166.78458235718	50.78458235718
+74	500	16.54651491976	15.54651491976
+74	2124	166.78458235718	50.78458235718
+75	505	16.9312878751	180
+75	651	29.87699187308	180
+75	963	54.90028529958	180
+75	1683	140.60429009347	180
+75	3466	279.85657614091	180
+76	505	16.9312878751	15.9312878751
+76	651	29.87699187308	28.87699187308
+76	963	54.90028529958	53.90028529958
+76	1683	140.60429009347	24.60429009347
+76	3466	279.85657614091	48.85657614091
+77	505	16.9312878751	15.9312878751
+77	1683	140.60429009347	24.60429009347
+77	3466	279.85657614091	48.85657614091
+78	536	23.63059999158	180
+78	1977	156.41265408968	180
+78	2745	242.24237515166	180
+78	3036	256.46329054999	180
+78	3313	270.09768331697	180
+78	3494	280.8663697766	180
+78	4476	372.25214565098	180
+79	536	23.63059999158	22.63059999158
+79	1977	156.41265408968	40.41265408968
+79	2745	242.24237515166	11.24237515166
+79	3036	256.46329054999	25.46329054999
+79	3313	270.09768331697	39.09768331697
+79	3494	280.8663697766	49.8663697766
+79	4476	372.25214565098	26.25214565098
+80	536	23.63059999158	22.63059999158
+80	1977	156.41265408968	40.41265408968
+80	2745	242.24237515166	11.24237515166
+80	4476	372.25214565098	26.25214565098
+81	567	25.01706013217	180
+81	913	52.24274784669	180
+81	1907	153.8432409332	180
+81	2103	165.37586979888	180
+81	4155	356.60988310858	180
+81	4363	367.21620212349	180
+82	567	25.01706013217	24.01706013217
+82	913	52.24274784669	51.24274784669
+82	1907	153.8432409332	37.8432409332
+82	2103	165.37586979888	49.37586979888
+82	4155	356.60988310858	10.60988310858
+82	4363	367.21620212349	21.21620212349
+83	567	25.01706013217	24.01706013217
+83	1907	153.8432409332	37.8432409332
+83	4155	356.60988310858	10.60988310858
+84	632	29.1152284913	180
+84	936	53.69616654253	180
+84	1522	128.77192958601	180
+84	1733	142.00156862492	180
+84	1880	152.73052636528	180
+84	2088	164.91032373736	180
+84	2868	245.37937978485	180
+84	3420	277.2541895657	180
+85	632	29.1152284913	28.1152284913
+85	936	53.69616654253	52.69616654253
+85	1522	128.77192958601	12.77192958601
+85	1733	142.00156862492	26.00156862492
+85	1880	152.73052636528	36.73052636528
+85	2088	164.91032373736	48.91032373736
+85	2868	245.37937978485	14.37937978485
+85	3420	277.2541895657	46.2541895657
+86	632	29.1152284913	28.1152284913
+86	1522	128.77192958601	12.77192958601
+86	2868	245.37937978485	14.37937978485
+87	754	39.82638075636	180
+87	909	52.21734487955	180
+87	1688	140.67580406078	180
+87	1864	152.01332134999	180
+87	3623	285.9383087283	180
+88	754	39.82638075636	38.82638075636
+88	909	52.21734487955	51.21734487955
+88	1688	140.67580406078	24.67580406078
+88	1864	152.01332134999	36.01332134999
+88	3623	285.9383087283	54.9383087283
+89	754	39.82638075636	38.82638075636
+89	1688	140.67580406078	24.67580406078
+89	3623	285.9383087283	54.9383087283
+90	819	45.46890526212	180
+90	1801	145.06446212757	180
+90	2010	158.34899507457	180
+90	2221	171.63057402934	180
+91	819	45.46890526212	44.46890526212
+91	1801	145.06446212757	29.06446212757
+91	2010	158.34899507457	42.34899507457
+91	2221	171.63057402934	55.63057402934
+92	819	45.46890526212	44.46890526212
+92	1801	145.06446212757	29.06446212757
+93	867	50.23161106397	180
+94	867	50.23161106397	49.23161106397
+95	867	50.23161106397	49.23161106397
+96	920	52.98997292904	180
+97	920	52.98997292904	51.98997292904
+98	920	52.98997292904	51.98997292904
+99	968	55.26038246125	180
+99	4945	398.07902083606	180
+100	968	55.26038246125	54.26038246125
+100	4945	398.07902083606	52.07902083606
+101	968	55.26038246125	54.26038246125
+101	4945	398.07902083606	52.07902083606
+102	983	56.48618021504	180
+102	1961	155.84378806981	180
+102	2169	168.96088743456	180
+102	2996	255.15684499395	180
+103	983	56.48618021504	55.48618021504
+103	1961	155.84378806981	39.84378806981
+103	2169	168.96088743456	52.96088743456
+103	2996	255.15684499395	24.15684499395
+104	983	56.48618021504	55.48618021504
+104	1961	155.84378806981	39.84378806981
+104	2996	255.15684499395	24.15684499395
+105	1644	138.02895508165	180
+106	1644	138.02895508165	22.02895508165
+107	1644	138.02895508165	22.02895508165
+108	1805	145.09512284668	180
+108	4993	400.52149272211	180
+109	1805	145.09512284668	29.09512284668
+109	4993	400.52149272211	54.52149272211
+110	1805	145.09512284668	29.09512284668
+110	4993	400.52149272211	54.52149272211
+111	1921	154.66154272076	180
+111	4780	388.98601155044	180
+111	5024	403.81617330611	180
+112	1921	154.66154272076	38.66154272076
+112	4780	388.98601155044	42.98601155044
+112	5024	403.81617330611	57.81617330611
+113	1921	154.66154272076	38.66154272076
+113	4780	388.98601155044	42.98601155044
+114	1996	157.3617393306	180
+114	3449	279.49146044595	180
+114	4978	399.36474489063	180
+114	6089	507.64655766695	180
+115	1996	157.3617393306	41.3617393306
+115	3449	279.49146044595	48.49146044595
+115	4978	399.36474489063	53.36474489063
+115	6089	507.64655766695	46.64655766695
+116	1996	157.3617393306	41.3617393306
+116	3449	279.49146044595	48.49146044595
+116	4978	399.36474489063	53.36474489063
+116	6089	507.64655766695	46.64655766695
+117	2055	163.17314556725	180
+117	3241	268.30297347805	180
+117	6101	508.22638967837	180
+118	2055	163.17314556725	47.17314556725
+118	3241	268.30297347805	37.30297347805
+118	6101	508.22638967837	47.22638967837
+119	2055	163.17314556725	47.17314556725
+119	3241	268.30297347805	37.30297347805
+119	6101	508.22638967837	47.22638967837
+120	2069	164.3141594781	180
+121	2069	164.3141594781	48.3141594781
+122	2069	164.3141594781	48.3141594781
+123	2832	244.7158697518	180
+123	3259	268.81422195611	180
+123	3562	282.61380489594	180
+123	4284	359.86399432764	180
+123	4422	370.76032498156	180
+123	4642	383.16087579241	180
+124	2832	244.7158697518	13.7158697518
+124	3259	268.81422195611	37.81422195611
+124	3562	282.61380489594	51.61380489594
+124	4284	359.86399432764	13.86399432764
+124	4422	370.76032498156	24.76032498156
+124	4642	383.16087579241	37.16087579241
+125	2832	244.7158697518	13.7158697518
+125	4284	359.86399432764	13.86399432764
+126	2839	244.90244276722	180
+126	4406	370.3033034717	180
+126	4635	382.97524229547	180
+127	2839	244.90244276722	13.90244276722
+127	4406	370.3033034717	24.3033034717
+127	4635	382.97524229547	36.97524229547
+128	2839	244.90244276722	13.90244276722
+128	4406	370.3033034717	24.3033034717
+129	2960	252.99847665559	180
+129	3174	263.14196765506	180
+129	3392	273.51880167578	180
+130	2960	252.99847665559	21.99847665559
+130	3174	263.14196765506	32.14196765506
+130	3392	273.51880167578	42.51880167578
+131	2960	252.99847665559	21.99847665559
+132	3107	258.16342560941	180
+132	3283	269.28694806079	180
+132	4531	374.06760726188	180
+132	4775	388.30958033161	180
+133	3107	258.16342560941	27.16342560941
+133	3283	269.28694806079	38.28694806079
+133	4531	374.06760726188	28.06760726188
+133	4775	388.30958033161	42.30958033161
+134	3107	258.16342560941	27.16342560941
+134	4531	374.06760726188	28.06760726188
+135	3155	260.10224985907	180
+135	4622	382.34204096667	180
+135	4816	392.50803687557	180
+136	3155	260.10224985907	29.10224985907
+136	4622	382.34204096667	36.34204096667
+136	4816	392.50803687557	46.50803687557
+137	3155	260.10224985907	29.10224985907
+137	4622	382.34204096667	36.34204096667
+138	3160	260.60173412626	180
+138	4795	390.58754737679	180
+138	5028	403.88529931734	180
+139	3160	260.60173412626	29.60173412626
+139	4795	390.58754737679	44.58754737679
+139	5028	403.88529931734	57.88529931734
+140	3160	260.60173412626	29.60173412626
+140	4795	390.58754737679	44.58754737679
+141	3234	268.28086681189	180
+142	3234	268.28086681189	37.28086681189
+143	3234	268.28086681189	37.28086681189
+144	3397	274.2118782434	180
+144	4335	361.58771495058	180
+144	4560	376.42231858408	180
+144	4768	388.19216064716	180
+144	4969	399.00294706997	180
+145	3397	274.2118782434	43.2118782434
+145	4335	361.58771495058	15.58771495058
+145	4560	376.42231858408	30.42231858408
+145	4768	388.19216064716	42.19216064716
+145	4969	399.00294706997	53.00294706997
+146	3397	274.2118782434	43.2118782434
+146	4335	361.58771495058	15.58771495058
+147	3411	275.74918175152	180
+148	3411	275.74918175152	44.74918175152
+149	3411	275.74918175152	44.74918175152
+150	4391	369.71513303573	180
+150	4586	380.28128326865	180
+150	4806	391.76251975465	180
+151	4391	369.71513303573	23.71513303573
+151	4586	380.28128326865	34.28128326865
+151	4806	391.76251975465	45.76251975465
+152	4391	369.71513303573	23.71513303573
+153	4593	380.56394980525	180
+153	5687	475.9432748957	180
+153	6050	502.92506797429	180
+154	4593	380.56394980525	34.56394980525
+154	5687	475.9432748957	14.9432748957
+154	6050	502.92506797429	41.92506797429
+155	4593	380.56394980525	34.56394980525
+155	5687	475.9432748957	14.9432748957
+156	4658	384.06994845711	180
+156	6117	509.45709452657	180
+156	6958	605.59382774325	180
+156	7785	714.94486500502	180
+157	4658	384.06994845711	38.06994845711
+157	6117	509.45709452657	48.45709452657
+157	6958	605.59382774325	29.59382774325
+157	7785	714.94486500502	23.94486500502
+158	4658	384.06994845711	38.06994845711
+158	6117	509.45709452657	48.45709452657
+158	6958	605.59382774325	29.59382774325
+158	7785	714.94486500502	23.94486500502
+159	4875	395.54022429128	180
+159	6045	502.65123166832	180
+159	6245	517.40323074152	180
+159	6921	603.15670421966	180
+159	7083	617.09335613451	180
+160	4875	395.54022429128	49.54022429128
+160	6045	502.65123166832	41.65123166832
+160	6245	517.40323074152	56.40323074152
+160	6921	603.15670421966	27.15670421966
+160	7083	617.09335613451	41.09335613451
+161	4875	395.54022429128	49.54022429128
+161	6045	502.65123166832	41.65123166832
+161	6921	603.15670421966	27.15670421966
+162	4914	397.17763829476	180
+163	4914	397.17763829476	51.17763829476
+164	4914	397.17763829476	51.17763829476
+165	4938	398.01454715378	180
+165	5704	476.95072433951	180
+166	4938	398.01454715378	52.01454715378
+166	5704	476.95072433951	15.95072433951
+167	4938	398.01454715378	52.01454715378
+167	5704	476.95072433951	15.95072433951
+168	5474	462.08346606059	180
+168	5594	474.19012875472	180
+168	5746	485.50281818201	180
+168	5999	500.35804636021	180
+168	6208	514.77770347091	180
+168	7768	713.54244364462	180
+169	5474	462.08346606059	1.08346606059
+169	5594	474.19012875472	13.19012875472
+169	5746	485.50281818201	24.50281818201
+169	5999	500.35804636021	39.35804636021
+169	6208	514.77770347091	53.77770347091
+169	7768	713.54244364462	22.54244364462
+170	5474	462.08346606059	1.08346606059
+170	7768	713.54244364462	22.54244364462
+171	5585	474.04438580156	180
+171	5782	486.91190474087	180
+171	6109	508.92183663093	180
+171	6941	604.47432035957	180
+171	7824	716.61193404932	180
+171	8014	738.50258113005	180
+172	5585	474.04438580156	13.04438580156
+172	5782	486.91190474087	25.91190474087
+172	6109	508.92183663093	47.92183663093
+172	6941	604.47432035957	28.47432035957
+172	7824	716.61193404932	25.61193404932
+172	8014	738.50258113005	47.50258113005
+173	5585	474.04438580156	13.04438580156
+173	6941	604.47432035957	28.47432035957
+173	7824	716.61193404932	25.61193404932
+174	5645	474.86809115758	180
+174	5763	486.3336787328	180
+174	6013	500.62299437838	180
+174	6177	512.93682354287	180
+174	6659	577.07970540638	180
+174	6732	588.24452764371	180
+174	6864	600.17997877456	180
+174	6992	611.27459123747	180
+174	7164	625.64221879251	180
+174	7838	717.48243238166	180
+174	7962	731.17547639384	180
+174	8067	744.05609480193	180
+175	5645	474.86809115758	13.86809115758
+175	5763	486.3336787328	25.3336787328
+175	6013	500.62299437838	39.62299437838
+175	6177	512.93682354287	51.93682354287
+175	6659	577.07970540638	1.07970540638
+175	6732	588.24452764371	12.24452764371
+175	6864	600.17997877456	24.17997877456
+175	6992	611.27459123747	35.27459123747
+175	7164	625.64221879251	49.64221879251
+175	7838	717.48243238166	26.48243238166
+175	7962	731.17547639384	40.17547639384
+175	8067	744.05609480193	53.05609480193
+176	5645	474.86809115758	13.86809115758
+176	6659	577.07970540638	1.07970540638
+176	7838	717.48243238166	26.48243238166
+177	5683	475.87970090535	180
+177	5920	497.38882331032	180
+177	6093	507.75522828539	180
+177	6610	576.62541324127	180
+177	6794	590.59689034911	180
+177	6946	604.59305802447	180
+177	7073	616.41684710019	180
+177	7179	626.69126553083	180
+177	7820	716.56638402533	180
+177	7941	729.8219782514	180
+177	8040	741.65099398275	180
+178	5683	475.87970090535	14.87970090535
+178	5920	497.38882331032	36.38882331032
+178	6093	507.75522828539	46.75522828539
+178	6610	576.62541324127	0.62541324126994
+178	6794	590.59689034911	14.59689034911
+178	6946	604.59305802447	28.59305802447
+178	7073	616.41684710019	40.41684710019
+178	7179	626.69126553083	50.69126553083
+178	7820	716.56638402533	25.56638402533
+178	7941	729.8219782514	38.8219782514
+178	8040	741.65099398275	50.65099398275
+179	5683	475.87970090535	14.87970090535
+179	6610	576.62541324127	0.62541324126994
+179	7820	716.56638402533	25.56638402533
+180	5708	477.99481701692	180
+181	5708	477.99481701692	16.99481701692
+182	5708	477.99481701692	16.99481701692
+183	5934	497.87595832059	180
+183	6164	512.45377583466	180
+184	5934	497.87595832059	36.87595832059
+184	6164	512.45377583466	51.45377583466
+185	5934	497.87595832059	36.87595832059
+186	6033	501.5450766547	180
+186	6160	512.06252036424	180
+186	6780	590.02823583496	180
+186	7051	614.762158547	180
+187	6033	501.5450766547	40.5450766547
+187	6160	512.06252036424	51.06252036424
+187	6780	590.02823583496	14.02823583496
+187	7051	614.762158547	38.762158547
+188	6033	501.5450766547	40.5450766547
+188	6780	590.02823583496	14.02823583496
+189	6065	503.80914488472	180
+189	6225	515.66303579151	180
+189	6846	599.1003648505	180
+189	7025	613.56562993828	180
+189	7204	628.25596297266	180
+189	7976	732.12683559992	180
+189	8089	746.11455688151	180
+190	6065	503.80914488472	42.80914488472
+190	6225	515.66303579151	54.66303579151
+190	6846	599.1003648505	23.1003648505
+190	7025	613.56562993828	37.56562993828
+190	7204	628.25596297266	52.25596297266
+190	7976	732.12683559992	41.12683559992
+190	8089	746.11455688151	55.11455688151
+191	6065	503.80914488472	42.80914488472
+191	6846	599.1003648505	23.1003648505
+191	7976	732.12683559992	41.12683559992
+192	6143	511.22642532935	180
+192	6671	577.48173673627	180
+192	6746	588.82950511634	180
+192	6898	601.81312180812	180
+192	7013	612.635873414	180
+192	7141	624.58243015793	180
+192	7986	733.46652685306	180
+192	8101	747.37333441726	180
+193	6143	511.22642532935	50.22642532935
+193	6671	577.48173673627	1.4817367362699
+193	6746	588.82950511634	12.82950511634
+193	6898	601.81312180812	25.81312180812
+193	7013	612.635873414	36.635873414
+193	7141	624.58243015793	48.58243015793
+193	7986	733.46652685306	42.46652685306
+193	8101	747.37333441726	56.37333441726
+194	6143	511.22642532935	50.22642532935
+194	6671	577.48173673627	1.4817367362699
+194	7986	733.46652685306	42.46652685306
+195	6705	587.34249084852	180
+195	7056	615.38407236817	180
+195	7804	716.10323354988	180
+195	7947	730.07954381792	180
+195	8079	744.90951474094	180
+196	6705	587.34249084852	11.34249084852
+196	7056	615.38407236817	39.38407236817
+196	7804	716.10323354988	25.10323354988
+196	7947	730.07954381792	39.07954381792
+196	8079	744.90951474094	53.90951474094
+197	6705	587.34249084852	11.34249084852
+197	7804	716.10323354988	25.10323354988
+198	6965	606.26229423124	180
+198	7764	713.54202912449	180
+198	7886	725.94534451751	180
+198	7996	736.0354016689	180
+199	6965	606.26229423124	30.26229423124
+199	7764	713.54202912449	22.54202912449
+199	7886	725.94534451751	34.94534451751
+199	7996	736.0354016689	45.0354016689
+200	6965	606.26229423124	30.26229423124
+200	7764	713.54202912449	22.54202912449
+

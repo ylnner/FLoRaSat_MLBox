@@ -47,7 +47,7 @@ namespace mlbox{
         const double mean_delta_t = 61.31933958104395;
         const double scale_delta_t = 40.97636157062998;
 
-
+        bool coldStart;
     protected:
         torch::jit::script::Module scaler;
 

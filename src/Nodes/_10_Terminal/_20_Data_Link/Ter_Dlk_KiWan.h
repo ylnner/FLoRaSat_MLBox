@@ -18,6 +18,9 @@
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_Analytical.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h"
+#include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.h"
+#include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.h"
+
 
 using namespace mlbox;
 using namespace omnetpp;
@@ -155,14 +158,19 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         cOutVector vector_preds_BiLSTM;
         cOutVector vector_preds_Transformer;
         cOutVector vector_preds_Analytical;
+        cOutVector vector_preds_MLP;
     protected:
         Transmission_Predictor *mlBox;
         Transmission_Predictor_BiLSTM *mlBoxBiLSTM;
         Transmission_Predictor_Analytical *predAnalytical;
+        Transmission_Predictor_MLP *mlBoxMLP;
+        Transmission_Predictor_TwoBranches *mlBoxTwoBranches;
 
         bool mlBoxAvailable = false;
         bool mlBoxAvailableBiLSTM = false;
         bool analyticalAvailable = false;
+        bool mlBoxAvailableMLP = false;
+        bool mlBoxAvailableTwoBranches = false;
 
 }; // namespace mac
 

@@ -16,6 +16,7 @@ void Transmission_Predictor::initialize(int stage){
 
     if (stage == inet::INITSTAGE_LOCAL) {
         scalerPath = par("scalerPath").stringValue();
+        coldStart = par("coldStart").boolValue();
         //threshold = par("threshold").doubleValue();
     }
 }
@@ -67,12 +68,16 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
         EV << endl;
     }
 
-    // If the buffer is not complete return 1
-    if (window_buffer.size() < seq_length) {
-        EV << "Buffer not complete (" << window_buffer.size() << "/" << seq_length
-           << "). Returning 1 by default \n";
-        return {1}; // Return a vector with 1
+    // if is not activated control the buffer size
+    if(coldStart == false){
+        // If the buffer is not complete return 1
+        if (window_buffer.size() < seq_length) {
+            EV << "Buffer not complete (" << window_buffer.size() << "/" << seq_length
+               << "). Returning 1 by default \n";
+            return {1}; // Return a vector with 1
+        }
     }
+
 
     // Call the model to predict
     try {
@@ -99,9 +104,16 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
             }
         }
 
+
+        int current_seq_length = seq_length;
+
+        // If is activated set the shape with the current size of the buffer
+        if(coldStart){
+            current_seq_length = buffer_copia.size();
+        }
         // Convert to a Tensor format
         at::Tensor input_tensor = torch::from_blob(flattened.data(),
-                                    {1, seq_length, num_features},
+                                    {1, current_seq_length, num_features},
                                     torch::kFloat32).clone();
 
         // 1. Ver el tamaño/forma (Shape)

@@ -1,0 +1,946 @@
+version 3
+run General-488-20260805-16:13:48-69325
+attr configname General
+attr datetime 20260805-16:13:48
+attr datetimef 20260805-161348
+attr experiment General
+attr inifile Test_MLModel_7.ini
+attr iterationvars "$myraan=205, $threshold=0.90, $0=76328"
+attr iterationvarsd myraan=205/threshold=0.90/76328
+attr iterationvarsf myraan=205,threshold=0.90,76328-
+attr measurement "$myraan=205, $threshold=0.90, $0=76328"
+attr network Florasat.Test_Individual.Florasat_Individual_Sats
+attr processid 69325
+attr repetition 8
+attr replication #8
+attr resultdir results
+attr runnumber 488
+attr seedset 488
+itervar myraan 205
+itervar threshold 0.90
+config *.stats_altitude 670
+config *.stats_raan 185
+config image-path ../../images:../../../../samples/inet4.5_2/images
+config network Florasat.Test_Individual.Florasat_Individual_Sats
+config rng-class cMersenneTwister
+config *.**.result-recording-modes -
+config **.result-recording-modes -
+config **.statistic-recording true
+config **.scalar-recording true
+config **.vector-recording true
+config **.vector-record-eventnumbers true
+config repeat 10
+config seed-0-mt 76328
+config sim-time-limit 749s
+config simtime-resolution -11
+config **.stats_altitude 670
+config **.stats_raan 185
+config *.radioMedium.backgroundNoise.power -110dBm
+config *.radioMedium.mediumLimitCache.centerFrequency 868MHz
+config *.radioMedium.mediumLimitCache.maxTransmissionDuration 4s
+config *.radioMedium.mediumLimitCache.minInterferenceTime 0s
+config **.numSatellites 1
+config *.satellite[*].mobilityType "\"Sat_Mob_SatelliteMobility_Standalone\""
+config *.satellite[*].noradModuleType "\"Sat_Mob_NoradA\""
+config **.satellite[*].**.initFromDisplayString false
+config *.satellite[*].mobility.faceForward true
+config *.satellite[*].mobility.updateInterval 20s
+config *.satellite[*].NoradModule.satName "\"FLoRaSat\""
+config *.satellite[*].NoradModule.satIndex -1
+config *.satellite[*].NoradModule.baseYear 20
+config *.satellite[*].NoradModule.baseDay 1.5
+config *.satellite[*].NoradModule.planes 1
+config *.satellite[*].NoradModule.satPerPlane 1
+config *.satellite[*].NoradModule.eccentricity 0.000001
+config *.satellite[*].NoradModule.inclination 98
+config *.satellite[*].NoradModule.altitude 670
+config *.satellite[0].NoradModule.raan 205
+config *.satellite[0].NoradModule.meanAnomaly 195
+config *.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap true
+config *.satellite[*].phyDSL.radio.receiver.minCollisionOverlap 0s
+config *.satellite[*].phyDSL.radio.antenna.typename ConstantGainAntenna
+config *.satellite[*].phyDSL.radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config *.satellite[*].phyISL.radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config *.satellite[*].phyGSL.radio.antenna.mobilityModule "\"^.^.^.mobility\""
+config *.satellite[*].phyDSL.radio.antenna.gain 12dB
+config *.satellite[*].net.routingType "\"Null_Routing\""
+config *.terminal[*].net.routingType "\"Ter_Null_Routing\""
+config *.**.numGroundLinks 40
+config *.satellite[*].**.interfaceTableModule "\"\""
+config **.radioMedium.typename LoRaMedium
+config **.radioMedium.analogModel.typename LoRaAnalogModel
+config **.intraPlaneIslDisabled false
+config **.interPlaneIslDisabled false
+config **.numTerminals 60
+config *.terminal[*].phy.radio.antenna.mobilityModule "\"^.^.^.mob\""
+config *.terminal[*].dlk.mac.interfaceTableModule "\"\""
+config *.terminal[*].dlk.energySourceModule "\"\""
+config *.terminal[*].dlk.mac.LoRaTP "intuniform(12, 14)"
+config *.terminal[*].dlk.mac.LoRaSF "intuniform(10, 12)"
+config *.terminal[*].dlk.mac.useMLBoxTwoBranches true
+config *.terminal[*].dlk.mac.mlBoxTwoBranches.modelPath "\"/home/ylnner/Documents/omnet++/omnetpp-6.3.0/projects/florasat_v4_ult_routing/simulations/Test_Individual/mlmodels/two_branch_transformer_scripted.pt\""
+config *.terminal[*].dlk.mac.mlBoxTwoBranches.threshold 0.90
+config **.numberOfPacketsToSend 0
+config **.timeToFirstPacket 1s
+config **.timeToNextPacket 115s
+config *.terminal[0].mob.radius 0.0
+config *.terminal[0].mob.centerLatitude 54.978
+config *.terminal[0].mob.centerLongitude -1.617
+config *.terminal[1].mob.radius 0.0
+config *.terminal[1].mob.centerLatitude 52.630
+config *.terminal[1].mob.centerLongitude -1.139
+config *.terminal[2].mob.radius 0.0
+config *.terminal[2].mob.centerLatitude 52.612
+config *.terminal[2].mob.centerLongitude -6.295
+config *.terminal[3].mob.radius 0.0
+config *.terminal[3].mob.centerLatitude 47.243
+config *.terminal[3].mob.centerLongitude 6.024
+config *.terminal[4].mob.radius 0.0
+config *.terminal[4].mob.centerLatitude 43.610
+config *.terminal[4].mob.centerLongitude 3.876
+config *.terminal[5].mob.radius 0.0
+config *.terminal[5].mob.centerLatitude 49.443
+config *.terminal[5].mob.centerLongitude 1.099
+config *.terminal[6].mob.radius 0.0
+config *.terminal[6].mob.centerLatitude 37.992
+config *.terminal[6].mob.centerLongitude -1.130
+config *.terminal[7].mob.radius 0.0
+config *.terminal[7].mob.centerLatitude 40.965
+config *.terminal[7].mob.centerLongitude -5.664
+config *.terminal[8].mob.radius 0.0
+config *.terminal[8].mob.centerLatitude 40.657
+config *.terminal[8].mob.centerLongitude -7.914
+config *.terminal[9].mob.radius 0.0
+config *.terminal[9].mob.centerLatitude 51.340
+config *.terminal[9].mob.centerLongitude 12.373
+config *.terminal[10].mob.radius 0.0
+config *.terminal[10].mob.centerLatitude 51.455
+config *.terminal[10].mob.centerLongitude 7.011
+config *.terminal[11].mob.radius 0.0
+config *.terminal[11].mob.centerLatitude 49.452
+config *.terminal[11].mob.centerLongitude 11.076
+config *.terminal[12].mob.radius 0.0
+config *.terminal[12].mob.centerLatitude 43.769
+config *.terminal[12].mob.centerLongitude 11.255
+config *.terminal[13].mob.radius 0.0
+config *.terminal[13].mob.centerLatitude 41.117
+config *.terminal[13].mob.centerLongitude 16.871
+config *.terminal[14].mob.radius 0.0
+config *.terminal[14].mob.centerLatitude 52.132
+config *.terminal[14].mob.centerLongitude 5.291
+config *.terminal[15].mob.radius 0.0
+config *.terminal[15].mob.centerLatitude 50.411
+config *.terminal[15].mob.centerLongitude 4.444
+config *.terminal[16].mob.radius 0.0
+config *.terminal[16].mob.centerLatitude 47.559
+config *.terminal[16].mob.centerLongitude 7.588
+config *.terminal[17].mob.radius 0.0
+config *.terminal[17].mob.centerLatitude 55.403
+config *.terminal[17].mob.centerLongitude 10.402
+config *.terminal[18].mob.radius 0.0
+config *.terminal[18].mob.centerLatitude 59.858
+config *.terminal[18].mob.centerLongitude 17.638
+config *.terminal[19].mob.radius 0.0
+config *.terminal[19].mob.centerLatitude 60.451
+config *.terminal[19].mob.centerLongitude 22.266
+config *.terminal[20].mob.radius 0.0
+config *.terminal[20].mob.centerLatitude 56.325
+config *.terminal[20].mob.centerLongitude 22.349
+config *.terminal[21].mob.radius 0.0
+config *.terminal[21].mob.centerLatitude 49.883
+config *.terminal[21].mob.centerLongitude 18.568
+config *.terminal[22].mob.radius 0.0
+config *.terminal[22].mob.centerLatitude 47.531
+config *.terminal[22].mob.centerLongitude 21.627
+config *.terminal[23].mob.radius 0.0
+config *.terminal[23].mob.centerLatitude 44.179
+config *.terminal[23].mob.centerLongitude 28.649
+config *.terminal[24].mob.radius 0.0
+config *.terminal[24].mob.centerLatitude 45.327
+config *.terminal[24].mob.centerLongitude 14.442
+config *.terminal[25].mob.radius 0.0
+config *.terminal[25].mob.centerLatitude 40.694
+config *.terminal[25].mob.centerLongitude 30.400
+config *.terminal[26].mob.radius 0.0
+config *.terminal[26].mob.centerLatitude 37.066
+config *.terminal[26].mob.centerLongitude 37.383
+config *.terminal[27].mob.radius 0.0
+config *.terminal[27].mob.centerLatitude 64.836
+config *.terminal[27].mob.centerLongitude -23.708
+config *.terminal[28].mob.radius 0.0
+config *.terminal[28].mob.centerLatitude 28.099
+config *.terminal[28].mob.centerLongitude -17.113
+config *.terminal[29].mob.radius 0.0
+config *.terminal[29].mob.centerLatitude 34.921
+config *.terminal[29].mob.centerLongitude 33.623
+config *.terminal[30].mob.radius 0.0
+config *.terminal[30].mob.centerLatitude 55.953
+config *.terminal[30].mob.centerLongitude -3.188
+config *.terminal[31].mob.radius 0.0
+config *.terminal[31].mob.centerLatitude 51.481
+config *.terminal[31].mob.centerLongitude -3.179
+config *.terminal[32].mob.radius 0.0
+config *.terminal[32].mob.centerLatitude 53.349
+config *.terminal[32].mob.centerLongitude -6.260
+config *.terminal[33].mob.radius 0.0
+config *.terminal[33].mob.centerLatitude 45.764
+config *.terminal[33].mob.centerLongitude 4.835
+config *.terminal[34].mob.radius 0.0
+config *.terminal[34].mob.centerLatitude 48.573
+config *.terminal[34].mob.centerLongitude 7.752
+config *.terminal[35].mob.radius 0.0
+config *.terminal[35].mob.centerLatitude 44.837
+config *.terminal[35].mob.centerLongitude -0.579
+config *.terminal[36].mob.radius 0.0
+config *.terminal[36].mob.centerLatitude 41.385
+config *.terminal[36].mob.centerLongitude 2.173
+config *.terminal[37].mob.radius 0.0
+config *.terminal[37].mob.centerLatitude 41.157
+config *.terminal[37].mob.centerLongitude -8.629
+config *.terminal[38].mob.radius 0.0
+config *.terminal[38].mob.centerLatitude 37.389
+config *.terminal[38].mob.centerLongitude -5.984
+config *.terminal[39].mob.radius 0.0
+config *.terminal[39].mob.centerLatitude 53.551
+config *.terminal[39].mob.centerLongitude 9.993
+config *.terminal[40].mob.radius 0.0
+config *.terminal[40].mob.centerLatitude 48.135
+config *.terminal[40].mob.centerLongitude 11.582
+config *.terminal[41].mob.radius 0.0
+config *.terminal[41].mob.centerLatitude 50.110
+config *.terminal[41].mob.centerLongitude 8.682
+config *.terminal[42].mob.radius 0.0
+config *.terminal[42].mob.centerLatitude 45.464
+config *.terminal[42].mob.centerLongitude 9.190
+config *.terminal[43].mob.radius 0.0
+config *.terminal[43].mob.centerLatitude 40.851
+config *.terminal[43].mob.centerLongitude 14.268
+config *.terminal[44].mob.radius 0.0
+config *.terminal[44].mob.centerLatitude 51.209
+config *.terminal[44].mob.centerLongitude 3.224
+config *.terminal[45].mob.radius 0.0
+config *.terminal[45].mob.centerLatitude 48.208
+config *.terminal[45].mob.centerLongitude 16.373
+config *.terminal[46].mob.radius 0.0
+config *.terminal[46].mob.centerLatitude 52.229
+config *.terminal[46].mob.centerLongitude 21.012
+config *.terminal[47].mob.radius 0.0
+config *.terminal[47].mob.centerLatitude 59.913
+config *.terminal[47].mob.centerLongitude 10.752
+config *.terminal[48].mob.radius 0.0
+config *.terminal[48].mob.centerLatitude 56.949
+config *.terminal[48].mob.centerLongitude 24.105
+config *.terminal[49].mob.radius 0.0
+config *.terminal[49].mob.centerLatitude 59.437
+config *.terminal[49].mob.centerLongitude 24.753
+config *.terminal[50].mob.radius 0.0
+config *.terminal[50].mob.centerLatitude 50.075
+config *.terminal[50].mob.centerLongitude 14.437
+config *.terminal[51].mob.radius 0.0
+config *.terminal[51].mob.centerLatitude 42.697
+config *.terminal[51].mob.centerLongitude 23.321
+config *.terminal[52].mob.radius 0.0
+config *.terminal[52].mob.centerLatitude 45.815
+config *.terminal[52].mob.centerLongitude 15.981
+config *.terminal[53].mob.radius 0.0
+config *.terminal[53].mob.centerLatitude 40.640
+config *.terminal[53].mob.centerLongitude 22.944
+config *.terminal[54].mob.radius 0.0
+config *.terminal[54].mob.centerLatitude 39.933
+config *.terminal[54].mob.centerLongitude 32.859
+config *.terminal[55].mob.radius 0.0
+config *.terminal[55].mob.centerLatitude 38.419
+config *.terminal[55].mob.centerLongitude 27.128
+config *.terminal[56].mob.radius 0.0
+config *.terminal[56].mob.centerLatitude 35.898
+config *.terminal[56].mob.centerLongitude 14.514
+config *.terminal[57].mob.radius 0.0
+config *.terminal[57].mob.centerLatitude 65.683
+config *.terminal[57].mob.centerLongitude -18.087
+config *.terminal[58].mob.radius 0.0
+config *.terminal[58].mob.centerLatitude 28.463
+config *.terminal[58].mob.centerLongitude -16.251
+config *.terminal[59].mob.radius 0.0
+config *.terminal[59].mob.centerLatitude 35.185
+config *.terminal[59].mob.centerLongitude 33.382
+config **.numStations 3
+config **.numStations 3
+config *.station[0].mobility.latitude 55.752
+config *.station[0].mobility.longitude 37.616
+config *.station[0].cityName "\"Moscow\""
+config *.station[0].groundStationId 7
+config *.station[0].routerAddr "\"10.0.0.29\""
+config *.station[0].serving "\"10.0.0.29\""
+config *.station[1].mobility.latitude 28.652
+config *.station[1].mobility.longitude 77.231
+config *.station[1].cityName "\"Delhi\""
+config *.station[1].groundStationId 11
+config *.station[1].routerAddr "\"10.0.0.45\""
+config *.station[1].serving "\"10.0.0.45\""
+config *.station[2].mobility.latitude 25.35
+config *.station[2].mobility.longitude 51.24
+config *.station[2].cityName "\"Katar\""
+config *.station[2].groundStationId 19
+config *.station[2].routerAddr "\"10.0.0.77\""
+config *.station[2].serving "\"10.0.0.77\""
+config *.visualizer.canvasVisualizer.mediumVisualizer.typename ""
+config *.visualizer.*.radioVisualizer.displayAntennaLobes true
+config *.visualizer.*.dataLinkVisualizer.displayLinks true
+config *.visualizer.*.mobilityVisualizer.displayMovementTrails true
+config *.visualizer.*.mobilityVisualizer.movementTrailLineWidth 1
+config *.visualizer.*.mobilityVisualizer.trailLength 3000
+config **.ttxStart_max 1s
+config **.ttxIdle_min 10s
+config **.ttxIdle_max 15s
+config **.Ntw 1
+config **.Ntx 5
+config **.ttwDuration 100s
+config output-scalar-file results/results_florasat_ml_twoBranches/twoBranches-raan-205-th-0.90-General-8.sca
+config output-vector-file results/results_florasat_ml_twoBranches/twoBranches-raan-205-th-0.90-General-8.vec
+
+vector 0 Florasat_Individual_Sats.satellite[0].dlkDSL.mac VectorTransmitMethod_ReceptionResult ETV
+vector 1 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Satellite Position when Repetition Received" ETV
+vector 2 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 823 at Satellite" ETV
+vector 3 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "All Nodes Repetition Generation Delay at Satellite" ETV
+vector 4 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 823 at Satellite" ETV
+vector 5 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Successful Repetition Number counted for MAC protocol" ETV
+vector 6 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Successful Repetition Number counted for the Model" ETV
+vector 7 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "All Nodes Message Generation Delay at Satellite" ETV
+vector 8 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 823 at Satellite" ETV
+vector 9 Florasat_Individual_Sats.satellite[0].net.packetHandler "packets received" ETV
+vector 10 Florasat_Individual_Sats.satellite[0].net.packetHandler "dropped unroutable" ETV
+vector 11 Florasat_Individual_Sats.satellite[0].net.packetHandler "packets dropped" ETV
+vector 12 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 388 at Satellite" ETV
+vector 13 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 388 at Satellite" ETV
+vector 14 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 388 at Satellite" ETV
+vector 15 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 358 at Satellite" ETV
+vector 16 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 358 at Satellite" ETV
+vector 17 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 358 at Satellite" ETV
+vector 18 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 373 at Satellite" ETV
+vector 19 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 373 at Satellite" ETV
+vector 20 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 373 at Satellite" ETV
+vector 21 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 808 at Satellite" ETV
+vector 22 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 808 at Satellite" ETV
+vector 23 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 808 at Satellite" ETV
+vector 24 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 418 at Satellite" ETV
+vector 25 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 418 at Satellite" ETV
+vector 26 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 418 at Satellite" ETV
+vector 27 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 778 at Satellite" ETV
+vector 28 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 778 at Satellite" ETV
+vector 29 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 778 at Satellite" ETV
+vector 30 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 433 at Satellite" ETV
+vector 31 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 433 at Satellite" ETV
+vector 32 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 433 at Satellite" ETV
+vector 33 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 898 at Satellite" ETV
+vector 34 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 898 at Satellite" ETV
+vector 35 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 898 at Satellite" ETV
+vector 36 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 463 at Satellite" ETV
+vector 37 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 463 at Satellite" ETV
+vector 38 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 463 at Satellite" ETV
+vector 39 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 973 at Satellite" ETV
+vector 40 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 973 at Satellite" ETV
+vector 41 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 973 at Satellite" ETV
+vector 42 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 523 at Satellite" ETV
+vector 43 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 523 at Satellite" ETV
+vector 44 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 523 at Satellite" ETV
+vector 45 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 853 at Satellite" ETV
+vector 46 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 853 at Satellite" ETV
+vector 47 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 853 at Satellite" ETV
+vector 48 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 913 at Satellite" ETV
+vector 49 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 913 at Satellite" ETV
+vector 50 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 913 at Satellite" ETV
+vector 51 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 733 at Satellite" ETV
+vector 52 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 733 at Satellite" ETV
+vector 53 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 733 at Satellite" ETV
+vector 54 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Position for Node 928 at Satellite" ETV
+vector 55 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Repetition Generation Delay for Node 928 at Satellite" ETV
+vector 56 Florasat_Individual_Sats.satellite[0].dlkDSL.mac "Message Generation Delay for Node 928 at Satellite" ETV
+0	911	117.40572628415	20506901
+0	931	127.15600130884	20504002
+0	942	127.51369311747	20503802
+0	974	129.68529086597	20503902
+0	988	130.44551878183	20506802
+0	1005	131.85236637913	20506902
+0	1067	143.44292671154	20506903
+0	1072	143.68945919972	20506803
+0	1093	149.51636939463	20504004
+0	1183	166.14497380764	20506905
+0	1589	231.94727768324	20512801
+0	1593	232.18403980592	20512901
+0	1634	244.0830405	20512802
+0	1646	244.57937063523	20512902
+0	1682	254.17089780969	20509903
+0	1691	254.884720453	20512803
+0	1768	265.91266040824	20512804
+0	1784	266.82761885429	20510204
+0	1791	267.05949485245	20512604
+0	1841	272.86428450597	20512904
+0	1911	285.9265089558	20510005
+0	2460	385.6496093816	20516304
+0	2969	474.08385706906	20525402
+0	2981	475.01236973603	20522502
+0	3005	477.35549251855	20522302
+0	3019	483.26402228689	20525903
+0	3046	485.41188386808	20525403
+0	3073	487.6007946717	20522903
+0	3086	488.51305568953	20525103
+0	3096	489.36560209531	20522503
+0	3112	491.90095762563	20522303
+0	3124	494.49746097219	20525904
+0	3167	498.97223976165	20525404
+0	3183	500.15896812587	20522504
+0	3195	500.66059365183	20525104
+0	3204	501.89020478868	20525504
+0	3217	504.01732090818	20522304
+0	3243	509.37047860483	20525905
+0	3261	510.42807038957	20522905
+0	3268	510.48024147556	20522505
+0	3702	577.67900034007	20528901
+0	3780	590.01812837007	20528902
+0	3822	600.06638541738	20528903
+0	3854	601.28855649582	20531903
+0	3893	605.39019153433	20531503
+0	3919	612.41660874304	20531904
+0	3945	614.50213588578	20528904
+0	3978	619.19890270082	20531504
+0	4019	625.74169636089	20531905
+0	4044	628.89114962811	20528905
+0	4068	631.42309499534	20531505
+0	4474	702.46199652616	20536302
+0	4479	702.56142577146	20537602
+0	4493	703.63391322855	20537502
+0	4515	705.2389230187	20534902
+0	4586	716.37042750292	20534903
+0	4622	725.81909033692	20537604
+0	4646	727.89100059578	20534904
+0	4702	738.66194109469	20534905
+0	4724	740.84390078662	20537905
+1	911	117.40572628415	180
+1	931	127.15600130884	180
+1	942	127.51369311747	180
+1	974	129.68529086597	180
+1	988	130.44551878183	180
+1	1005	131.85236637913	180
+1	1067	143.44292671154	180
+1	1072	143.68945919972	180
+1	1093	149.51636939463	180
+1	1183	166.14497380764	180
+1	1589	231.94727768324	180
+1	1593	232.18403980592	180
+1	1634	244.0830405	180
+1	1646	244.57937063523	180
+1	1682	254.17089780969	180
+1	1691	254.884720453	180
+1	1768	265.91266040824	180
+1	1784	266.82761885429	180
+1	1791	267.05949485245	180
+1	1841	272.86428450597	180
+1	1911	285.9265089558	180
+1	2460	385.6496093816	180
+1	2969	474.08385706906	180
+1	2981	475.01236973603	180
+1	3005	477.35549251855	180
+1	3019	483.26402228689	180
+1	3046	485.41188386808	180
+1	3073	487.6007946717	180
+1	3086	488.51305568953	180
+1	3096	489.36560209531	180
+1	3112	491.90095762563	180
+1	3124	494.49746097219	180
+1	3167	498.97223976165	180
+1	3183	500.15896812587	180
+1	3195	500.66059365183	180
+1	3204	501.89020478868	180
+1	3217	504.01732090818	180
+1	3243	509.37047860483	180
+1	3261	510.42807038957	180
+1	3268	510.48024147556	180
+1	3702	577.67900034007	180
+1	3780	590.01812837007	180
+1	3822	600.06638541738	180
+1	3854	601.28855649582	180
+1	3893	605.39019153433	180
+1	3919	612.41660874304	180
+1	3945	614.50213588578	180
+1	3978	619.19890270082	180
+1	4019	625.74169636089	180
+1	4044	628.89114962811	180
+1	4068	631.42309499534	180
+1	4474	702.46199652616	180
+1	4479	702.56142577146	180
+1	4493	703.63391322855	180
+1	4515	705.2389230187	180
+1	4586	716.37042750292	180
+1	4622	725.81909033692	180
+1	4646	727.89100059578	180
+1	4702	738.66194109469	180
+1	4724	740.84390078662	180
+2	911	117.40572628415	180
+2	1005	131.85236637913	180
+2	1067	143.44292671154	180
+2	1183	166.14497380764	180
+2	1593	232.18403980592	180
+2	1646	244.57937063523	180
+2	1841	272.86428450597	180
+3	911	117.40572628415	1.40572628415
+3	931	127.15600130884	11.15600130884
+3	942	127.51369311747	11.51369311747
+3	974	129.68529086597	13.68529086597
+3	988	130.44551878183	14.44551878183
+3	1005	131.85236637913	15.85236637913
+3	1067	143.44292671154	27.44292671154
+3	1072	143.68945919972	27.68945919972
+3	1093	149.51636939463	33.51636939463
+3	1183	166.14497380764	50.14497380764
+3	1589	231.94727768324	0.94727768323997
+3	1593	232.18403980592	1.18403980592
+3	1634	244.0830405	13.0830405
+3	1646	244.57937063523	13.57937063523
+3	1682	254.17089780969	23.17089780969
+3	1691	254.884720453	23.884720453
+3	1768	265.91266040824	34.91266040824
+3	1784	266.82761885429	35.82761885429
+3	1791	267.05949485245	36.05949485245
+3	1841	272.86428450597	41.86428450597
+3	1911	285.9265089558	54.9265089558
+3	2460	385.6496093816	39.6496093816
+3	2969	474.08385706906	13.08385706906
+3	2981	475.01236973603	14.01236973603
+3	3005	477.35549251855	16.35549251855
+3	3019	483.26402228689	22.26402228689
+3	3046	485.41188386808	24.41188386808
+3	3073	487.6007946717	26.6007946717
+3	3086	488.51305568953	27.51305568953
+3	3096	489.36560209531	28.36560209531
+3	3112	491.90095762563	30.90095762563
+3	3124	494.49746097219	33.49746097219
+3	3167	498.97223976165	37.97223976165
+3	3183	500.15896812587	39.15896812587
+3	3195	500.66059365183	39.66059365183
+3	3204	501.89020478868	40.89020478868
+3	3217	504.01732090818	43.01732090818
+3	3243	509.37047860483	48.37047860483
+3	3261	510.42807038957	49.42807038957
+3	3268	510.48024147556	49.48024147556
+3	3702	577.67900034007	1.6790003400699
+3	3780	590.01812837007	14.01812837007
+3	3822	600.06638541738	24.06638541738
+3	3854	601.28855649582	25.28855649582
+3	3893	605.39019153433	29.39019153433
+3	3919	612.41660874304	36.41660874304
+3	3945	614.50213588578	38.50213588578
+3	3978	619.19890270082	43.19890270082
+3	4019	625.74169636089	49.74169636089
+3	4044	628.89114962811	52.89114962811
+3	4068	631.42309499534	55.42309499534
+3	4474	702.46199652616	11.46199652616
+3	4479	702.56142577146	11.56142577146
+3	4493	703.63391322855	12.63391322855
+3	4515	705.2389230187	14.2389230187
+3	4586	716.37042750292	25.37042750292
+3	4622	725.81909033692	34.81909033692
+3	4646	727.89100059578	36.89100059578
+3	4702	738.66194109469	47.66194109469
+3	4724	740.84390078662	49.84390078662
+4	911	117.40572628415	1.40572628415
+4	1005	131.85236637913	15.85236637913
+4	1067	143.44292671154	27.44292671154
+4	1183	166.14497380764	50.14497380764
+4	1593	232.18403980592	1.18403980592
+4	1646	244.57937063523	13.57937063523
+4	1841	272.86428450597	41.86428450597
+5	911	117.40572628415	1
+5	931	127.15600130884	2
+5	942	127.51369311747	2
+5	974	129.68529086597	2
+5	988	130.44551878183	2
+5	1589	231.94727768324	1
+5	1593	232.18403980592	1
+5	1682	254.17089780969	3
+5	1784	266.82761885429	4
+5	1791	267.05949485245	4
+5	1911	285.9265089558	5
+5	2460	385.6496093816	4
+5	2969	474.08385706906	2
+5	2981	475.01236973603	2
+5	3005	477.35549251855	2
+5	3019	483.26402228689	3
+5	3073	487.6007946717	3
+5	3086	488.51305568953	3
+5	3204	501.89020478868	4
+5	3702	577.67900034007	1
+5	3854	601.28855649582	3
+5	3893	605.39019153433	3
+5	4474	702.46199652616	2
+5	4479	702.56142577146	2
+5	4493	703.63391322855	2
+5	4515	705.2389230187	2
+5	4724	740.84390078662	5
+6	911	117.40572628415	1
+6	931	127.15600130884	1
+6	942	127.51369311747	1
+6	974	129.68529086597	1
+6	988	130.44551878183	1
+6	1589	231.94727768324	1
+6	1593	232.18403980592	1
+6	1682	254.17089780969	1
+6	1784	266.82761885429	1
+6	1791	267.05949485245	1
+6	1911	285.9265089558	2
+6	2460	385.6496093816	1
+6	2969	474.08385706906	2
+6	2981	475.01236973603	2
+6	3005	477.35549251855	2
+6	3019	483.26402228689	2
+6	3073	487.6007946717	2
+6	3086	488.51305568953	2
+6	3204	501.89020478868	1
+6	3702	577.67900034007	1
+6	3854	601.28855649582	3
+6	3893	605.39019153433	3
+6	4474	702.46199652616	1
+6	4479	702.56142577146	1
+6	4493	703.63391322855	1
+6	4515	705.2389230187	2
+6	4724	740.84390078662	3
+7	911	117.40572628415	1.40572628415
+7	931	127.15600130884	11.15600130884
+7	942	127.51369311747	11.51369311747
+7	974	129.68529086597	13.68529086597
+7	988	130.44551878183	14.44551878183
+7	1589	231.94727768324	0.94727768323997
+7	1593	232.18403980592	1.18403980592
+7	1682	254.17089780969	23.17089780969
+7	1784	266.82761885429	35.82761885429
+7	1791	267.05949485245	36.05949485245
+7	1911	285.9265089558	54.9265089558
+7	2460	385.6496093816	39.6496093816
+7	2969	474.08385706906	13.08385706906
+7	2981	475.01236973603	14.01236973603
+7	3005	477.35549251855	16.35549251855
+7	3019	483.26402228689	22.26402228689
+7	3073	487.6007946717	26.6007946717
+7	3086	488.51305568953	27.51305568953
+7	3204	501.89020478868	40.89020478868
+7	3702	577.67900034007	1.6790003400699
+7	3854	601.28855649582	25.28855649582
+7	3893	605.39019153433	29.39019153433
+7	4474	702.46199652616	11.46199652616
+7	4479	702.56142577146	11.56142577146
+7	4493	703.63391322855	12.63391322855
+7	4515	705.2389230187	14.2389230187
+7	4724	740.84390078662	49.84390078662
+8	911	117.40572628415	1.40572628415
+8	1593	232.18403980592	1.18403980592
+9	912	117.40572628415	1
+9	932	127.15600130884	2
+9	943	127.51369311747	3
+9	975	129.68529086597	4
+9	989	130.44551878183	5
+9	1006	131.85236637913	6
+9	1068	143.44292671154	7
+9	1073	143.68945919972	8
+9	1094	149.51636939463	9
+9	1184	166.14497380764	10
+9	1590	231.94727768324	11
+9	1594	232.18403980592	12
+9	1635	244.0830405	13
+9	1647	244.57937063523	14
+9	1683	254.17089780969	15
+9	1692	254.884720453	16
+9	1769	265.91266040824	17
+9	1785	266.82761885429	18
+9	1792	267.05949485245	19
+9	1842	272.86428450597	20
+9	1912	285.9265089558	21
+9	2461	385.6496093816	22
+9	2970	474.08385706906	23
+9	2982	475.01236973603	24
+9	3006	477.35549251855	25
+9	3020	483.26402228689	26
+9	3047	485.41188386808	27
+9	3074	487.6007946717	28
+9	3087	488.51305568953	29
+9	3097	489.36560209531	30
+9	3113	491.90095762563	31
+9	3125	494.49746097219	32
+9	3168	498.97223976165	33
+9	3184	500.15896812587	34
+9	3196	500.66059365183	35
+9	3205	501.89020478868	36
+9	3218	504.01732090818	37
+9	3244	509.37047860483	38
+9	3262	510.42807038957	39
+9	3269	510.48024147556	40
+9	3703	577.67900034007	41
+9	3781	590.01812837007	42
+9	3823	600.06638541738	43
+9	3855	601.28855649582	44
+9	3894	605.39019153433	45
+9	3920	612.41660874304	46
+9	3946	614.50213588578	47
+9	3979	619.19890270082	48
+9	4020	625.74169636089	49
+9	4045	628.89114962811	50
+9	4069	631.42309499534	51
+9	4475	702.46199652616	52
+9	4480	702.56142577146	53
+9	4494	703.63391322855	54
+9	4516	705.2389230187	55
+9	4587	716.37042750292	56
+9	4623	725.81909033692	57
+9	4647	727.89100059578	58
+9	4703	738.66194109469	59
+9	4725	740.84390078662	60
+10	912	117.40572628415	1
+10	932	127.15600130884	2
+10	943	127.51369311747	3
+10	975	129.68529086597	4
+10	989	130.44551878183	5
+10	1006	131.85236637913	6
+10	1068	143.44292671154	7
+10	1073	143.68945919972	8
+10	1094	149.51636939463	9
+10	1184	166.14497380764	10
+10	1590	231.94727768324	11
+10	1594	232.18403980592	12
+10	1635	244.0830405	13
+10	1647	244.57937063523	14
+10	1683	254.17089780969	15
+10	1692	254.884720453	16
+10	1769	265.91266040824	17
+10	1785	266.82761885429	18
+10	1792	267.05949485245	19
+10	1842	272.86428450597	20
+10	1912	285.9265089558	21
+10	2461	385.6496093816	22
+10	2970	474.08385706906	23
+10	2982	475.01236973603	24
+10	3006	477.35549251855	25
+10	3020	483.26402228689	26
+10	3047	485.41188386808	27
+10	3074	487.6007946717	28
+10	3087	488.51305568953	29
+10	3097	489.36560209531	30
+10	3113	491.90095762563	31
+10	3125	494.49746097219	32
+10	3168	498.97223976165	33
+10	3184	500.15896812587	34
+10	3196	500.66059365183	35
+10	3205	501.89020478868	36
+10	3218	504.01732090818	37
+10	3244	509.37047860483	38
+10	3262	510.42807038957	39
+10	3269	510.48024147556	40
+10	3703	577.67900034007	41
+10	3781	590.01812837007	42
+10	3823	600.06638541738	43
+10	3855	601.28855649582	44
+10	3894	605.39019153433	45
+10	3920	612.41660874304	46
+10	3946	614.50213588578	47
+10	3979	619.19890270082	48
+10	4020	625.74169636089	49
+10	4045	628.89114962811	50
+10	4069	631.42309499534	51
+10	4475	702.46199652616	52
+10	4480	702.56142577146	53
+10	4494	703.63391322855	54
+10	4516	705.2389230187	55
+10	4587	716.37042750292	56
+10	4623	725.81909033692	57
+10	4647	727.89100059578	58
+10	4703	738.66194109469	59
+10	4725	740.84390078662	60
+11	912	117.40572628415	1
+11	932	127.15600130884	2
+11	943	127.51369311747	3
+11	975	129.68529086597	4
+11	989	130.44551878183	5
+11	1006	131.85236637913	6
+11	1068	143.44292671154	7
+11	1073	143.68945919972	8
+11	1094	149.51636939463	9
+11	1184	166.14497380764	10
+11	1590	231.94727768324	11
+11	1594	232.18403980592	12
+11	1635	244.0830405	13
+11	1647	244.57937063523	14
+11	1683	254.17089780969	15
+11	1692	254.884720453	16
+11	1769	265.91266040824	17
+11	1785	266.82761885429	18
+11	1792	267.05949485245	19
+11	1842	272.86428450597	20
+11	1912	285.9265089558	21
+11	2461	385.6496093816	22
+11	2970	474.08385706906	23
+11	2982	475.01236973603	24
+11	3006	477.35549251855	25
+11	3020	483.26402228689	26
+11	3047	485.41188386808	27
+11	3074	487.6007946717	28
+11	3087	488.51305568953	29
+11	3097	489.36560209531	30
+11	3113	491.90095762563	31
+11	3125	494.49746097219	32
+11	3168	498.97223976165	33
+11	3184	500.15896812587	34
+11	3196	500.66059365183	35
+11	3205	501.89020478868	36
+11	3218	504.01732090818	37
+11	3244	509.37047860483	38
+11	3262	510.42807038957	39
+11	3269	510.48024147556	40
+11	3703	577.67900034007	41
+11	3781	590.01812837007	42
+11	3823	600.06638541738	43
+11	3855	601.28855649582	44
+11	3894	605.39019153433	45
+11	3920	612.41660874304	46
+11	3946	614.50213588578	47
+11	3979	619.19890270082	48
+11	4020	625.74169636089	49
+11	4045	628.89114962811	50
+11	4069	631.42309499534	51
+11	4475	702.46199652616	52
+11	4480	702.56142577146	53
+11	4494	703.63391322855	54
+11	4516	705.2389230187	55
+11	4587	716.37042750292	56
+11	4623	725.81909033692	57
+11	4647	727.89100059578	58
+11	4703	738.66194109469	59
+11	4725	740.84390078662	60
+12	931	127.15600130884	180
+12	1093	149.51636939463	180
+12	1911	285.9265089558	180
+13	931	127.15600130884	11.15600130884
+13	1093	149.51636939463	33.51636939463
+13	1911	285.9265089558	54.9265089558
+14	931	127.15600130884	11.15600130884
+14	1911	285.9265089558	54.9265089558
+15	942	127.51369311747	180
+16	942	127.51369311747	11.51369311747
+17	942	127.51369311747	11.51369311747
+18	974	129.68529086597	180
+18	1682	254.17089780969	180
+19	974	129.68529086597	13.68529086597
+19	1682	254.17089780969	23.17089780969
+20	974	129.68529086597	13.68529086597
+20	1682	254.17089780969	23.17089780969
+21	988	130.44551878183	180
+21	1072	143.68945919972	180
+21	1589	231.94727768324	180
+21	1634	244.0830405	180
+21	1691	254.884720453	180
+21	1768	265.91266040824	180
+22	988	130.44551878183	14.44551878183
+22	1072	143.68945919972	27.68945919972
+22	1589	231.94727768324	0.94727768323997
+22	1634	244.0830405	13.0830405
+22	1691	254.884720453	23.884720453
+22	1768	265.91266040824	34.91266040824
+23	988	130.44551878183	14.44551878183
+23	1589	231.94727768324	0.94727768323997
+24	1784	266.82761885429	180
+25	1784	266.82761885429	35.82761885429
+26	1784	266.82761885429	35.82761885429
+27	1791	267.05949485245	180
+28	1791	267.05949485245	36.05949485245
+29	1791	267.05949485245	36.05949485245
+30	2460	385.6496093816	180
+30	3005	477.35549251855	180
+30	3112	491.90095762563	180
+30	3217	504.01732090818	180
+31	2460	385.6496093816	39.6496093816
+31	3005	477.35549251855	16.35549251855
+31	3112	491.90095762563	30.90095762563
+31	3217	504.01732090818	43.01732090818
+32	2460	385.6496093816	39.6496093816
+32	3005	477.35549251855	16.35549251855
+33	2969	474.08385706906	180
+33	3046	485.41188386808	180
+33	3167	498.97223976165	180
+34	2969	474.08385706906	13.08385706906
+34	3046	485.41188386808	24.41188386808
+34	3167	498.97223976165	37.97223976165
+35	2969	474.08385706906	13.08385706906
+36	2981	475.01236973603	180
+36	3096	489.36560209531	180
+36	3183	500.15896812587	180
+36	3268	510.48024147556	180
+37	2981	475.01236973603	14.01236973603
+37	3096	489.36560209531	28.36560209531
+37	3183	500.15896812587	39.15896812587
+37	3268	510.48024147556	49.48024147556
+38	2981	475.01236973603	14.01236973603
+39	3019	483.26402228689	180
+39	3124	494.49746097219	180
+39	3243	509.37047860483	180
+39	3854	601.28855649582	180
+39	3919	612.41660874304	180
+39	4019	625.74169636089	180
+39	4724	740.84390078662	180
+40	3019	483.26402228689	22.26402228689
+40	3124	494.49746097219	33.49746097219
+40	3243	509.37047860483	48.37047860483
+40	3854	601.28855649582	25.28855649582
+40	3919	612.41660874304	36.41660874304
+40	4019	625.74169636089	49.74169636089
+40	4724	740.84390078662	49.84390078662
+41	3019	483.26402228689	22.26402228689
+41	3854	601.28855649582	25.28855649582
+41	4724	740.84390078662	49.84390078662
+42	3073	487.6007946717	180
+42	3261	510.42807038957	180
+42	3702	577.67900034007	180
+42	3780	590.01812837007	180
+42	3822	600.06638541738	180
+42	3945	614.50213588578	180
+42	4044	628.89114962811	180
+42	4515	705.2389230187	180
+42	4586	716.37042750292	180
+42	4646	727.89100059578	180
+42	4702	738.66194109469	180
+43	3073	487.6007946717	26.6007946717
+43	3261	510.42807038957	49.42807038957
+43	3702	577.67900034007	1.6790003400699
+43	3780	590.01812837007	14.01812837007
+43	3822	600.06638541738	24.06638541738
+43	3945	614.50213588578	38.50213588578
+43	4044	628.89114962811	52.89114962811
+43	4515	705.2389230187	14.2389230187
+43	4586	716.37042750292	25.37042750292
+43	4646	727.89100059578	36.89100059578
+43	4702	738.66194109469	47.66194109469
+44	3073	487.6007946717	26.6007946717
+44	3702	577.67900034007	1.6790003400699
+44	4515	705.2389230187	14.2389230187
+45	3086	488.51305568953	180
+45	3195	500.66059365183	180
+46	3086	488.51305568953	27.51305568953
+46	3195	500.66059365183	39.66059365183
+47	3086	488.51305568953	27.51305568953
+48	3204	501.89020478868	180
+48	3893	605.39019153433	180
+48	3978	619.19890270082	180
+48	4068	631.42309499534	180
+48	4493	703.63391322855	180
+49	3204	501.89020478868	40.89020478868
+49	3893	605.39019153433	29.39019153433
+49	3978	619.19890270082	43.19890270082
+49	4068	631.42309499534	55.42309499534
+49	4493	703.63391322855	12.63391322855
+50	3204	501.89020478868	40.89020478868
+50	3893	605.39019153433	29.39019153433
+50	4493	703.63391322855	12.63391322855
+51	4474	702.46199652616	180
+52	4474	702.46199652616	11.46199652616
+53	4474	702.46199652616	11.46199652616
+54	4479	702.56142577146	180
+54	4622	725.81909033692	180
+55	4479	702.56142577146	11.56142577146
+55	4622	725.81909033692	34.81909033692
+56	4479	702.56142577146	11.56142577146
+

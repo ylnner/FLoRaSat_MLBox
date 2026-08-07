@@ -7,6 +7,8 @@ import inet.queueing.contract.IPacketQueue;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_Analytical;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_BiLSTM;
+import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_MLP;
+import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_TwoBranches;
 
 module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 {
@@ -56,6 +58,8 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		bool useMLBox = default(false);		
 		bool useMLBoxBiLSTM = default(false);
 		bool useAnalytical = default(false);
+		bool useMLBoxMLP = default(false);
+		bool useMLBoxTwoBranches = default(false);
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {
             parameters:
@@ -74,5 +78,10 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		    @display("p=100,250");
 		}
 		
-		
+		mlBoxMLP: Transmission_Predictor_MLP if useMLBoxMLP{
+			 @display("p=100,250");
+		}		
+		mlBoxTwoBranches : Transmission_Predictor_TwoBranches if useMLBoxTwoBranches{
+		    @display("p=100,250");
+		}
 }

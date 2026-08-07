@@ -25,5 +25,6 @@ simple Transmission_Predictor extends Base_MLBox{
         @class(mlbox::Transmission_Predictor);		
         //string modelPath = default("");     	
         string scalerPath = default("");
+        bool coldStart = default(false);
 
 }

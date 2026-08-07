@@ -128,6 +128,7 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         vector_preds_BiLSTM.setName("vector_preds_BiLSTM");
         vector_preds_Transformer.setName("vector_preds_Transformer");
         vector_preds_Analytical.setName("vector_preds_Analytical");
+        vector_preds_MLP.setName("vector_preds_MLP");
 
         mlBoxAvailable = par("useMLBox").boolValue();
         if( mlBoxAvailable ){
@@ -143,6 +144,16 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         if(analyticalAvailable){
             predAnalytical = check_and_cast<Transmission_Predictor_Analytical *>(getSubmodule("predAnalytical"));
         }
+
+        mlBoxAvailableMLP = par("useMLBoxMLP").boolValue();
+        if(mlBoxAvailableMLP){
+            mlBoxMLP = check_and_cast<mlbox::Transmission_Predictor_MLP *>(getSubmodule("mlBoxMLP"));
+        }
+        mlBoxAvailableTwoBranches = par("useMLBoxTwoBranches").boolValue();
+        if(mlBoxAvailableTwoBranches){
+            mlBoxTwoBranches = check_and_cast<mlbox::Transmission_Predictor_TwoBranches *>(getSubmodule("mlBoxTwoBranches"));
+        }
+
 
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
@@ -635,6 +646,53 @@ void Ter_Dlk_KiWan::sendData() {
             vector_preds_BiLSTM.record(element_vector);
 
 
+        }else if(mlBoxAvailableMLP){
+            /*
+             * MLP
+             * */
+
+            bool transmitMLP = false;
+            std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
+
+            // For LSTM
+            std::vector<double> myFeatures_2 = mlBoxMLP->scaleFeatures(myFeatures);
+            std::vector<double> output = mlBoxMLP->predict(myFeatures_2);
+
+
+            transmit = static_cast<bool>(output[0]);
+            EV << "After execute model: " << transmit <<endl;
+
+            double element_vector = transmissionId;
+            if (transmit)
+                element_vector = element_vector + 0.1;
+
+            EV << "MLP element_vector: " << element_vector <<endl;
+            vector_preds_MLP.record(element_vector);
+
+        }else if(mlBoxAvailableTwoBranches){
+            /*
+             * Two Branches model
+             * */
+            //mlBoxTwoBranches
+            bool transmitTwoBranches = false;
+            std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
+            // For Two Branches
+            std::vector<double> myFeatures_2 = mlBoxTwoBranches->scaleFeatures(myFeatures);
+
+            myFeatures_2.push_back(simTime().dbl());
+            // Add two times, one for the position encoding the other for the input
+            myFeatures_2.push_back(simTime().dbl());
+
+            std::vector<double> output = mlBoxTwoBranches->predict(myFeatures_2);
+            transmit = static_cast<bool>(output[0]);
+
+            EV << "After execute model transmit: " << transmit <<endl;
+            double element_vector = transmissionId;
+            if (transmit)
+                element_vector = element_vector + 0.1;
+
+            //EV << "Transformer element_vector: " << element_vector <<endl;
+            //vector_preds_Transformer.record(element_vector);
         }
 
 
