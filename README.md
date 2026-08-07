@@ -162,13 +162,12 @@ The FLoRaSat simulator is based on an extended version of [FLoRa](https://flora.
 - make_frontier_data_more_models.py -> read the sca, vec, sci files and create csv files. It is only focused in several models
 - make_figures_with_mlp.py -> Create the frontier pareto plot for several ML models.
 
-## General pipelin
+## General pipeline
+
+End-to-end pipeline for machine learning integration into the FLoRaSat simulator. The pipeline is composed of three main phases: (i) Data Engineering, which includes simulation setup, generation of datasets, and processing; (ii) ML Model process, which covers development, training, fine-tuning, and model exportation; and (iii) ML deployment, which consists of ML model integration and evaluation within the FLORASAT simulations.
 
 
-Currently, we support a single sample scenario comprising 16 satellites in a grid-like formation (realistic orbital parameters), passing over a circular region with up to 1500 nodes. However, some flexibility can already be leveraged based on the features listed below.
-
-
-![image info](images/screenshot.jpg)
+![image info](images/pipeline_reduced.jpg)
 
 
 
