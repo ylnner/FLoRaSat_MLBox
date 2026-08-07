@@ -19,10 +19,6 @@ The FLoRaSat simulator is based on an extended version of [FLoRa](https://flora.
 
 
 
-Currently, we support a single sample scenario comprising 16 satellites in a grid-like formation (realistic orbital parameters), passing over a circular region with up to 1500 nodes. However, some flexibility can already be leveraged based on the features listed below.
-
-
-![image info](images/screenshot.jpg)
 
 
 ## Features
@@ -128,35 +124,51 @@ Currently, we support a single sample scenario comprising 16 satellites in a gri
 
 10. If you have files that are considered by Git as modified when they are not, execute `git config core.filemode false` in the local repository.
 
-## Execution of experiments in FLoRaSat
+## Files for run FLoRasat simulations and create synthetic dataset
+  The sh file run ini located at Test_Individual folder
 
-  They ini files are saved are saved in: '/simulations/routing'
+  - **For Training data**
+  	- run.sh, run_pass_2.sh,  run_pass_3.sh, run_pass_4.sh
+  - **For testing data**
+  	- run_test.sh, run_pass_2_test.sh, run_pass_3_test.sh, run_pass_4_test.sh
 
-  The Ini files used in the article are: 
-  - Regular-Iridium.ini
-  - Failure-StarLink.ini
 
-## Execution FLoRaSat-CLI
-   Use the help command to view a description of the necessary parameters for each command.
+## Files For ML Models training and fine-tuning
+ - **Files for train the models with fine tuning if its necessary**
+  	- baselines_transformer_v3.py
+	- baselines_bilstm_v3.py
+	- baselines_ml_v2.py
+	- baselines_math_v2.py
+	- train_two_branch_transformer.py
+- **Complemmentary files**
+  	- convert_pth_to_pt.ipynb -> Convert the pth file (final file of the pytorch model) to pt format and use it in ML_Sandbox in FLoRasat
+	- convert_scikit_learn_to_pt.ipynb -> Convert the final model of scikit-learn to pt format. 
 
-  - Install florasatcli from Source. Ensure that florasatcli is installed from the source code before proceeding.
-  - Set Up the Configuration File: Initialize the configuration file using the following command:
-	
-	* 'florasat config init'
+## Files for testing the deployment of ML models in Florasat
+- all_run_single_mlmodels.sh -> run simulations with all ML techniques
+- run_mlmodels_single.sh -> run simulations with Transformer-encoder with buffer
+- run_mlmodels_single_bilstm.sh -> run simulations with Bi-LSTM
+- run_mlmodels_single_analytical.sh -> run simulations with Analytical
+- run_mlmodels_single_noml.sh -> run simulations with noML 
+- run_mlmodels_single_noml_N1to5.sh -> run simulations with noML with different Nx
+- run_mlmodels_single_mlp.sh -> run simulations with MLP model 
+- run_mlmodels_single_twobranches.sh -> run simulations with two branches model (Transformer-Encoder and MLP, this runs without buffer)
+- run_mlmodels_single_trf_nobuffer.sh -> run simulations with Transformer-encoder without buffer
 
-	This will generate a .toml file specifying the path where florasat simulation results will be stored and the number of simulation runs.
+## Files for process output of simulations that runs ML models in Florasat
+- extract_from_omnet_output.py -> read the sca, vec, sci files and create csv files. It needs to use the omnetpp_env. 
+- make_frontier_data.py -> read the sca, vec, sci files and create csv files. It is only focused in Transformer-encoder and NonML
+- make_figures.py -> Create the frontier pareto plot between Transformer-encoder and NonML
+- make_frontier_data_more_models.py -> read the sca, vec, sci files and create csv files. It is only focused in several models
+- make_figures_with_mlp.py -> Create the frontier pareto plot for several ML models.
 
-  - Preprocess Routes and Satellites: Before generating statistics, preprocess the satellites and routes data using the 
-    following commands:
+## General pipelin
 
-	* florasat statistics --cstl Iridium --name Regular --algs DDRA Directed --run 1 --preprocess-satellites  
-	* florasat statistics --cstl Iridium --name Regular --algs DDRA Directed --run 1 --preprocess-routes  
 
-	Each parameter can be explored using the -h (help) option.
+Currently, we support a single sample scenario comprising 16 satellites in a grid-like formation (realistic orbital parameters), passing over a circular region with up to 1500 nodes. However, some flexibility can already be leveraged based on the features listed below.
 
- - Generate Statistics: Run the following command to execute the simulation and generate statistics:	
-	* florasat statistics --cstl Iridium --name Regular --algs DDRA Directed --run 1 --all  
 
+![image info](images/screenshot.jpg)
 
 
 
