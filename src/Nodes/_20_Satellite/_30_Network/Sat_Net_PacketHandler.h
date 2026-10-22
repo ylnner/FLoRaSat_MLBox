@@ -22,6 +22,7 @@
 #include "inet/common/packet/Packet.h"
 #include "inet/queueing/base/PacketProcessorBase.h"
 #include "Global/Statistics/TransmissionStatistics/TransmissionStatistics.h"
+#include "Global/Statistics/TransmissionStatistics/KD_TransmissionStatistics.h"
 #include "Nodes/_10_Terminal/Ter.h"
 
 #include "Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h"
@@ -124,8 +125,11 @@ class Sat_Net_PacketHandler : public cSimpleModule, public Sat_Net_PacketSender 
 
     /*
      * Reference to TransmissionStatistics
+     * ACHF - Hardcode change to KD_TransmissionStatistics
      * */
     statistics::TransmissionStatistics *transmissionStatistics = nullptr;
+    //statistics::KD_TransmissionStatistics *transmissionStatistics = nullptr;
+
   public:
     /**
      * Send a packet in the specified direction.

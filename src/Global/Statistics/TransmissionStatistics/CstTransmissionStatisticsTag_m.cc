@@ -177,6 +177,7 @@ CstTransmissionStatisticsTag& CstTransmissionStatisticsTag::operator=(const CstT
 
 void CstTransmissionStatisticsTag::copy(const CstTransmissionStatisticsTag& other)
 {
+    this->packetId = other.packetId;
     this->latDev = other.latDev;
     this->longDev = other.longDev;
     this->satId = other.satId;
@@ -188,11 +189,25 @@ void CstTransmissionStatisticsTag::copy(const CstTransmissionStatisticsTag& othe
     this->loraBW = other.loraBW;
     this->loraCR = other.loraCR;
     this->rcvOk = other.rcvOk;
+    this->txStart = other.txStart;
+    this->txDuration = other.txDuration;
+    this->repetition = other.repetition;
+    this->rssi_dbm = other.rssi_dbm;
+    this->snr_db = other.snr_db;
+    this->rx_power_dbm = other.rx_power_dbm;
+    this->noise_dbm = other.noise_dbm;
+    this->total_interferences = other.total_interferences;
+    this->collision_flag = other.collision_flag;
+    this->num_colliding_packets = other.num_colliding_packets;
+    this->minPower_dbm = other.minPower_dbm;
+    this->sensitivity_dbm = other.sensitivity_dbm;
+    this->rx_power_dbm_dev = other.rx_power_dbm_dev;
 }
 
 void CstTransmissionStatisticsTag::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::inet::TagBase::parsimPack(b);
+    doParsimPacking(b,this->packetId);
     doParsimPacking(b,this->latDev);
     doParsimPacking(b,this->longDev);
     doParsimPacking(b,this->satId);
@@ -204,11 +219,25 @@ void CstTransmissionStatisticsTag::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->loraBW);
     doParsimPacking(b,this->loraCR);
     doParsimPacking(b,this->rcvOk);
+    doParsimPacking(b,this->txStart);
+    doParsimPacking(b,this->txDuration);
+    doParsimPacking(b,this->repetition);
+    doParsimPacking(b,this->rssi_dbm);
+    doParsimPacking(b,this->snr_db);
+    doParsimPacking(b,this->rx_power_dbm);
+    doParsimPacking(b,this->noise_dbm);
+    doParsimPacking(b,this->total_interferences);
+    doParsimPacking(b,this->collision_flag);
+    doParsimPacking(b,this->num_colliding_packets);
+    doParsimPacking(b,this->minPower_dbm);
+    doParsimPacking(b,this->sensitivity_dbm);
+    doParsimPacking(b,this->rx_power_dbm_dev);
 }
 
 void CstTransmissionStatisticsTag::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::inet::TagBase::parsimUnpack(b);
+    doParsimUnpacking(b,this->packetId);
     doParsimUnpacking(b,this->latDev);
     doParsimUnpacking(b,this->longDev);
     doParsimUnpacking(b,this->satId);
@@ -220,6 +249,29 @@ void CstTransmissionStatisticsTag::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->loraBW);
     doParsimUnpacking(b,this->loraCR);
     doParsimUnpacking(b,this->rcvOk);
+    doParsimUnpacking(b,this->txStart);
+    doParsimUnpacking(b,this->txDuration);
+    doParsimUnpacking(b,this->repetition);
+    doParsimUnpacking(b,this->rssi_dbm);
+    doParsimUnpacking(b,this->snr_db);
+    doParsimUnpacking(b,this->rx_power_dbm);
+    doParsimUnpacking(b,this->noise_dbm);
+    doParsimUnpacking(b,this->total_interferences);
+    doParsimUnpacking(b,this->collision_flag);
+    doParsimUnpacking(b,this->num_colliding_packets);
+    doParsimUnpacking(b,this->minPower_dbm);
+    doParsimUnpacking(b,this->sensitivity_dbm);
+    doParsimUnpacking(b,this->rx_power_dbm_dev);
+}
+
+int CstTransmissionStatisticsTag::getPacketId() const
+{
+    return this->packetId;
+}
+
+void CstTransmissionStatisticsTag::setPacketId(int packetId)
+{
+    this->packetId = packetId;
 }
 
 double CstTransmissionStatisticsTag::getLatDev() const
@@ -332,11 +384,142 @@ void CstTransmissionStatisticsTag::setRcvOk(int rcvOk)
     this->rcvOk = rcvOk;
 }
 
+double CstTransmissionStatisticsTag::getTxStart() const
+{
+    return this->txStart;
+}
+
+void CstTransmissionStatisticsTag::setTxStart(double txStart)
+{
+    this->txStart = txStart;
+}
+
+double CstTransmissionStatisticsTag::getTxDuration() const
+{
+    return this->txDuration;
+}
+
+void CstTransmissionStatisticsTag::setTxDuration(double txDuration)
+{
+    this->txDuration = txDuration;
+}
+
+int CstTransmissionStatisticsTag::getRepetition() const
+{
+    return this->repetition;
+}
+
+void CstTransmissionStatisticsTag::setRepetition(int repetition)
+{
+    this->repetition = repetition;
+}
+
+double CstTransmissionStatisticsTag::getRssi_dbm() const
+{
+    return this->rssi_dbm;
+}
+
+void CstTransmissionStatisticsTag::setRssi_dbm(double rssi_dbm)
+{
+    this->rssi_dbm = rssi_dbm;
+}
+
+double CstTransmissionStatisticsTag::getSnr_db() const
+{
+    return this->snr_db;
+}
+
+void CstTransmissionStatisticsTag::setSnr_db(double snr_db)
+{
+    this->snr_db = snr_db;
+}
+
+double CstTransmissionStatisticsTag::getRx_power_dbm() const
+{
+    return this->rx_power_dbm;
+}
+
+void CstTransmissionStatisticsTag::setRx_power_dbm(double rx_power_dbm)
+{
+    this->rx_power_dbm = rx_power_dbm;
+}
+
+double CstTransmissionStatisticsTag::getNoise_dbm() const
+{
+    return this->noise_dbm;
+}
+
+void CstTransmissionStatisticsTag::setNoise_dbm(double noise_dbm)
+{
+    this->noise_dbm = noise_dbm;
+}
+
+int CstTransmissionStatisticsTag::getTotal_interferences() const
+{
+    return this->total_interferences;
+}
+
+void CstTransmissionStatisticsTag::setTotal_interferences(int total_interferences)
+{
+    this->total_interferences = total_interferences;
+}
+
+int CstTransmissionStatisticsTag::getCollision_flag() const
+{
+    return this->collision_flag;
+}
+
+void CstTransmissionStatisticsTag::setCollision_flag(int collision_flag)
+{
+    this->collision_flag = collision_flag;
+}
+
+int CstTransmissionStatisticsTag::getNum_colliding_packets() const
+{
+    return this->num_colliding_packets;
+}
+
+void CstTransmissionStatisticsTag::setNum_colliding_packets(int num_colliding_packets)
+{
+    this->num_colliding_packets = num_colliding_packets;
+}
+
+double CstTransmissionStatisticsTag::getMinPower_dbm() const
+{
+    return this->minPower_dbm;
+}
+
+void CstTransmissionStatisticsTag::setMinPower_dbm(double minPower_dbm)
+{
+    this->minPower_dbm = minPower_dbm;
+}
+
+double CstTransmissionStatisticsTag::getSensitivity_dbm() const
+{
+    return this->sensitivity_dbm;
+}
+
+void CstTransmissionStatisticsTag::setSensitivity_dbm(double sensitivity_dbm)
+{
+    this->sensitivity_dbm = sensitivity_dbm;
+}
+
+double CstTransmissionStatisticsTag::getRx_power_dbm_dev() const
+{
+    return this->rx_power_dbm_dev;
+}
+
+void CstTransmissionStatisticsTag::setRx_power_dbm_dev(double rx_power_dbm_dev)
+{
+    this->rx_power_dbm_dev = rx_power_dbm_dev;
+}
+
 class CstTransmissionStatisticsTagDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertyNames;
     enum FieldConstants {
+        FIELD_packetId,
         FIELD_latDev,
         FIELD_longDev,
         FIELD_satId,
@@ -348,6 +531,19 @@ class CstTransmissionStatisticsTagDescriptor : public omnetpp::cClassDescriptor
         FIELD_loraBW,
         FIELD_loraCR,
         FIELD_rcvOk,
+        FIELD_txStart,
+        FIELD_txDuration,
+        FIELD_repetition,
+        FIELD_rssi_dbm,
+        FIELD_snr_db,
+        FIELD_rx_power_dbm,
+        FIELD_noise_dbm,
+        FIELD_total_interferences,
+        FIELD_collision_flag,
+        FIELD_num_colliding_packets,
+        FIELD_minPower_dbm,
+        FIELD_sensitivity_dbm,
+        FIELD_rx_power_dbm_dev,
     };
   public:
     CstTransmissionStatisticsTagDescriptor();
@@ -414,7 +610,7 @@ const char *CstTransmissionStatisticsTagDescriptor::getProperty(const char *prop
 int CstTransmissionStatisticsTagDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 11+base->getFieldCount() : 11;
+    return base ? 25+base->getFieldCount() : 25;
 }
 
 unsigned int CstTransmissionStatisticsTagDescriptor::getFieldTypeFlags(int field) const
@@ -426,6 +622,7 @@ unsigned int CstTransmissionStatisticsTagDescriptor::getFieldTypeFlags(int field
         field -= base->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,    // FIELD_packetId
         FD_ISEDITABLE,    // FIELD_latDev
         FD_ISEDITABLE,    // FIELD_longDev
         FD_ISEDITABLE,    // FIELD_satId
@@ -437,8 +634,21 @@ unsigned int CstTransmissionStatisticsTagDescriptor::getFieldTypeFlags(int field
         FD_ISEDITABLE,    // FIELD_loraBW
         FD_ISEDITABLE,    // FIELD_loraCR
         FD_ISEDITABLE,    // FIELD_rcvOk
+        FD_ISEDITABLE,    // FIELD_txStart
+        FD_ISEDITABLE,    // FIELD_txDuration
+        FD_ISEDITABLE,    // FIELD_repetition
+        FD_ISEDITABLE,    // FIELD_rssi_dbm
+        FD_ISEDITABLE,    // FIELD_snr_db
+        FD_ISEDITABLE,    // FIELD_rx_power_dbm
+        FD_ISEDITABLE,    // FIELD_noise_dbm
+        FD_ISEDITABLE,    // FIELD_total_interferences
+        FD_ISEDITABLE,    // FIELD_collision_flag
+        FD_ISEDITABLE,    // FIELD_num_colliding_packets
+        FD_ISEDITABLE,    // FIELD_minPower_dbm
+        FD_ISEDITABLE,    // FIELD_sensitivity_dbm
+        FD_ISEDITABLE,    // FIELD_rx_power_dbm_dev
     };
-    return (field >= 0 && field < 11) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 25) ? fieldTypeFlags[field] : 0;
 }
 
 const char *CstTransmissionStatisticsTagDescriptor::getFieldName(int field) const
@@ -450,6 +660,7 @@ const char *CstTransmissionStatisticsTagDescriptor::getFieldName(int field) cons
         field -= base->getFieldCount();
     }
     static const char *fieldNames[] = {
+        "packetId",
         "latDev",
         "longDev",
         "satId",
@@ -461,25 +672,52 @@ const char *CstTransmissionStatisticsTagDescriptor::getFieldName(int field) cons
         "loraBW",
         "loraCR",
         "rcvOk",
+        "txStart",
+        "txDuration",
+        "repetition",
+        "rssi_dbm",
+        "snr_db",
+        "rx_power_dbm",
+        "noise_dbm",
+        "total_interferences",
+        "collision_flag",
+        "num_colliding_packets",
+        "minPower_dbm",
+        "sensitivity_dbm",
+        "rx_power_dbm_dev",
     };
-    return (field >= 0 && field < 11) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 25) ? fieldNames[field] : nullptr;
 }
 
 int CstTransmissionStatisticsTagDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
     int baseIndex = base ? base->getFieldCount() : 0;
-    if (strcmp(fieldName, "latDev") == 0) return baseIndex + 0;
-    if (strcmp(fieldName, "longDev") == 0) return baseIndex + 1;
-    if (strcmp(fieldName, "satId") == 0) return baseIndex + 2;
-    if (strcmp(fieldName, "elevSat") == 0) return baseIndex + 3;
-    if (strcmp(fieldName, "doppler") == 0) return baseIndex + 4;
-    if (strcmp(fieldName, "loraTP") == 0) return baseIndex + 5;
-    if (strcmp(fieldName, "loraCF") == 0) return baseIndex + 6;
-    if (strcmp(fieldName, "loraSF") == 0) return baseIndex + 7;
-    if (strcmp(fieldName, "loraBW") == 0) return baseIndex + 8;
-    if (strcmp(fieldName, "loraCR") == 0) return baseIndex + 9;
-    if (strcmp(fieldName, "rcvOk") == 0) return baseIndex + 10;
+    if (strcmp(fieldName, "packetId") == 0) return baseIndex + 0;
+    if (strcmp(fieldName, "latDev") == 0) return baseIndex + 1;
+    if (strcmp(fieldName, "longDev") == 0) return baseIndex + 2;
+    if (strcmp(fieldName, "satId") == 0) return baseIndex + 3;
+    if (strcmp(fieldName, "elevSat") == 0) return baseIndex + 4;
+    if (strcmp(fieldName, "doppler") == 0) return baseIndex + 5;
+    if (strcmp(fieldName, "loraTP") == 0) return baseIndex + 6;
+    if (strcmp(fieldName, "loraCF") == 0) return baseIndex + 7;
+    if (strcmp(fieldName, "loraSF") == 0) return baseIndex + 8;
+    if (strcmp(fieldName, "loraBW") == 0) return baseIndex + 9;
+    if (strcmp(fieldName, "loraCR") == 0) return baseIndex + 10;
+    if (strcmp(fieldName, "rcvOk") == 0) return baseIndex + 11;
+    if (strcmp(fieldName, "txStart") == 0) return baseIndex + 12;
+    if (strcmp(fieldName, "txDuration") == 0) return baseIndex + 13;
+    if (strcmp(fieldName, "repetition") == 0) return baseIndex + 14;
+    if (strcmp(fieldName, "rssi_dbm") == 0) return baseIndex + 15;
+    if (strcmp(fieldName, "snr_db") == 0) return baseIndex + 16;
+    if (strcmp(fieldName, "rx_power_dbm") == 0) return baseIndex + 17;
+    if (strcmp(fieldName, "noise_dbm") == 0) return baseIndex + 18;
+    if (strcmp(fieldName, "total_interferences") == 0) return baseIndex + 19;
+    if (strcmp(fieldName, "collision_flag") == 0) return baseIndex + 20;
+    if (strcmp(fieldName, "num_colliding_packets") == 0) return baseIndex + 21;
+    if (strcmp(fieldName, "minPower_dbm") == 0) return baseIndex + 22;
+    if (strcmp(fieldName, "sensitivity_dbm") == 0) return baseIndex + 23;
+    if (strcmp(fieldName, "rx_power_dbm_dev") == 0) return baseIndex + 24;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -492,6 +730,7 @@ const char *CstTransmissionStatisticsTagDescriptor::getFieldTypeString(int field
         field -= base->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
+        "int",    // FIELD_packetId
         "double",    // FIELD_latDev
         "double",    // FIELD_longDev
         "int",    // FIELD_satId
@@ -503,8 +742,21 @@ const char *CstTransmissionStatisticsTagDescriptor::getFieldTypeString(int field
         "double",    // FIELD_loraBW
         "int",    // FIELD_loraCR
         "int",    // FIELD_rcvOk
+        "double",    // FIELD_txStart
+        "double",    // FIELD_txDuration
+        "int",    // FIELD_repetition
+        "double",    // FIELD_rssi_dbm
+        "double",    // FIELD_snr_db
+        "double",    // FIELD_rx_power_dbm
+        "double",    // FIELD_noise_dbm
+        "int",    // FIELD_total_interferences
+        "int",    // FIELD_collision_flag
+        "int",    // FIELD_num_colliding_packets
+        "double",    // FIELD_minPower_dbm
+        "double",    // FIELD_sensitivity_dbm
+        "double",    // FIELD_rx_power_dbm_dev
     };
-    return (field >= 0 && field < 11) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 25) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **CstTransmissionStatisticsTagDescriptor::getFieldPropertyNames(int field) const
@@ -587,6 +839,7 @@ std::string CstTransmissionStatisticsTagDescriptor::getFieldValueAsString(omnetp
     }
     CstTransmissionStatisticsTag *pp = omnetpp::fromAnyPtr<CstTransmissionStatisticsTag>(object); (void)pp;
     switch (field) {
+        case FIELD_packetId: return long2string(pp->getPacketId());
         case FIELD_latDev: return double2string(pp->getLatDev());
         case FIELD_longDev: return double2string(pp->getLongDev());
         case FIELD_satId: return long2string(pp->getSatId());
@@ -598,6 +851,19 @@ std::string CstTransmissionStatisticsTagDescriptor::getFieldValueAsString(omnetp
         case FIELD_loraBW: return double2string(pp->getLoraBW());
         case FIELD_loraCR: return long2string(pp->getLoraCR());
         case FIELD_rcvOk: return long2string(pp->getRcvOk());
+        case FIELD_txStart: return double2string(pp->getTxStart());
+        case FIELD_txDuration: return double2string(pp->getTxDuration());
+        case FIELD_repetition: return long2string(pp->getRepetition());
+        case FIELD_rssi_dbm: return double2string(pp->getRssi_dbm());
+        case FIELD_snr_db: return double2string(pp->getSnr_db());
+        case FIELD_rx_power_dbm: return double2string(pp->getRx_power_dbm());
+        case FIELD_noise_dbm: return double2string(pp->getNoise_dbm());
+        case FIELD_total_interferences: return long2string(pp->getTotal_interferences());
+        case FIELD_collision_flag: return long2string(pp->getCollision_flag());
+        case FIELD_num_colliding_packets: return long2string(pp->getNum_colliding_packets());
+        case FIELD_minPower_dbm: return double2string(pp->getMinPower_dbm());
+        case FIELD_sensitivity_dbm: return double2string(pp->getSensitivity_dbm());
+        case FIELD_rx_power_dbm_dev: return double2string(pp->getRx_power_dbm_dev());
         default: return "";
     }
 }
@@ -614,6 +880,7 @@ void CstTransmissionStatisticsTagDescriptor::setFieldValueAsString(omnetpp::any_
     }
     CstTransmissionStatisticsTag *pp = omnetpp::fromAnyPtr<CstTransmissionStatisticsTag>(object); (void)pp;
     switch (field) {
+        case FIELD_packetId: pp->setPacketId(string2long(value)); break;
         case FIELD_latDev: pp->setLatDev(string2double(value)); break;
         case FIELD_longDev: pp->setLongDev(string2double(value)); break;
         case FIELD_satId: pp->setSatId(string2long(value)); break;
@@ -625,6 +892,19 @@ void CstTransmissionStatisticsTagDescriptor::setFieldValueAsString(omnetpp::any_
         case FIELD_loraBW: pp->setLoraBW(string2double(value)); break;
         case FIELD_loraCR: pp->setLoraCR(string2long(value)); break;
         case FIELD_rcvOk: pp->setRcvOk(string2long(value)); break;
+        case FIELD_txStart: pp->setTxStart(string2double(value)); break;
+        case FIELD_txDuration: pp->setTxDuration(string2double(value)); break;
+        case FIELD_repetition: pp->setRepetition(string2long(value)); break;
+        case FIELD_rssi_dbm: pp->setRssi_dbm(string2double(value)); break;
+        case FIELD_snr_db: pp->setSnr_db(string2double(value)); break;
+        case FIELD_rx_power_dbm: pp->setRx_power_dbm(string2double(value)); break;
+        case FIELD_noise_dbm: pp->setNoise_dbm(string2double(value)); break;
+        case FIELD_total_interferences: pp->setTotal_interferences(string2long(value)); break;
+        case FIELD_collision_flag: pp->setCollision_flag(string2long(value)); break;
+        case FIELD_num_colliding_packets: pp->setNum_colliding_packets(string2long(value)); break;
+        case FIELD_minPower_dbm: pp->setMinPower_dbm(string2double(value)); break;
+        case FIELD_sensitivity_dbm: pp->setSensitivity_dbm(string2double(value)); break;
+        case FIELD_rx_power_dbm_dev: pp->setRx_power_dbm_dev(string2double(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CstTransmissionStatisticsTag'", field);
     }
 }
@@ -639,6 +919,7 @@ omnetpp::cValue CstTransmissionStatisticsTagDescriptor::getFieldValue(omnetpp::a
     }
     CstTransmissionStatisticsTag *pp = omnetpp::fromAnyPtr<CstTransmissionStatisticsTag>(object); (void)pp;
     switch (field) {
+        case FIELD_packetId: return pp->getPacketId();
         case FIELD_latDev: return pp->getLatDev();
         case FIELD_longDev: return pp->getLongDev();
         case FIELD_satId: return pp->getSatId();
@@ -650,6 +931,19 @@ omnetpp::cValue CstTransmissionStatisticsTagDescriptor::getFieldValue(omnetpp::a
         case FIELD_loraBW: return pp->getLoraBW();
         case FIELD_loraCR: return pp->getLoraCR();
         case FIELD_rcvOk: return pp->getRcvOk();
+        case FIELD_txStart: return pp->getTxStart();
+        case FIELD_txDuration: return pp->getTxDuration();
+        case FIELD_repetition: return pp->getRepetition();
+        case FIELD_rssi_dbm: return pp->getRssi_dbm();
+        case FIELD_snr_db: return pp->getSnr_db();
+        case FIELD_rx_power_dbm: return pp->getRx_power_dbm();
+        case FIELD_noise_dbm: return pp->getNoise_dbm();
+        case FIELD_total_interferences: return pp->getTotal_interferences();
+        case FIELD_collision_flag: return pp->getCollision_flag();
+        case FIELD_num_colliding_packets: return pp->getNum_colliding_packets();
+        case FIELD_minPower_dbm: return pp->getMinPower_dbm();
+        case FIELD_sensitivity_dbm: return pp->getSensitivity_dbm();
+        case FIELD_rx_power_dbm_dev: return pp->getRx_power_dbm_dev();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'CstTransmissionStatisticsTag' as cValue -- field index out of range?", field);
     }
 }
@@ -666,6 +960,7 @@ void CstTransmissionStatisticsTagDescriptor::setFieldValue(omnetpp::any_ptr obje
     }
     CstTransmissionStatisticsTag *pp = omnetpp::fromAnyPtr<CstTransmissionStatisticsTag>(object); (void)pp;
     switch (field) {
+        case FIELD_packetId: pp->setPacketId(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_latDev: pp->setLatDev(value.doubleValue()); break;
         case FIELD_longDev: pp->setLongDev(value.doubleValue()); break;
         case FIELD_satId: pp->setSatId(omnetpp::checked_int_cast<int>(value.intValue())); break;
@@ -677,6 +972,19 @@ void CstTransmissionStatisticsTagDescriptor::setFieldValue(omnetpp::any_ptr obje
         case FIELD_loraBW: pp->setLoraBW(value.doubleValue()); break;
         case FIELD_loraCR: pp->setLoraCR(omnetpp::checked_int_cast<int>(value.intValue())); break;
         case FIELD_rcvOk: pp->setRcvOk(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_txStart: pp->setTxStart(value.doubleValue()); break;
+        case FIELD_txDuration: pp->setTxDuration(value.doubleValue()); break;
+        case FIELD_repetition: pp->setRepetition(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_rssi_dbm: pp->setRssi_dbm(value.doubleValue()); break;
+        case FIELD_snr_db: pp->setSnr_db(value.doubleValue()); break;
+        case FIELD_rx_power_dbm: pp->setRx_power_dbm(value.doubleValue()); break;
+        case FIELD_noise_dbm: pp->setNoise_dbm(value.doubleValue()); break;
+        case FIELD_total_interferences: pp->setTotal_interferences(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_collision_flag: pp->setCollision_flag(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_num_colliding_packets: pp->setNum_colliding_packets(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_minPower_dbm: pp->setMinPower_dbm(value.doubleValue()); break;
+        case FIELD_sensitivity_dbm: pp->setSensitivity_dbm(value.doubleValue()); break;
+        case FIELD_rx_power_dbm_dev: pp->setRx_power_dbm_dev(value.doubleValue()); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CstTransmissionStatisticsTag'", field);
     }
 }

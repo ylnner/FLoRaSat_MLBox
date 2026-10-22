@@ -47,6 +47,7 @@ void Sat_Net_PacketHandler::initialize(int stage) {
         cModule* trxStats = getSystemModule()->getSubmodule("transmissionStatistics");
         if(trxStats != nullptr){
             transmissionStatistics = check_and_cast<statistics:: TransmissionStatistics *>(trxStats);
+            //transmissionStatistics = check_and_cast<statistics:: KD_TransmissionStatistics *>(trxStats);
         }
 
     } else if (stage == inet::INITSTAGE_NETWORK_LAYER) {

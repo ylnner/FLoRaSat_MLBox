@@ -383,6 +383,12 @@ void Ter_Dlk_KiWan::handleTransmitWindowEnd() {
         }
         this->deleteCurrentTxFrame();
         checkForWaitingData();
+
+        // ACHF
+        // No more data to transmit, inform to the app that al Ntw are donde
+        //sendUplink = new cMessage("sendMeasurements");
+        cMessage *macDoneMsg = new cMessage("MacRepetitionsDone");
+        send(macDoneMsg, "upperLayerOut");
     }
     // Otherwise, next window is already scheduled from startTransmissionWindow
 }
@@ -420,6 +426,58 @@ void Ter_Dlk_KiWan::checkForWaitingData() {
             std::cout << "Node " << address << " at time " << simTime() << ": has no more data, returning to IDLE" << endl;
         }
     }
+}
+
+
+double Ter_Dlk_KiWan::computeReceptionPower() {
+
+    EV << "Transmission_Predictor_Analytical::computeReceptionPower" <<endl;
+
+    Ter_Mob* ter_mob = check_and_cast<Ter_Mob*>(getParentModule()->getParentModule()->getSubmodule("mob"));
+    satellite::Sat *sat  = check_and_cast<satellite::Sat *>(getSystemModule()->getSubmodule("satellite", 0));
+
+    Sat_Mob_SatelliteMobility_Standalone* sat_mob = check_and_cast<Sat_Mob_SatelliteMobility_Standalone*>(sat->getSubmodule("mobility"));
+
+
+    double distance = sat_mob->getDistance(ter_mob->getLatitude(), ter_mob->getLongitude(), 0);
+    distance = distance * 1000; // Pasar de km a metros
+    EV << "distance: " << distance << endl;
+
+
+    medium::LoRaMedium *radioMedium = check_and_cast<medium::LoRaMedium*>(getSystemModule()->getSubmodule("radioMedium"));
+    mps propagationSpeed = radioMedium->getPropagation()->getPropagationSpeed();
+    EV << "propagationSpeed: " << propagationSpeed << endl;
+
+    auto myRadio = ter_mob->getParentModule()->getSubmodule("phy")->getSubmodule("radio");
+
+    double transmitterAntennaGain = 1.0;
+
+    double receiverAntennaGainDb = sat->getSubmodule("phyDSL")->getSubmodule("radio")->getSubmodule("antenna")->par("gain").doubleValue();
+    EV << "receiverAntennaGainDb: " << receiverAntennaGainDb << endl;
+
+    double receiverAntennaGain = math::dB2fraction(receiverAntennaGainDb);
+    EV << "receiverAntennaGainDb: " << receiverAntennaGain << endl;
+
+    inet::Hz centerFrequency = inet::Hz(myRadio->par("centerFrequency").doubleValue());
+    EV << "centerFrequency: " << centerFrequency << endl;
+
+    int loraTP = ter_mob->getParentModule()->getSubmodule("dlk")->getSubmodule("mac")->par("LoRaTP").doubleValue();
+    EV << "loraTP: " << loraTP << endl;
+
+    //loraTag->setPower(W(math::dBmW2mW(loRaTP)));
+
+    inet::W transmissionPower = mW(math::dBmW2mW(loraTP));
+    EV << "transmissionPower: " << transmissionPower << endl;
+
+    double pathLoss = radioMedium->getPathLoss()->computePathLoss(propagationSpeed, centerFrequency, m(distance));
+    EV << "pathLoss: " << pathLoss << endl;
+
+    double obstacleLoss = 1.0; // Línea de vista directa al espacio (LOS)
+    inet::W estimatedRxPower = transmissionPower * std::min(1.0, transmitterAntennaGain * receiverAntennaGain * pathLoss * obstacleLoss);
+    EV << "estimatedRxPower: " << estimatedRxPower << endl;
+
+    return math::mW2dBmW(double(estimatedRxPower.get()*1000));;
+
 }
 
 void Ter_Dlk_KiWan::sendData() {
@@ -496,16 +554,19 @@ void Ter_Dlk_KiWan::sendData() {
         auto transmissionTag = frameCopy->addTagIfAbsent<statistics::CstTransmissionStatisticsTag>();
         satellite::Sat *sat  = check_and_cast<satellite::Sat *>(getSystemModule()->getSubmodule("satellite", 0));
         Ter *ter             = check_and_cast<Ter *>(getParentModule()->getParentModule());
-        double loRaTP        = ter->getSubmodule("app")->par("initialLoRaTP").doubleValue();
-        int loRaSF           = ter->getSubmodule("app")->par("initialLoRaSF");
+        //double loRaTP        = ter->getSubmodule("app")->par("initialLoRaTP").doubleValue();
+        //int loRaSF           = ter->getSubmodule("app")->par("initialLoRaSF");
         double timeToNextPacket = ter->getSubmodule("app")->par("timeToNextPacket").doubleValue();
+
+        //EV << "loRaTP: " << loRaTP <<endl;
+
 
         float latDev  = float(ter->getLatitude());
         float longDev = float(ter->getLongitude());
         double elevSat_temp = sat->getElevation(*ter);
         float elevSat = float(elevSat_temp);
-        float loraTP  = float((mW(math::dBmW2mW(loRaTP)).get())/1000); // We split this value to put in the same range than dataset, since we use a Scaler this does not affect and should be in the same range.
-        float loraSF  = float(loRaSF);
+        //float loraTP  = float((mW(math::dBmW2mW(loRaTP)).get())/1000); // We split this value to put in the same range than dataset, since we use a Scaler this does not affect and should be in the same range.
+        //float loraSF  = float(loRaSF);
 
         // COmpute Doppler frequency
         Hz originalFreq = Hz(ter->getSubmodule("app")->par("initialLoRaCF").doubleValue());
@@ -565,12 +626,26 @@ void Ter_Dlk_KiWan::sendData() {
                 << " MHz (shift=" << dopplerShift / 1e6 << " MHz)" << endl;
 
         float doppler = float(Hz(dopplerShift).get());
-
         float alt     = float((getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("NoradModule"))->par("altitude").doubleValue());
         float raan    = float((getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("NoradModule"))->par("raan").doubleValue());
 
         //double elevSat_temp  = sat->getElevation(*ter);
         transmissionTag->setElevSat(elevSat_temp);
+
+        // New Features for KD
+        double tx_start = simTime().dbl();
+        int repetition = newFrame->getRepetition();
+        transmissionTag->setPacketId(newFrame->getId());
+        //transmissionTag->set
+        transmissionTag->setTxStart(tx_start);
+        transmissionTag->setRepetition(repetitionNumber);
+
+        transmissionTag->setRx_power_dbm_dev(computeReceptionPower());
+
+        //transmissionTag->setTxDuration(0);
+        float loraTP = (mW(newFrame->getLoRaTP()).get())/1000 ;
+        float loraSF = newFrame->getLoRaSF();
+
 
         EV << "time= " << simTime().dbl() <<endl;
         EV << "latDev=" << latDev
@@ -595,6 +670,18 @@ void Ter_Dlk_KiWan::sendData() {
              * Transformer-Encoder
              * */
 
+            EV << "Transformer Input: "<< endl;
+            //EV << "loraTP: " << loraTP <<endl;
+            //EV << "loRaSF: " << loRaSF <<endl;
+            EV << "newFrame "<< endl;
+            EV << "frame->getLoRaTP(): " << newFrame->getLoRaTP() <<endl;
+            EV << "mW(frame->getLoRaTP()): " << mW(newFrame->getLoRaTP()) <<endl;
+            EV << "getLoraTP: "<< (mW(newFrame->getLoRaTP()).get())/1000 << endl; // Equal to Benoit MIgration
+
+            EV << "getLoraSF: "<< newFrame->getLoRaSF() << endl;
+
+
+
             std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
             // For Transformer
             std::vector<double> myFeatures_2 = mlBox->scaleFeatures(myFeatures);
@@ -615,7 +702,6 @@ void Ter_Dlk_KiWan::sendData() {
             /*
              * Analytical
              * */
-
             double pred_analytical = predAnalytical->predict(loraSF, dopplerShift, timeToNextPacket);
             EV <<"pred_analytical: " << pred_analytical <<endl;
             transmit = static_cast<bool>(pred_analytical);
@@ -721,7 +807,6 @@ void Ter_Dlk_KiWan::sendData() {
                     << " after " << ttxIdle << " seconds" << endl;
             scheduleAt(simTime() + ttxIdle, this->eventTransmitData);
         }
-
     }
 }
 

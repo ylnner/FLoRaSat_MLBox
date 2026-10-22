@@ -38,9 +38,14 @@ void Ter_Net_TerminalRouting::initialize(int stage){
 }
 
 void Ter_Net_TerminalRouting::handleMessage(cMessage *msg) {
+    // --- 1. BYPASS for control messages
+    if (!msg->isSelfMessage() && strcmp(msg->getName(), "MacRepetitionsDone") == 0) {
+        send(msg, "upperOut");
+        return;
+    }
+
     // This module is a compound module with @class annotation for statistics collection.
     // All messages should be routed through NED connections to the routing submodule.
-
     Packet *pkt = check_and_cast<Packet *>(msg);
     if (routingModule) {
         // Add a RoutingHeader to the packet

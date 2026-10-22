@@ -38,6 +38,9 @@ module Ter_App extends LayerForwarder
         int maxHops 	   						   = default(50);
         int nroMaxAttempts						   = default(0);
 
+        //bool usePPP = default(false);
+        //double lambda = default(0);
+
      gates:
         output appOut @labels(LoRaAppPacket/down);
         input appIn @labels(LoRaAppPacket/up);

@@ -293,18 +293,14 @@ void Sat_Dsl_Phy_LoRaRadio::endReception(cMessage *timer)
         }
     }
 
-
-    const LoRaReception *loRaReception = check_and_cast<const LoRaReception *>(radioFrame->getReception());
-
-    W minReceptionPower = loRaReception->computeMinPower(reception->getStartTime(part), reception->getEndTime(part));
-    W sensitivity = check_and_cast<const LoRaReceiver *>(radioFrame->getReceiver()->getReceiver())->getSensitivity(loRaReception);
-
-    double minReceptionPower_dBm = math::mW2dBmW(double(minReceptionPower.get()*1000));
-    double sensitivity_dBm = math::mW2dBmW(double(sensitivity.get()*1000));
+    const LoRaReception *loRaReception  = check_and_cast<const LoRaReception *>(radioFrame->getReception());
+    W minReceptionPower                 = loRaReception->computeMinPower(reception->getStartTime(part), reception->getEndTime(part));
+    W sensitivity                       = check_and_cast<const LoRaReceiver *>(radioFrame->getReceiver()->getReceiver())->getSensitivity(loRaReception);
+    double minReceptionPower_dBm        = math::mW2dBmW(double(minReceptionPower.get()*1000));
+    double sensitivity_dBm              = math::mW2dBmW(double(sensitivity.get()*1000));
 
     EV << "minReceptionPower: " << minReceptionPower <<endl;
     EV << "minReceptionPower: " << minReceptionPower_dBm << " dBm "<<endl;
-
     EV << "Receiver sensitivity is " << sensitivity << endl;
     EV << "Received sensitivity is " << sensitivity_dBm << " dBm" << endl;
 
@@ -324,7 +320,6 @@ void Sat_Dsl_Phy_LoRaRadio::endReception(cMessage *timer)
     if (timer == receptionTimer && isReceiverMode(radioMode) && arrival->getEndTime() == simTime() && iAmTransmiting == false) {
         auto transmission = radioFrame->getTransmission();
 
-
 // TODO: this would draw twice from the random number generator in isReceptionSuccessful: auto isReceptionSuccessful = medium->isReceptionSuccessful(this, transmission, part);
         auto isReceptionSuccessful = medium->getReceptionDecision(this, radioFrame->getListening(), transmission, part)->isReceptionSuccessful();
 
@@ -334,6 +329,13 @@ void Sat_Dsl_Phy_LoRaRadio::endReception(cMessage *timer)
             auto macFrame = medium->receivePacket(this, radioFrame);
             take(macFrame);
             emit(packetSentToUpperSignal, macFrame);
+
+            // ACHF - Conver to pkt to add tags with information for the ML model.
+            //////cPacket *aux_frame = check_and_cast<cPacket *>(macFrame);
+            //////Packet *pkt = check_and_cast<Packet *>(aux_frame);
+            //////auto transmissionTag = pkt->addTagIfAbsent<statistics::CstTransmissionStatisticsTag>();
+
+
             //////emit(Sat_Dsl_Phy_LoRaRadioReceptionFinishedCorrect, satIndex);
             if (simTime() >= getSimulation()->getWarmupPeriod())
                 Sat_Dsl_Phy_LoRaRadioReceptionFinishedCorrect_counter++;
@@ -345,38 +347,21 @@ void Sat_Dsl_Phy_LoRaRadio::endReception(cMessage *timer)
             EV_INFO << "getEndTime" << radioFrame->getTransmission()->getEndTime() << endl;
             EV_INFO << "getDuration" << radioFrame->getTransmission()->getDuration() << endl;
 
-            /*
-            const LoRaReception *loRaReception = check_and_cast<const LoRaReception *>(radioFrame->getReception());
-
-            W minReceptionPower = loRaReception->computeMinPower(reception->getStartTime(part), reception->getEndTime(part));
-            W sensitivity = check_and_cast<const LoRaReceiver *>(radioFrame->getReceiver()->getReceiver())->getSensitivity(loRaReception);
-            double minReceptionPower_dBm = math::mW2dBmW(double(minReceptionPower.get()*1000));
-            EV << "minReceptionPower: " << minReceptionPower <<endl;
-            EV << "minReceptionPower: " << minReceptionPower_dBm << " dBm "<<endl;
-            double sensitivity_dBm = math::mW2dBmW(double(sensitivity.get()*1000));
-            EV << "Receiver sensitivity is " << sensitivity << endl;
-            EV << "Received sensitivity is " << sensitivity_dBm << " dBm" << endl;
+            //////transmissionTag->setMinPower_dbm(minReceptionPower_dBm);
+            //////transmissionTag->setSensitivity_dbm(sensitivity_dBm);
+            //////transmissionTag->setTxDuration((double)radioFrame->getTransmission()->getDuration().dbl());
+            //////transmissionTag->setDoppler(loRaReception->getDopplerShift().get());
 
 
-            // ACHF
-            //cValueMap *map = new cValueMap("LoRa_Receiver");
-            //map->set("minPower_dBm", minReceptionPower_dBm);
-            //map->set("sensitivity_dBm", sensitivity_dBm);
-            */
-            // 1. Crear el contenedor de datos
             cValueMap *statsMap = new cValueMap("TransmissionStats");
-
-            // 2. Insertar los valores
             statsMap->set("macFrame", macFrame->dup()); // El mapa puede guardar objetos
             statsMap->set("minPower_dBm", minReceptionPower_dBm);
             statsMap->set("sensitivity_dBm", sensitivity_dBm);
             statsMap->set("duration", (double)radioFrame->getTransmission()->getDuration().dbl());
-            //const LoRaReception *loRaReception = check_and_cast<const LoRaReception *>(radioFrame->getReception());
             statsMap->set("doppler", loRaReception->getDopplerShift().get());
 
 
-
-            // 3. Emitir el mapa completo
+            // Emitir el mapa completo
             //emit(Sat_Dsl_Phy_TranmissionStatisticsCorrect, macFrame);
             emit(Sat_Dsl_Phy_TranmissionStatisticsCorrect, statsMap);
             sendUp(macFrame);

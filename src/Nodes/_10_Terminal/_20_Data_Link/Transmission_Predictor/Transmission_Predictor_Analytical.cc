@@ -94,8 +94,11 @@ double Transmission_Predictor_Analytical::computeReceptionPower(){
 
     double transmitterAntennaGain = 1.0;
 
-    double receiverAntennaGain = sat->getSubmodule("phyDSL")->getSubmodule("radio")->getSubmodule("antenna")->par("gain").doubleValue();
-    EV << "receiverAntennaGain: " << receiverAntennaGain << endl;
+    double receiverAntennaGainDb = sat->getSubmodule("phyDSL")->getSubmodule("radio")->getSubmodule("antenna")->par("gain").doubleValue();
+    EV << "receiverAntennaGainDb: " << receiverAntennaGainDb << endl;
+
+    double receiverAntennaGain = math::dB2fraction(receiverAntennaGainDb);
+    EV << "receiverAntennaGainDb: " << receiverAntennaGain << endl;
 
     inet::Hz centerFrequency = inet::Hz(myRadio->par("centerFrequency").doubleValue());
     EV << "centerFrequency: " << centerFrequency << endl;

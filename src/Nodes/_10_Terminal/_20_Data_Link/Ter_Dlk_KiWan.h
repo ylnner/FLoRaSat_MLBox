@@ -149,7 +149,8 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         int numDetectionAttempts = 0; // Count of detection attempts
         int numSuccessfulDetections = 0; // Count of successful detections
         
-
+        // ACHF
+        double computeReceptionPower();
         // statistics for ML
         int numTransmissionsApproved = 0;
         //int numTransmissionsApprovedTransformer = 0;

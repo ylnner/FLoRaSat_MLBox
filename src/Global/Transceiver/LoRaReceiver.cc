@@ -134,9 +134,25 @@ bool LoRaReceiver::computeIsReceptionPossible(const IListening *listening, const
 bool LoRaReceiver::computeIsReceptionAttempted(const IListening *listening, const IReception *reception, IRadioSignal::SignalPart part, const IInterference *interference) const
 {
     EV << "LoRaReceiver::computeIsReceptionAttempted" <<endl;
+
+
+    // const IListening *listening, const IInterference *interference) const
+    // ACHF - Added calculation of noise to calculate the SNR.
+    const IRadio *receiver = listening->getReceiver();
+    const IRadioMedium *radioMedium = receiver->getMedium();
+    const IAnalogModel *analogModel = radioMedium->getAnalogModel();
+    const INoise *noise = analogModel->computeNoise(listening, interference);
+    const ScalarNoise *loRaNoise = check_and_cast<const ScalarNoise *>(noise);
+    W maxPower = loRaNoise->computeMaxPower(listening->getStartTime(), listening->getEndTime());
+    noise_dbm = math::mW2dBmW(maxPower.get() * 1000);
+    delete noise;
+    // END ACHF
+
+
     if(isPacketCollided(reception, part, interference))
     {
         EV << "inside if isPacketCollided" <<endl;
+
         auto packet = reception->getTransmission()->getPacket();
         const auto &chunk = packet->peekAtFront<FieldsChunk>();
 
@@ -184,8 +200,6 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
     //EV << "interference: " << interference <<endl;
     auto interferingReceptions = interference->getInterferingReceptions();
 
-    //EV << "interferingReceptions: " << interferingReceptions <<endl;
-
     const LoRaReception *loRaReception = check_and_cast<const LoRaReception *>(reception);
     simtime_t m_x = (loRaReception->getStartTime() + loRaReception->getEndTime())/2;
     simtime_t d_x = (loRaReception->getEndTime() - loRaReception->getStartTime())/2;
@@ -197,6 +211,29 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
     double signalRSSI_dBm = math::mW2dBmW(signalRSSI_mw);
     EV << "Received signal RSSI is " << signalRSSI_mw << " mw" << endl;
     EV << "Received signal RSSI is " << signalRSSI_dBm << " dBm" << endl;
+
+    ////////////////////////////////////
+    ////// ACHF
+    ////////////////////////////////////
+    //////////////////// double aux_rssi_power_w = signalRSSI_w.get();
+    // ACHF - Added a new bucle to capturate all interferences without interrupting the other process.
+    //total_interferences = interferingReceptions->size();
+    /*
+    for (auto interferingReception : *interferingReceptions) {
+       const LoRaReception *loRaInterference = check_and_cast<const LoRaReception *>(interferingReception);
+       double interference_w                 = loRaInterference->getPower().get();
+       aux_rssi_power_w                     += interference_w;
+    }
+    double aux_rssi_dBm = math::mW2dBmW(aux_rssi_power_w * 1000);
+    real_P_rx_dbm       = signalRSSI_dBm;
+    real_rssi_dbm       = aux_rssi_dBm;
+    */
+
+
+    ////////////////////////////////////
+    ////// END ACHF
+    ////////////////////////////////////
+
 
     int receptionSF = loRaReception->getLoRaSF();
     for (auto interferingReception : *interferingReceptions) {
@@ -263,6 +300,7 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
 
         }
     }
+
     return false;
 }
 
@@ -279,6 +317,7 @@ Packet *LoRaReceiver::computeReceivedPacket(const ISnir *snir, bool isReceptionS
     auto transmittedPacket = snir->getReception()->getTransmission()->getPacket();
     auto receivedPacket = transmittedPacket->dup();
 
+
     if(receivedPacket->findTag<CstRoutingTag>()){
         receivedPacket->removeTagIfPresent<inet::PacketProtocolTag>();
         receivedPacket->removeTagIfPresent<inet::MacAddressInd>();
@@ -292,6 +331,31 @@ Packet *LoRaReceiver::computeReceivedPacket(const ISnir *snir, bool isReceptionS
     }else{
         receivedPacket->clearTags();
     }
+
+    auto transmissionTag = receivedPacket->addTagIfAbsent<statistics::CstTransmissionStatisticsTag>();
+    EV << "LoRaReceiver::computeReceivedPacket"<<endl;
+    EV << "getPacketId: " << transmissionTag->getPacketId() <<endl;
+    EV << "repetition: " << transmissionTag->getRepetition() <<endl;
+    EV << "real_P_rx_dbm: " << real_P_rx_dbm <<endl;
+    EV << "real_rssi_dbm: " << real_rssi_dbm <<endl;
+    EV << "num_colliding_packets: " << num_colliding_packets <<endl;
+    EV << "noise_dbm: " << noise_dbm <<endl;
+    EV << "collision_flag: " << collision_flag <<endl;
+
+    transmissionTag->setRx_power_dbm(real_P_rx_dbm);
+    transmissionTag->setRssi_dbm(real_rssi_dbm);
+    //transmissionTag->setTotal_interferences(total_interferences);
+    transmissionTag->setNum_colliding_packets(num_colliding_packets);
+    transmissionTag->setNoise_dbm(noise_dbm);
+    transmissionTag->setCollision_flag(collision_flag);
+
+    // Setting to default values again
+    real_P_rx_dbm       = -999;
+    real_rssi_dbm       = -999;
+    noise_dbm           = -999;
+    num_colliding_packets = 0;
+    collision_flag      = 0;
+
 
     //receivedPacket->removeTag<>();
     //INFO (LoRaMedium)RoutingGsToLn.LoRaMedium: i: 6 -- inet::PacketProtocolTag-
@@ -418,15 +482,23 @@ bool LoRaReceiver::computeIsReceptionSuccessful(const IListening *listening, con
     }
     */
 
+    // ACHF
+    collision_flag = 0;
+    num_colliding_packets = interference->getInterferingReceptions()->size();
+
     // If collision overlap detection is enabled, check for temporal overlap with interferers
     if (enableCollisionOverlap && detectCollisionOverlap(loraReception, interference)) {
+        collision_flag = 1;
         //const_cast<CustomReceiver *>(this)->emit(receptionCollisionSignal, true);
         //const_cast<CustomReceiver *>(this)->numCollisions++;
         //collisionEventVector->record(1);
-
+        EV_INFO << "collision_flag: " << collision_flag <<endl;
+        EV_INFO << "num_colliding_packets: " << num_colliding_packets <<endl;
         return false;
     }
     //collisionEventVector->record(0);
+    EV_INFO << "collision_flag: " << collision_flag <<endl;
+    EV_INFO << "num_colliding_packets: " << num_colliding_packets <<endl;
     return true; // No collision detected, reception successful
 
 
@@ -439,6 +511,32 @@ bool LoRaReceiver::detectCollisionOverlap(const LoRaReception *loraReception, co
 {
     EV << "LoRaReceiver::detectCollisionOverlap "<<endl;
     auto interferingReceptions = interference->getInterferingReceptions();
+
+    ////////////////////////////////////
+    ////// ACHF
+    ////////////////////////////////////
+
+    W signalRSSI_w = loraReception->getPower();
+    double signalRSSI_mw = signalRSSI_w.get()*1000;
+    double signalRSSI_dBm = math::mW2dBmW(signalRSSI_mw);
+
+    double aux_rssi_power_w = signalRSSI_w.get();
+    // ACHF - Added a new bucle to capturate all interferences without interrupting the other process.
+    for (auto interferingReception : *interferingReceptions) {
+       const LoRaReception *loRaInterference = check_and_cast<const LoRaReception *>(interferingReception);
+       double interference_w                 = loRaInterference->getPower().get();
+       aux_rssi_power_w                     += interference_w;
+
+    }
+    double aux_rssi_dBm = math::mW2dBmW(aux_rssi_power_w * 1000);
+    real_P_rx_dbm       = signalRSSI_dBm;
+    real_rssi_dbm       = aux_rssi_dBm;
+
+    ////////////////////////////////////
+    ////// END ACHF
+    ////////////////////////////////////
+
+
     if (interferingReceptions->empty()) {
         return false;
     }
@@ -446,6 +544,7 @@ bool LoRaReceiver::detectCollisionOverlap(const LoRaReception *loraReception, co
     simtime_t start_x = loraReception->getStartTime();
     simtime_t end_x   = loraReception->getEndTime();
     Hz freq_x         = loraReception->getDopplerShiftedFrequency();
+
 
     EV << "envFalgs loraReception: " << loraReception->getTransmission()->getTransmitter()->getCompleteStringRepresentation(evFlags)<<endl;
 
@@ -479,6 +578,8 @@ bool LoRaReceiver::detectCollisionOverlap(const LoRaReception *loraReception, co
         // Collision detected due to temporal or frequency overlap
         if (temporalOverlap && overlapExceedsThreshold && frequencyOverlap) {
             EV_INFO << "Collision detected: temporal overlap AND frequency overlap" << endl;
+
+            collision_flag = 1;
             return true;
         }
     }

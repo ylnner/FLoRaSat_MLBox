@@ -108,6 +108,10 @@ class Ter_App : public cSimpleModule, public ILifecycle {
         Ter_Mob *ter_mob = nullptr;
         Sat_Mob_NoradA *sat_mob = nullptr;
 
+        //achf
+        //bool usePPP     = false;
+        //double lambda   = 0.0;
+
     public:
         Ter_App() {}
         virtual ~Ter_App();

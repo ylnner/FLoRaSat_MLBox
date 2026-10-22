@@ -12,4 +12,7 @@ echo "Starting Analytical ..."
 echo "Starting noML..."
 ./run_mlmodels_single_noml.sh
 
+echo "Starting noMLN1to5..."
+./run_mlmodels_single_noml_N1to5.sh
+
 echo "All experiments finished."

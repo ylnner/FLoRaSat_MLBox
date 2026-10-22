@@ -27,6 +27,7 @@ OUTDIR = HERE          # write the PDFs next to this script
 BLUE, ORANGE = "#2a78d6", "#eb6834"
 INK, INK2, MUTED = "#0b0b0b", "#52514e", "#8a8880"
 COL_W = 3.333
+#COL_W = 4.2
 
 plt.rcParams.update({
     "font.family": "serif",
@@ -61,7 +62,7 @@ def dress(ax):
 # ============================================================ Figure 1
 rows = list(csv.DictReader(open(os.path.join(HERE, "frontier.csv"))))
 blind = [r for r in rows if r["series"] == "blind"]
-gated = [r for r in rows if r["series"] == "gated_trf_no_buffer"]
+gated = [r for r in rows if r["series"] == "gated_trf"]
 
 
 def xy(rs):
@@ -74,7 +75,8 @@ def xy(rs):
 bx, by, bse = xy(blind)
 gx, gy, gse = xy(sorted(gated, key=lambda r: float(r["tx_mean"])))
 
-fig, ax = plt.subplots(figsize=(COL_W, 2.25))
+#fig, ax = plt.subplots(figsize=(COL_W, 2.25))
+fig, ax = plt.subplots(figsize=(COL_W, 3.5))#375
 dress(ax)
 
 ax.errorbar(bx, by, yerr=bse, color=ORANGE, lw=1.6, marker="s", ms=4.5,

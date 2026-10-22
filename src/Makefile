@@ -56,6 +56,7 @@ OBJS = \
     $O/Global/Medium/DSL/LoRaNeighborCache.o \
     $O/Global/Mobility/INorad.o \
     $O/Global/Statistics/PacketRecorder.o \
+    $O/Global/Statistics/TransmissionStatistics/KD_TransmissionStatistics.o \
     $O/Global/Statistics/TransmissionStatistics/TransmissionStatistics.o \
     $O/Global/Topology_Control/ConstellationTopologyControl.o \
     $O/Global/Topology_Control/TopologyControlBase.o \

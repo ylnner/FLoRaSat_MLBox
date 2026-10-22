@@ -116,6 +116,9 @@ void Ter_App::initialize(int stage)
         ter_mob = check_and_cast<Ter_Mob *>(ter->getSubmodule("mob"));
         sat_mob = check_and_cast<Sat_Mob_NoradA *>(getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("NoradModule"));
 
+        //usePPP = par("usePPP");
+        //lambda = par("lambda");
+
     }
 }
 
@@ -147,11 +150,17 @@ void Ter_App::handleMessage(cMessage *msg)
             }
         }
 
+
         // New packet to send
+        // This execute the MAC layer
         if ((msg == sendUplink))
         {
             EV << "(msg == sendUplink)"<<endl;
+            EV << "timeToNextPacket: " << timeToNextPacket <<endl;
             delete msg;
+            // ACHF - added for fix
+            sendUplink = nullptr;
+
 
             // Send new packet
             sendUplinkPacket();
@@ -160,9 +169,13 @@ void Ter_App::handleMessage(cMessage *msg)
             // More packets to send
             if (numberOfPacketsToSend == 0 || sentPackets < numberOfPacketsToSend)
             {
+
+                /*
                 // Schedule next packet
                 sendUplink = new cMessage("sendMeasurements");
                 scheduleAt(simTime() + timeToNextPacket, sendUplink);
+                */
+
 
                 // Schedule next packet ack timeout
                 /*if (par("usingAck").boolValue())
@@ -175,8 +188,24 @@ void Ter_App::handleMessage(cMessage *msg)
             }
 
         }
-    }
+    }else{
+    //if (!msg->isSelfMessage()) {
+        // Message recevied from MAC layer
+        if (strcmp(msg->getName(), "MacRepetitionsDone") == 0) {
+            if (numberOfPacketsToSend == 0 || sentPackets < numberOfPacketsToSend){
+                timeToNextPacket = par("timeToNextPacket");
+                EV << "timeToNextPacket: " << timeToNextPacket <<endl;
+                EV << "simTime() + timeToNextPacket: " << simTime() + timeToNextPacket << endl;
 
+
+                sendUplink = new cMessage("sendMeasurements");
+                scheduleAt(simTime() + timeToNextPacket, sendUplink);
+
+                delete msg;
+                return;
+            }
+        }
+    }
 }
 
 

@@ -20,7 +20,7 @@ namespace statistics;
 
 class CstTransmissionStatisticsTag extends inet::TagBase {    
     
-    
+    int packetId	= -1;
     double latDev	= 0;
     double longDev 	= 0;
     int satId 		= -1;
@@ -35,5 +35,22 @@ class CstTransmissionStatisticsTag extends inet::TagBase {
     
 	int rcvOk		= -1;
     
+    double txStart = 0;
+    double txDuration = -1;
+    int repetition = 0;
     
+    //rssi_dbm, snr_db, rx_power_dbm, collision_flag, num_colliding_packets    
+    double rssi_dbm = 0;
+    double snr_db = 0;
+    double rx_power_dbm = 0;
+    double noise_dbm = 0;
+    int total_interferences = -1;
+    int collision_flag = 0;
+    int num_colliding_packets = -1;
+    
+    double minPower_dbm = 0;
+    double sensitivity_dbm = 0;
+   	
+   	//This value is calculated at the device, not in the satellite. 
+    double rx_power_dbm_dev = 0;
 }

@@ -33,6 +33,7 @@ namespace statistics {
  * <pre>
  * class CstTransmissionStatisticsTag extends inet::TagBase
  * {
+ *     int packetId = -1;
  *     double latDev = 0;
  *     double longDev = 0;
  *     int satId = -1;
@@ -47,13 +48,31 @@ namespace statistics {
  * 
  *     int rcvOk = -1;
  * 
+ *     double txStart = 0;
+ *     double txDuration = -1;
+ *     int repetition = 0;
  * 
+ *     //rssi_dbm, snr_db, rx_power_dbm, collision_flag, num_colliding_packets    
+ *     double rssi_dbm = 0;
+ *     double snr_db = 0;
+ *     double rx_power_dbm = 0;
+ *     double noise_dbm = 0;
+ *     int total_interferences = -1;
+ *     int collision_flag = 0;
+ *     int num_colliding_packets = -1;
+ * 
+ *     double minPower_dbm = 0;
+ *     double sensitivity_dbm = 0;
+ * 
+ *    	//This value is calculated at the device, not in the satellite. 
+ *     double rx_power_dbm_dev = 0;
  * }
  * </pre>
  */
 class CstTransmissionStatisticsTag : public ::inet::TagBase
 {
   protected:
+    int packetId = -1;
     double latDev = 0;
     double longDev = 0;
     int satId = -1;
@@ -65,6 +84,19 @@ class CstTransmissionStatisticsTag : public ::inet::TagBase
     double loraBW = 0;
     int loraCR = 0;
     int rcvOk = -1;
+    double txStart = 0;
+    double txDuration = -1;
+    int repetition = 0;
+    double rssi_dbm = 0;
+    double snr_db = 0;
+    double rx_power_dbm = 0;
+    double noise_dbm = 0;
+    int total_interferences = -1;
+    int collision_flag = 0;
+    int num_colliding_packets = -1;
+    double minPower_dbm = 0;
+    double sensitivity_dbm = 0;
+    double rx_power_dbm_dev = 0;
 
   private:
     void copy(const CstTransmissionStatisticsTag& other);
@@ -80,6 +112,9 @@ class CstTransmissionStatisticsTag : public ::inet::TagBase
     virtual CstTransmissionStatisticsTag *dup() const override {return new CstTransmissionStatisticsTag(*this);}
     virtual void parsimPack(omnetpp::cCommBuffer *b) const override;
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
+
+    virtual int getPacketId() const;
+    virtual void setPacketId(int packetId);
 
     virtual double getLatDev() const;
     virtual void setLatDev(double latDev);
@@ -113,6 +148,45 @@ class CstTransmissionStatisticsTag : public ::inet::TagBase
 
     virtual int getRcvOk() const;
     virtual void setRcvOk(int rcvOk);
+
+    virtual double getTxStart() const;
+    virtual void setTxStart(double txStart);
+
+    virtual double getTxDuration() const;
+    virtual void setTxDuration(double txDuration);
+
+    virtual int getRepetition() const;
+    virtual void setRepetition(int repetition);
+
+    virtual double getRssi_dbm() const;
+    virtual void setRssi_dbm(double rssi_dbm);
+
+    virtual double getSnr_db() const;
+    virtual void setSnr_db(double snr_db);
+
+    virtual double getRx_power_dbm() const;
+    virtual void setRx_power_dbm(double rx_power_dbm);
+
+    virtual double getNoise_dbm() const;
+    virtual void setNoise_dbm(double noise_dbm);
+
+    virtual int getTotal_interferences() const;
+    virtual void setTotal_interferences(int total_interferences);
+
+    virtual int getCollision_flag() const;
+    virtual void setCollision_flag(int collision_flag);
+
+    virtual int getNum_colliding_packets() const;
+    virtual void setNum_colliding_packets(int num_colliding_packets);
+
+    virtual double getMinPower_dbm() const;
+    virtual void setMinPower_dbm(double minPower_dbm);
+
+    virtual double getSensitivity_dbm() const;
+    virtual void setSensitivity_dbm(double sensitivity_dbm);
+
+    virtual double getRx_power_dbm_dev() const;
+    virtual void setRx_power_dbm_dev(double rx_power_dbm_dev);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const CstTransmissionStatisticsTag& obj) {obj.parsimPack(b);}

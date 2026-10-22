@@ -36,6 +36,7 @@
 #include "Global/Transceiver/LoRaTransmission.h"
 
 #include "Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility.h"
+#include "Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h"
 #include "Nodes/_30_Station/_60_Mobility/Sta_Mob_StationMobility.h"
 #include "Global/Messages/_30_Network/SendAtTag_m.h"
 
@@ -149,6 +150,14 @@ bool LoRaMedium::isInCommunicationRange(const ITransmission *transmission, const
     m maxCommunicationRange = mediumLimitCache->getMaxCommunicationRange();
 
     const LoRaTransmission *loRaTransmission = check_and_cast<const LoRaTransmission *>(transmission);
+    if( (globalPotentialReceiver != nullptr) && (dynamic_cast<const Sat_Mob_SatelliteMobility_Standalone *>(globalPotentialReceiver->getAntenna()->getMobility())) &&
+                (dynamic_cast<const Sat_Mob_SatelliteMobility_Standalone *>(loRaTransmission->getTransmitter()->getAntenna()->getMobility()))){
+            EV_INFO << "Potential receiver is Sat_Mob_SatelliteMobility_Standalone" <<endl;
+            globalPotentialReceiver = nullptr;
+            return false;
+        }
+
+
     if( (globalPotentialReceiver != nullptr) && (dynamic_cast<const Sat_Mob_SatelliteMobility *>(globalPotentialReceiver->getAntenna()->getMobility())) &&
             (dynamic_cast<const Sat_Mob_SatelliteMobility *>(loRaTransmission->getTransmitter()->getAntenna()->getMobility()))){
         EV_INFO << "Potential receiver is SatMobility" <<endl;
@@ -203,8 +212,22 @@ bool LoRaMedium::isInCommunicationRange(const ITransmission *transmission, const
 
     const IMobility *transmitterMobility = loRaTransmission->getTransmitter()->getAntenna()->getMobility();
     const IMobility *receiverMobility = globalPotentialReceiver ? globalPotentialReceiver->getAntenna()->getMobility() : nullptr;
+
+    if (receiverMobility != nullptr) {
+        // El puntero NO es nulo, es seguro usarlo
+        // ej: auto pos = receiverMobility->getCurrentPosition();
+        EV << "NO es NULO"<<endl;
+    } else {
+        EV << "Es NULO"<<endl;
+        // El puntero ES nulo (globalPotentialReceiver era nulo o no tenía movilidad)
+    }
+
+
     const auto *transmitterSatMobility = dynamic_cast<const Sat_Mob_SatelliteMobility *>(transmitterMobility);
-    const auto *receiverSatMobility = receiverMobility ? dynamic_cast<const Sat_Mob_SatelliteMobility *>(receiverMobility) : nullptr;
+    //Sat_Mob_SatelliteMobility_Standalone
+    //Sat_Mob_SatelliteMobility
+    // SOLUCION TEMPORAL, ESTA HARDOCREADO PARA STANDALONE, HACER CATCH PARA VER SI DEBE SER SATANDALONE O SATELLITEMOBILITY
+    const auto *receiverSatMobility = receiverMobility ? dynamic_cast<const Sat_Mob_SatelliteMobility_Standalone *>(receiverMobility) : nullptr;
     const auto *transmitterTerMobility = dynamic_cast<const Ter_Mob *>(transmitterMobility);
     const auto *receiverTerMobility = receiverMobility ? dynamic_cast<const Ter_Mob *>(receiverMobility) : nullptr;
 
@@ -235,6 +258,9 @@ bool LoRaMedium::isInCommunicationRange(const ITransmission *transmission, const
         hasElevationMetric = true;
     }
 
+    EV << "satelliteLatDeg: " << satelliteLatDeg <<endl;
+    EV << "satelliteLonDeg: " << satelliteLonDeg <<endl;
+    EV << "satelliteAltKm: " << satelliteAltKm <<endl;
     if (hasElevationMetric) {
         double elevationDeg = computeTerminalSatelliteElevationDeg(terminalLatDeg, terminalLonDeg, terminalAltKm,
                                                                    satelliteLatDeg, satelliteLonDeg, satelliteAltKm);

@@ -11,7 +11,6 @@ import inet.visualizer.common.IntegratedVisualizer;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import Global.Medium.DSL.LoRaMedium;
 import Global.Statistics.TransmissionStatistics.TransmissionStatistics;
-import Global.Transmission_Predictor.Transmission_Predictor;
 
 import Nodes._20_Satellite._60_Mobility.Sat_Mob_Orchestrator;
 
@@ -61,9 +60,7 @@ network Florasat_Individual_Sats{
         transmissionStatistics: TransmissionStatistics{
              @display("p=121,825");
         }
-        transmissionPredictor: Transmission_Predictor{
-            @display("p=121,825");
-        }
+
 
     connections allowunconnected:
 

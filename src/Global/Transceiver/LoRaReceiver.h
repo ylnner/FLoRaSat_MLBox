@@ -82,8 +82,24 @@ private:
     // ACHF
     ///bool enableCollisions;
     bool enableCollisionOverlap;
-
     simtime_t minCollisionOverlap;
+
+    // ACHF -Added new parameters, they dont affect the behaviour of the simulator, only used to store new features for ML models.
+    // This parameter is added to store the real power at reception. It is obtained from loRaReception->getPower(),
+    // In the other functions it is used as RSSI
+    mutable double real_P_rx_dbm = -999;
+    // This parapemter is added to represent the real rssi that represents signal + interferences.
+    // It is calculated with real_P_rx+=loRaInterference->getPower().get() for each interference.
+    mutable double real_rssi_dbm = -999;
+
+    // This parameter represents the num_collindg Packets that appears during reception
+    mutable int num_colliding_packets = 0;
+
+    // this parameter represente the noise in dbm
+    mutable double noise_dbm = -999;
+
+    // this parameter is a flag for collision detected or not.
+    mutable int collision_flag = 0;
 
 public:
   LoRaReceiver();
