@@ -144,7 +144,8 @@ def train_single_config(config, train_loader, val_loader, device, epochs=20):
 
     # Configure the class weights to manage unbalanaced data
     # pos_wight gives more importance to the positive class (1) in the loss function, helping the model to learn better from the minority class.
-    pos_weight = torch.tensor([77.62/22.38], device=device)
+    #pos_weight = torch.tensor([77.62/22.38], device=device)
+    pos_weight = torch.tensor([80.44/19.56 ], device=device) # 77.62/22.38, antiguo desbalance
     #pos_weight = torch.tensor([(77.62/22.38) ** 0.5], device=device)
 
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
@@ -293,8 +294,8 @@ print(f"Using : {device}")
 param_grid = {
     'seq_length': [8],
     'hidden_size' : [32], #128                # Dimension of the mode
-    'num_layers'  : [1, 2, 3, 4, 5],                    # Number of encoder layers
-    'dropout'     : [0.1, 0.2, 0.3, 0.4,], # , 0.2                # doprout
+    'num_layers'  : [1, 2, 3],                    # Number of encoder layers
+    'dropout'     : [0.1, 0.2], # , 0.2                # doprout
     'lr'          : [0.001, 0.0005], #, 0.0005            # Learning rate
     'batch_size'  : [32]                          # Batch Size
 }

@@ -36,10 +36,12 @@ private:
     simsignal_t signal_TranmissionStatisticsIgnoring;
 
     simsignal_t signal_LoRaReceiver;
+    simsignal_t signal_BelowElevationMask;   // ACHF - emitida por LoRaMedium
 public:
     TransmissionStatistics();
 
-    void recordPacket(inet::Packet *packet, double minPower_dBm, double sensitivity_dBm, double duration);
+    //void recordPacket(inet::Packet *packet, double minPower_dBm, double sensitivity_dBm, double duration);
+    void recordPacket(inet::Packet *packet, double minPower_dBm, double sensitivity_dBm, double duration, int belowMask = 0, double recordTime = -1);
 
 protected:
     virtual ~TransmissionStatistics();

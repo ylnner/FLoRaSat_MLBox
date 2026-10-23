@@ -387,8 +387,8 @@ void Ter_Dlk_KiWan::handleTransmitWindowEnd() {
         // ACHF
         // No more data to transmit, inform to the app that al Ntw are donde
         //sendUplink = new cMessage("sendMeasurements");
-        cMessage *macDoneMsg = new cMessage("MacRepetitionsDone");
-        send(macDoneMsg, "upperLayerOut");
+        ///cMessage *macDoneMsg = new cMessage("MacRepetitionsDone");
+        ///send(macDoneMsg, "upperLayerOut");
     }
     // Otherwise, next window is already scheduled from startTransmissionWindow
 }
@@ -626,6 +626,7 @@ void Ter_Dlk_KiWan::sendData() {
                 << " MHz (shift=" << dopplerShift / 1e6 << " MHz)" << endl;
 
         float doppler = float(Hz(dopplerShift).get());
+        transmissionTag->setDoppler(doppler);   // ACHF - Doppler calculado por el dispositivo (necesario para filas belowMask)
         float alt     = float((getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("NoradModule"))->par("altitude").doubleValue());
         float raan    = float((getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("NoradModule"))->par("raan").doubleValue());
 

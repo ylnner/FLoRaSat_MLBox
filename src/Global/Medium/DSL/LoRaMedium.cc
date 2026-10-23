@@ -96,6 +96,9 @@ void LoRaMedium::initialize(int stage)
         minimumElevationTermSat = par("minimumElevationTermSat").doubleValue();
         mapX = std::atoi(getParentModule()->getDisplayString().getTagArg("bgb", 0));
         mapY = std::atoi(getParentModule()->getDisplayString().getTagArg("bgb", 1));
+
+        // ACHF - señal para registrar transmisiones bajo la máscara de elevación
+        signal_BelowElevationMask = registerSignal("LoRaMedium_BelowElevationMask");
     }
 }
 
@@ -267,6 +270,17 @@ bool LoRaMedium::isInCommunicationRange(const ITransmission *transmission, const
         EV_INFO << "Elevation between terminal and satellite is " << elevationDeg << " deg (min " << minimumElevationTermSat << ")" << endl;
         bool isVisible = elevationDeg >= minimumElevationTermSat;
         globalPotentialReceiver = nullptr;
+
+        // ACHF - Solo cuando el satelite es descartado por elevacióon.
+        // y registrar cada transmisión una sola vez (isPotentialReceiver puede repetirse).
+        if (!isVisible && transmitterTerMobility && receiverSatMobility && loggedBelowMask.insert(transmission->getId()).second) {
+            cValueMap *statsMap = new cValueMap("TransmissionStatsBelowMask");
+            statsMap->set("macFrame", transmission->getPacket()->dup());   // conserva los tags (latDev, elevSat, doppler, txStart, routing)
+            statsMap->set("duration", transmission->getDuration().dbl());
+            statsMap->set("elevationDeg", elevationDeg);
+            const_cast<LoRaMedium *>(this)->emit(signal_BelowElevationMask, statsMap);
+        }
+
         return isVisible;
     }
 

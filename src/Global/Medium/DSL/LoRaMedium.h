@@ -29,6 +29,7 @@
 #include "inet/physicallayer/wireless/common/contract/packetlevel/INeighborCache.h"
 #include "inet/physicallayer/wireless/common/contract/packetlevel/IRadioMedium.h"
 #include <algorithm>
+#include <set>
 
 #include "inet/common/INETDefs.h"
 #include "inet/common/ModuleAccess.h"
@@ -53,6 +54,11 @@ class LoRaMedium : public RadioMedium
 protected:
     int mapX, mapY;
     double minimumElevationTermSat = 0.0;
+    // ACHF - Registro de transmisiones descartadas por la máscara de elevación
+    simsignal_t signal_BelowElevationMask;
+    mutable std::set<int> loggedBelowMask;   // ids de ITransmission ya registrados (evita duplicados)
+
+
     virtual bool matchesMacAddressFilter(const IRadio *radio, const Packet *packet) const override;
     virtual bool isInCommunicationRange(const ITransmission *transmission, const Coord& startPosition, const Coord& endPosition) const override;
     virtual bool isPotentialReceiver(const IRadio *receiver, const ITransmission *transmission) const override;

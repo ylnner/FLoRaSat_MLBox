@@ -77,8 +77,13 @@ void TransmissionStatistics::initialize(){
     getSystemModule()->subscribe(signal_TranmissionStatisticsCorrect, this);
     getSystemModule()->subscribe(signal_TranmissionStatisticsIgnoring, this);
 
-    //fileStatsTmp << "pid,time,srcId,dstId,srcSat,dstSat,latDev,longDev,satId,elevSat,doppler";
-    fileStatsTmp << "pid,time,srcId,dstId,srcSat,dstSat,latDev,longDev,loraTP,loraCF,loraSF,loraBW,loraCR,satId,elevSat,doppler,rcvOk,minPowerdBm,sensitivitydBm,duration";
+    // ACHF - transmisiones descartadas por LoRaMedium (elevación < mínimo)
+    signal_BelowElevationMask = cComponent::registerSignal("LoRaMedium_BelowElevationMask");
+    getSystemModule()->subscribe(signal_BelowElevationMask, this);
+
+
+    //fileStatsTmp << "pid,time,srcId,dstId,srcSat,dstSat,latDev,longDev,loraTP,loraCF,loraSF,loraBW,loraCR,satId,elevSat,doppler,rcvOk,minPowerdBm,sensitivitydBm,duration";
+    fileStatsTmp << "pid,time,srcId,dstId,srcSat,dstSat,latDev,longDev,loraTP,loraCF,loraSF,loraBW,loraCR,satId,elevSat,doppler,rcvOk,minPowerdBm,sensitivitydBm,duration,belowMask";
 
     fileStatsTmp << "\n";
     fileStatsTmp.close();
@@ -91,7 +96,7 @@ void TransmissionStatistics::handleMessage(cMessage *msg){
 }
 
 
-void TransmissionStatistics::recordPacket(inet::Packet *packet, double minPower_dBm, double sensitivity_dBm, double duration){
+void TransmissionStatistics::recordPacket(inet::Packet *packet, double minPower_dBm, double sensitivity_dBm, double duration, int belowMask, double recordTime){
     Enter_Method("recordPacket");
 
     auto routingTag      = packet->getTag<routing::CstRoutingTag>();
@@ -115,8 +120,10 @@ void TransmissionStatistics::recordPacket(inet::Packet *packet, double minPower_
 
     // write statistics
     // id
+    double t = (recordTime >= 0) ? recordTime : simTime().dbl();
     fileStats << pid;
-    fileStats << ", "<< core::roundTo(simTime().dbl(), 6);
+    //fileStats << ", "<< core::roundTo(simTime().dbl(), 6);
+    fileStats << ", "<< core::roundTo(t, 6);
     fileStats << ", "<< srcId;
     fileStats << ", "<< dstId;
     fileStats << "," << srcSat;
@@ -139,6 +146,7 @@ void TransmissionStatistics::recordPacket(inet::Packet *packet, double minPower_
     fileStats << "," << minPower_dBm;
     fileStats << "," << sensitivity_dBm;
     fileStats << "," << duration;
+    fileStats << "," << belowMask;
     fileStats << "\n";
 
 
@@ -172,6 +180,33 @@ void TransmissionStatistics::receiveSignal(cComponent *source, simsignal_t signa
 
     }*/
 
+    // ACHF - Transmision terminal , el satelitees descartada por la mascara de elevación.
+    // No hubo recepción: rcvOk = 0, sin potencia/sensibilidad, Doppler del dispositivo
+    if (signalID == signal_BelowElevationMask) {
+        cValueMap *statsMap = check_and_cast<cValueMap *>(obj);
+        double duration = statsMap->get("duration").doubleValue();
+        Packet *pkt = check_and_cast<Packet *>(statsMap->get("macFrame").objectValue());
+
+        const auto& frame = pkt->peekAtFront<messages::LoRaPhyPreamble>();
+        auto transmissionTag = pkt->addTagIfAbsent<statistics::CstTransmissionStatisticsTag>();
+        transmissionTag->setLoraBW(frame->getBandwidth().get());
+        transmissionTag->setLoraCF(frame->getCenterFrequency().get());
+        transmissionTag->setLoraCR(frame->getCodeRendundance());
+        transmissionTag->setLoraSF(frame->getSpreadFactor());
+        transmissionTag->setLoraTP(frame->getPower().get());
+        transmissionTag->setRcvOk(0);
+
+
+        satellite::Sat *sat = check_and_cast<satellite::Sat *>(getSystemModule()->getSubmodule("satellite", 0));
+        transmissionTag->setSatId(sat->getId());
+
+        // time = fin de la transmisión, comparable con el fin de recepción de las filas normales
+        double recordTime = transmissionTag->getTxStart() + duration;
+
+        // llama a recordPacket con belowMask=1*/
+        recordPacket(pkt, NAN, NAN, duration, 1, recordTime);
+        return;
+    }
 
     if(signalID == signal_TranmissionStatisticsCorrect || signalID == signal_TranmissionStatisticsIgnoring){
         // 1. Convertir el objeto recibido a cValueMap

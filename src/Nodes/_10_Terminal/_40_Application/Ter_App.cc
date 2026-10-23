@@ -170,11 +170,11 @@ void Ter_App::handleMessage(cMessage *msg)
             if (numberOfPacketsToSend == 0 || sentPackets < numberOfPacketsToSend)
             {
 
-                /*
+                // ACHF - COMENTAR ESTO CUANDTO SE TENGA LISTO, ES PARA PPP
                 // Schedule next packet
                 sendUplink = new cMessage("sendMeasurements");
                 scheduleAt(simTime() + timeToNextPacket, sendUplink);
-                */
+
 
 
                 // Schedule next packet ack timeout
@@ -188,9 +188,10 @@ void Ter_App::handleMessage(cMessage *msg)
             }
 
         }
-    }else{
-    //if (!msg->isSelfMessage()) {
-        // Message recevied from MAC layer
+    }
+    // ACHF - DESCOMENTAR ESTO CUANDO SE TENGA LISTO
+
+    /*else{
         if (strcmp(msg->getName(), "MacRepetitionsDone") == 0) {
             if (numberOfPacketsToSend == 0 || sentPackets < numberOfPacketsToSend){
                 timeToNextPacket = par("timeToNextPacket");
@@ -205,7 +206,7 @@ void Ter_App::handleMessage(cMessage *msg)
                 return;
             }
         }
-    }
+    }*/
 }
 
 

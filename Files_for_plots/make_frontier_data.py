@@ -82,9 +82,9 @@ def uniq_from_vec(path):
                     count += 1
     return count
 
-# ---------------------------------------------------------------- gated sweep Transformer
-gated_trf = defaultdict(list)
-root = os.path.join(REPO, "results_florasat_ml_twoBranches")
+# ---------------------------------------------------------------- gated sweep Bi-LSTM
+gated_bilstm = defaultdict(list)
+root = os.path.join(REPO, "results_florasat_ml_lstm")
 print('root: ', root)
 for scal in glob.glob(os.path.join(root, "raan_*", "*_scalar.csv")):
     m = re.search(r"threshold_([0-9.]+)_(\d+)_scalar\.csv$", os.path.basename(scal))
@@ -97,10 +97,10 @@ for scal in glob.glob(os.path.join(root, "raan_*", "*_scalar.csv")):
     #print('vec: ', vec)
     uq = uniq_from_vector_csv(vec)
     if tx > 0:
-        gated_trf[float(m.group(1))].append((tx, uq))
+        gated_bilstm[float(m.group(1))].append((tx, uq))
 
-# ---------------------------------------------------------------- gated sweep MLP
-gated_mlp = defaultdict(list)
+# ---------------------------------------------------------------- gated sweep Transformer
+gated_trf = defaultdict(list)
 #root = os.path.join(REPO, "results_florasat_ml_mlp")
 root = os.path.join(REPO, "results_florasat_ml_trf")
 print('root: ', root)
@@ -114,7 +114,24 @@ for scal in glob.glob(os.path.join(root, "raan_*", "*_scalar.csv")):
     tx = tx_from_scalar_csv(scal)
     uq = uniq_from_vector_csv(vec)
     if tx > 0:
-        gated_mlp[float(m.group(1))].append((tx, uq))
+        gated_trf[float(m.group(1))].append((tx, uq))
+        
+# ---------------------------------------------------------------- gated sweep Analytical
+gated_analytical = defaultdict(list)
+#root = os.path.join(REPO, "results_florasat_ml_mlp")
+root = os.path.join(REPO, "results_florasat_analytical")
+print('root: ', root)
+for scal in glob.glob(os.path.join(root, "raan_*", "*_scalar.csv")):
+    m = re.search(r"threshold_([0-9.]+)_(\d+)_scalar\.csv$", os.path.basename(scal))
+    if not m:
+        continue
+    vec = scal.replace("_scalar.csv", "_vector.csv")
+    if not os.path.exists(vec):
+        continue
+    tx = tx_from_scalar_csv(scal)
+    uq = uniq_from_vector_csv(vec)
+    if tx > 0:
+        gated_analytical[float(m.group(1))].append((tx, uq))        
 
 
 
@@ -145,18 +162,24 @@ def summarise(series):
     return rows
 
 
-gated_rows_mlp, blind_rows, gated_rows_trf = summarise(gated_mlp), summarise(blind), summarise(gated_trf)
+gated_rows_trf = summarise(gated_trf)
+blind_rows = summarise(blind)
+gated_rows_bilstm = summarise(gated_bilstm)
+gated_rows_analytical = summarise(gated_analytical)
+
 
 
 with open(os.path.join(OUT, "frontier.csv"), "w", newline="") as fh:
     w = csv.writer(fh)
     w.writerow(["series", "key", "runs", "tx_mean", "packets_mean", "packets_sd"])
-    for tag, rows in (("blind", blind_rows), ("gated_mlp", gated_rows_mlp), ("gated_two", gated_rows_trf)):
+    
+    for tag, rows in (("blind", blind_rows), ("gated_bilstm", gated_rows_bilstm), ("gated_trf", gated_rows_trf), ("gated_analytical", gated_rows_analytical)):
+        #print('rows: ', rows)
         for key, n, mtx, muq, sd in rows:
             w.writerow([tag, key, n, f"{mtx:.4f}", f"{muq:.4f}", f"{sd:.4f}"])
 
 print(f"{'series':10} {'key':>5} {'runs':>5} {'TX':>9} {'packets':>9} {'sd':>7}")
-for tag, rows in (("blind", blind_rows), ("gated_mlp", gated_rows_mlp), ("gated_two", gated_rows_trf)):
+for tag, rows in (("blind", blind_rows), ("gated_bilstm", gated_rows_bilstm), ("gated_trf", gated_rows_trf), ("gated_analytical", gated_rows_analytical)):
     for key, n, mtx, muq, sd in rows:
         print(f"{tag:10} {key:>5} {n:>5} {mtx:9.1f} {muq:9.2f} {sd:7.2f}")
 
@@ -164,8 +187,8 @@ print("\nVALIDATION vs PAPER.md")
 for tag, rows, key, wp, wt in (
     ("blind N=5", blind_rows, 5, 78.38, 2099.9),
     #("gated tau=0.2", gated_rows, 0.2, 91.00, 1225.9),
-    ("gated_mlp tau=0.2", gated_rows_mlp, 0.2, 91.00, 1225.9),
-    ("gated_trf tau=0.2", gated_rows_trf, 0.2, 91.00, 1225.9),
+    #("gated_mlp tau=0.2", gated_rows_mlp, 0.2, 91.00, 1225.9),
+    #("gated_trf tau=0.2", gated_rows_trf, 0.2, 91.00, 1225.9),
 ):
     hit = [r for r in rows if r[0] == key]
     if not hit:

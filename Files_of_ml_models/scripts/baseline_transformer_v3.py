@@ -151,7 +151,7 @@ def train_single_config(config, train_loader, val_loader, device, epochs=20, ear
     
     # Configure the class weights to manage unbalanaced data
     # pos_wight gives more importance to the positive class (1) in the loss function, helping the model to learn better from the minority class.
-    pos_weight = torch.tensor([77.62/22.38], device=device)
+    pos_weight = torch.tensor([80.44/19.56 ], device=device) # 77.62/22.38, antiguo desbalance
 
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     optimizer = optim.Adam(model.parameters(), lr=config['lr'])
@@ -304,8 +304,8 @@ param_grid = {
     'seq_length': [8],
     'd_model'   : [32], #128                # Dimension of the model
     'n_heads'   : [2, 4],                       # Number of projections
-    'n_layers'  : [1, 2, 3], #[1, 2, 3],                    # Number of encoder layers
-    'dropout'   : [0.1, 0.2, 0.3, 0.4],  #[0.1, 0.2, 0.3, 0.4], # , 0.2                # doprout
+    'n_layers'  : [1, 2], #[1, 2, 3],                    # Number of encoder layers
+    'dropout'   : [0.1, 0.2,],  #[0.1, 0.2, 0.3, 0.4], # , 0.2                # doprout
     'lr'        : [0.001, 0.0005], #, 0.0005            # Learning rate
     'batch_size': [32]                          # Batch Size
 }

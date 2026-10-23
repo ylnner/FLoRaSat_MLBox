@@ -89,11 +89,14 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
         EV << "lastTime: " << lastTime<<endl;
 
         for (auto& row : buffer_copia) {
-            EV << "deltaTime: " << lastTime - row[TIME_INDEX]<<endl;
-            double deltaTime = scaleDeltaTime(lastTime - row[TIME_INDEX]);
+            double rawDeltaTime = lastTime - row[TIME_INDEX];
+            EV << "deltaTime: " << rawDeltaTime<<endl;
+
+            double deltaTime = scaleDeltaTime(rawDeltaTime);
             //double deltaTime = lastTime - row[TIME_INDEX];
             EV << "deltaTimeScaled: " << deltaTime<<endl;
             row[TIME_INDEX] = deltaTime;
+            row.push_back(rawDeltaTime);
         }
 
 

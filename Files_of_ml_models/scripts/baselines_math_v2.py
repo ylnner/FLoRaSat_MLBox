@@ -8,6 +8,8 @@ from sklearn.metrics import (log_loss, roc_auc_score, precision_recall_curve, au
 def grid_search(df_val, grid_params):    
     print('grid_params: ', grid_params)
     df_val_aux = df_val.sort_values(by=['id_simulation', 'time']).reset_index(drop=True)
+    below = (df_val_aux['belowMask'] == 1).values if 'belowMask' in df_val_aux.columns \
+            else np.zeros(len(df_val_aux), dtype=bool)
 
     BW = 125000               
     base_p_link = df_val_aux['minPowerdBm'] - df_val_aux['sensitivitydBm']
@@ -34,6 +36,9 @@ def grid_search(df_val, grid_params):
             idx_right = np.searchsorted(times, lim_right, side='right')
             #idx_right = np.searchsorted(times, times, side='left')
 
+            # se resta 1 solo si la propia transmisión es visible (ya está en vis_times)
+            own = (group['belowMask'] == 0).values.astype(int) if 'belowMask' in group.columns else 1
+
             num_trx_window = np.maximum((idx_right - idx_left) - 1, 0)
             #num_trx_window = np.maximum((idx_right - idx_left), 0)
 
@@ -45,8 +50,10 @@ def grid_search(df_val, grid_params):
         
         for alpha, k in product(grid_params['alpha'], grid_params['k']):            
             P_doppler = np.exp(-alpha * base_p_doppler)
-            P_link = 1 / (1 + np.exp(-k * base_p_link))
-            
+            #P_link = 1 / (1 + np.exp(-k * base_p_link))
+            P_link = 1 / (1 + np.exp(-k * base_p_link.fillna(0)))
+            P_link = np.where(below, 0.0, P_link)      # sin enlace bajo la mascara
+
             y_pred = P_link * P_doppler * P_collision
             y_pred_clipped = np.clip(y_pred, 1e-15, 1 - 1e-15)
             
@@ -60,11 +67,15 @@ def grid_search(df_val, grid_params):
 def evaluate_test(df_test, params):
     df_test_aux = df_test.sort_values(by=['id_simulation', 'time']).reset_index(drop=True)
 
+    below = (df_test_aux['belowMask'] == 1).values if 'belowMask' in df_test_aux.columns \
+                else np.zeros(len(df_test_aux), dtype=bool)
+    
     BW = 125000                           
     BW_SF = BW / (2 ** df_test_aux['loraSF'])
     
     base_p_link = df_test_aux['minPowerdBm'] - df_test_aux['sensitivitydBm']
-    P_link = 1 / (1 + np.exp(-params['k'] * base_p_link))
+    #P_link = 1 / (1 + np.exp(-params['k'] * base_p_link))
+    P_link = np.where(below, 0.0, 1 / (1 + np.exp(-params['k'] * base_p_link.fillna(0))))
     
     base_p_doppler = np.abs(df_test_aux['doppler']) / BW_SF
     P_doppler = np.exp(-params['alpha'] * base_p_doppler)

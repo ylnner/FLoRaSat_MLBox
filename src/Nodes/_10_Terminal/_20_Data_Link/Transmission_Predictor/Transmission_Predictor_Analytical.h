@@ -34,7 +34,7 @@ class Transmission_Predictor_Analytical : public cSimpleModule{
 
 protected:
     double k = 20;//5;
-    double alpha = 0.00001; //0.0001;
+    double alpha = 0.0001; //0.0001;
     int t_window = 2;//1;
     //double threshold = 0.00293165740758182;
     double threshold;
