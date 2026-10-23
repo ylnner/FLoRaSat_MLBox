@@ -67,11 +67,11 @@ def extract_raan_and_run_index(filename):
 #dirs = ['results_florasat_ml_trf', 'results_florasat_ml_lstm', 'results_florasat_analytical', 'results_florasat_no_ml', 'results_florasat_ml_mlp', 'results_florasat_ml_twoBranches', 'results_florasat_ml_trf_no_buffer']
 #names = ['wML_Transformer', 'wML_BiLSTM', 'wAnalytical', 'wNoML', 'wML_MLP', 'wML_TwoBranches', 'wML_Transformer_noBuffer']
 
-dirs = ['results_florasat_ml_trf', 'results_florasat_ml_lstm', 'results_florasat_analytical', 'results_florasat_no_ml']
-names = ['wML_Transformer', 'wML_BiLSTM', 'wAnalytical', 'wNoML']
+#dirs = ['results_florasat_ml_trf', 'results_florasat_ml_lstm', 'results_florasat_analytical', 'results_florasat_no_ml']
+#names = ['wML_Transformer', 'wML_BiLSTM', 'wAnalytical', 'wNoML']
 
-#dirs = ['results_florasat_analytical']
-#names = ['wAnalytical']
+dirs = ['results_florasat_ml_trf']
+names = ['wML_Transformer']
 
 #subdirs = ['raan_165', 'raan_175', 'raan_185', 'raan_195', 'raan_205']
 
