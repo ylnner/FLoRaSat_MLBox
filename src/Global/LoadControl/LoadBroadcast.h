@@ -16,7 +16,9 @@ class LoadBroadcast : public omnetpp::cSimpleModule {
     ~LoadBroadcast() override;
 
     double admissionFactor() const { return controller->published(); }
-    void reportBurst();
+    double expectedDevices() const { return devices->published(); }
+    void reportBurst();   // a transmission the satellite would detect
+    void reportDemand();  // a device wanting to transmit above the mask, before any gate
 
   protected:
     void initialize() override;
@@ -25,10 +27,12 @@ class LoadBroadcast : public omnetpp::cSimpleModule {
 
   private:
     std::unique_ptr<AdmissionController> controller;
+    std::unique_ptr<DelayedAverage> devices;
     omnetpp::cMessage *windowTimer = nullptr;
     omnetpp::simtime_t window;
 
     long windowBursts = 0;
+    long windowDemand = 0;
     long totalBursts = 0;
     long windows = 0;
     long windowsBelowOne = 0;

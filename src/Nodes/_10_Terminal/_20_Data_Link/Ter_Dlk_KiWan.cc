@@ -172,6 +172,7 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("numTransmissionsApproved", this->numTransmissionsApproved);
     recordScalar("gateMasked", this->gateMasked);
     recordScalar("gateBarred", this->gateBarred);
+    recordScalar("gateReads", this->gateReads);
     recordScalar("hearsBroadcast", this->hearsBroadcast ? 1 : 0);
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
     //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
@@ -836,10 +837,12 @@ void Ter_Dlk_KiWan::initializeGate()
     else if (mode == "random") gateMode = GateMode::RANDOM;
     else if (mode == "elevation") gateMode = GateMode::ELEVATION;
     else if (mode == "score") gateMode = GateMode::SCORE;
+    else if (mode == "skip") gateMode = GateMode::SKIP;
     else throw cRuntimeError("Unknown gateMode '%s'", mode.c_str());
 
     gateMaskDeg = par("gateMaskDeg").doubleValue();
     gateSoftness = par("gateSoftness").doubleValue();
+    gateSkipParam = par("gateSkipParam").doubleValue();
     gateRng = par("gateRng").intValue();
 
     // Same devices in every arm of a run: the choice depends only on the terminal index
@@ -853,7 +856,8 @@ void Ter_Dlk_KiWan::initializeGate()
     if (broadcast && broadcast->par("enabled").boolValue())
         loadBroadcast = check_and_cast<loadcontrol::LoadBroadcast *>(broadcast);
 
-    bool needsBroadcast = gateMode == GateMode::RANDOM || gateMode == GateMode::ELEVATION || gateMode == GateMode::SCORE;
+    bool needsBroadcast = gateMode == GateMode::RANDOM || gateMode == GateMode::ELEVATION
+            || gateMode == GateMode::SCORE || gateMode == GateMode::SKIP;
     if (needsBroadcast && !loadBroadcast)
         throw cRuntimeError("gateMode '%s' needs an enabled loadBroadcast module", mode.c_str());
     if (gateMode == GateMode::SCORE && !mlBoxAvailable)
@@ -869,6 +873,9 @@ void Ter_Dlk_KiWan::initializeGate()
 
 bool Ter_Dlk_KiWan::applyGate(double elevDeg, double score)
 {
+    if (loadBroadcast && elevDeg >= gateMaskDeg)
+        loadBroadcast->reportDemand();
+
     // A device that cannot hear the downlink keeps its blind behaviour
     if (!hearsBroadcast)
         return true;
@@ -880,16 +887,24 @@ bool Ter_Dlk_KiWan::applyGate(double elevDeg, double score)
     if (gateMode == GateMode::MASK)
         return true;
 
-    double u = loadBroadcast->admissionFactor();
-    if (u >= 1.0)
-        return true;
+    gateReads++;
 
-    // The coin is access barring, and the fallback while the model has no score yet
-    double p = u;
-    if (gateMode == GateMode::ELEVATION)
-        p = loadcontrol::gateProbability(elevDeg, gateTable.tau(u), gateSoftness);
-    else if (gateMode == GateMode::SCORE && !std::isnan(score))
-        p = loadcontrol::gateProbability(score, gateTable.tau(u), gateSoftness);
+    double p;
+    if (gateMode == GateMode::SKIP) {
+        p = loadcontrol::skipTransmitProbability(loadBroadcast->expectedDevices(), gateSkipParam);
+    }
+    else {
+        double u = loadBroadcast->admissionFactor();
+        if (u >= 1.0)
+            return true;
+
+        // The coin is access barring, and the fallback while the model has no score yet
+        p = u;
+        if (gateMode == GateMode::ELEVATION)
+            p = loadcontrol::gateProbability(elevDeg, gateTable.tau(u), gateSoftness);
+        else if (gateMode == GateMode::SCORE && !std::isnan(score))
+            p = loadcontrol::gateProbability(loadcontrol::logit(score), loadcontrol::logit(gateTable.tau(u)), gateSoftness);
+    }
 
     bool admit = uniform(0, 1, gateRng) < p;
     if (!admit)

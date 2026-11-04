@@ -175,16 +175,18 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         bool mlBoxAvailableTwoBranches = false;
 
         // Load control gate
-        enum class GateMode { NONE, MASK, RANDOM, ELEVATION, SCORE };
+        enum class GateMode { NONE, MASK, RANDOM, ELEVATION, SCORE, SKIP };
         GateMode gateMode = GateMode::NONE;
         double gateMaskDeg = 10;
         double gateSoftness = 0;
+        double gateSkipParam = 0;
         int gateRng = 0;
         bool hearsBroadcast = true;
         loadcontrol::ThresholdTable gateTable;
         loadcontrol::LoadBroadcast *loadBroadcast = nullptr;
         int gateMasked = 0;  // repetitions held back because no satellite was above the mask
         int gateBarred = 0;  // repetitions held back by the broadcast admission factor
+        int gateReads = 0;   // times the device read the broadcast; listening energy is charged per read
 
         void initializeGate();
         bool applyGate(double elevDeg, double score);

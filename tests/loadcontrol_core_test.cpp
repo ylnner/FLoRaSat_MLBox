@@ -113,6 +113,28 @@ int main()
     assert(near(gateProbability(0.5, 0.5, 0.1), 0.5, 1e-12));
     assert(gateProbability(0.9, 0.5, 0.1) > 0.95);
 
+    // Logit scale: symmetric, and finite at the ends.
+    assert(near(logit(0.5), 0.0, 1e-12));
+    assert(near(logit(0.9), -logit(0.1), 1e-9));
+    assert(std::isfinite(logit(0.0)) && std::isfinite(logit(1.0)));
+
+    // Trajectory skip: always transmit with no devices, less as N grows, more with a larger pSkip.
+    assert(near(skipTransmitProbability(0, 100), 1.0, 1e-12));
+    assert(skipTransmitProbability(200, 100) < skipTransmitProbability(100, 100));
+    assert(skipTransmitProbability(100, 400) > skipTransmitProbability(100, 100));
+    assert(skipTransmitProbability(1e6, 100) < 1e-6);
+
+    // Beaconed count: first window taken as is, then smoothed, and held back by the delay.
+    {
+        DelayedAverage d(0.5, 1);
+        d.step(100);
+        assert(near(d.published(), 0.0, 1e-12));
+        d.step(200);
+        assert(near(d.published(), 100.0, 1e-12));
+        d.step(200);
+        assert(near(d.published(), 150.0, 1e-12));
+    }
+
     std::puts("loadcontrol core: all checks passed");
     return 0;
 }

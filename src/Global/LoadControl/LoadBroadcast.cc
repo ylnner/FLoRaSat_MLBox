@@ -23,6 +23,7 @@ void LoadBroadcast::initialize()
     p.bits = par("bits").intValue();
     p.delayWindows = par("delayWindows").intValue();
     controller = std::make_unique<AdmissionController>(p);
+    devices = std::make_unique<DelayedAverage>(p.ewmaAlpha, p.delayWindows);
 
     window = par("window");
     observedVector.setName("lcObservedBursts");
@@ -41,9 +42,15 @@ void LoadBroadcast::reportBurst()
     totalBursts++;
 }
 
+void LoadBroadcast::reportDemand()
+{
+    windowDemand++;
+}
+
 void LoadBroadcast::handleMessage(cMessage *msg)
 {
     double u = controller->step((double)windowBursts);
+    devices->step((double)windowDemand);
 
     observedVector.record((double)windowBursts);
     estimateVector.record(controller->loadEstimate());
@@ -53,6 +60,7 @@ void LoadBroadcast::handleMessage(cMessage *msg)
     if (u < 1.0)
         windowsBelowOne++;
     windowBursts = 0;
+    windowDemand = 0;
 
     scheduleAt(simTime() + window, msg);
 }

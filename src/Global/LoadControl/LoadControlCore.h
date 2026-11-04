@@ -82,6 +82,34 @@ class AdmissionController {
     std::deque<double> pipeline;
 };
 
+// Smoothed per-window count that reaches devices after a delay, used for the beaconed device count.
+class DelayedAverage {
+  public:
+    DelayedAverage(double alpha, int delayWindows) : a(alpha), delay(delayWindows) {}
+
+    double step(double observed)
+    {
+        average = primed ? a * observed + (1 - a) * average : observed;
+        primed = true;
+        pipeline.push_back(average);
+        if ((int)pipeline.size() > delay) {
+            out = pipeline.front();
+            pipeline.pop_front();
+        }
+        return out;
+    }
+
+    double published() const { return out; }
+
+  private:
+    double a;
+    int delay;
+    double average = 0;
+    double out = 0;
+    bool primed = false;
+    std::deque<double> pipeline;
+};
+
 // Maps an admission factor to a score threshold, by linear interpolation between stored points.
 class ThresholdTable {
   public:
@@ -136,6 +164,22 @@ inline double gateProbability(double score, double tau, double softness)
     if (softness <= 0)
         return score >= tau ? 1.0 : 0.0;
     return 1.0 / (1.0 + std::exp(-(score - tau) / softness));
+}
+
+// Model probabilities bunch near 1, so a fixed softness on the probability scale cannot follow a
+// small u. The score gate works on this scale instead.
+inline double logit(double probability)
+{
+    double p = std::clamp(probability, 1e-6, 1.0 - 1e-6);
+    return std::log(p / (1.0 - p));
+}
+
+// Trajectory skip, Alvarez et al., IEEE Access 2022, Eq. (5), with N the beaconed device count.
+// The paper calls this the probability of skipping, but the expression falls as N grows and its
+// text says a lower pSkip means more skipping, so it is used here as the probability of transmitting.
+inline double skipTransmitProbability(double devices, double pSkip)
+{
+    return 2.0 / (1.0 + std::exp(devices / pSkip));
 }
 
 } // namespace loadcontrol
