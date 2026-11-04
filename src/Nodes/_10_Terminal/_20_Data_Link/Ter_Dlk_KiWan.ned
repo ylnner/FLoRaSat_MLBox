@@ -60,6 +60,14 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		bool useAnalytical = default(false);
 		bool useMLBoxMLP = default(false);
 		bool useMLBoxTwoBranches = default(false);
+
+        // Load control gate. "none" keeps the decision of the selected predictor.
+        string gateMode = default("none");          // none, mask, random, elevation, score
+        double gateMaskDeg = default(10);           // keep equal to radioMedium.minimumElevationTermSat
+        string gateTable = default("");             // CSV of u,tau for the elevation and score modes
+        double gateSoftness = default(0);           // logistic width in score units; 0 is a hard gate
+        int gateRng = default(0);                   // set to a spare RNG to keep arms paired
+        double uncontrolledFraction = default(0);   // share of devices that never hear the broadcast
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {
             parameters:

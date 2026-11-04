@@ -11,6 +11,7 @@ import inet.visualizer.common.IntegratedVisualizer;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import Global.Medium.DSL.LoRaMedium;
 import Global.Statistics.TransmissionStatistics.TransmissionStatistics;
+import Global.LoadControl.LoadBroadcast;
 
 import Nodes._20_Satellite._60_Mobility.Sat_Mob_Orchestrator;
 
@@ -59,6 +60,10 @@ network Florasat_Individual_Sats{
 
         transmissionStatistics: TransmissionStatistics{
              @display("p=121,825");
+        }
+
+        loadBroadcast: LoadBroadcast {
+            @display("p=121,600");
         }
 
 

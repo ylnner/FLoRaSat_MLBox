@@ -154,6 +154,8 @@ void Ter_Dlk_KiWan::initialize(int stage) {
             mlBoxTwoBranches = check_and_cast<mlbox::Transmission_Predictor_TwoBranches *>(getSubmodule("mlBoxTwoBranches"));
         }
 
+        initializeGate();
+
 
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
@@ -168,6 +170,9 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("successfulDetections", this->numSuccessfulDetections);
 
     recordScalar("numTransmissionsApproved", this->numTransmissionsApproved);
+    recordScalar("gateMasked", this->gateMasked);
+    recordScalar("gateBarred", this->gateBarred);
+    recordScalar("hearsBroadcast", this->hearsBroadcast ? 1 : 0);
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
     //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
 
@@ -666,6 +671,7 @@ void Ter_Dlk_KiWan::sendData() {
 
 
         bool transmit = true;
+        double gateScore = std::nan("");
         if(mlBoxAvailable){
             /*
              * Transformer-Encoder
@@ -691,6 +697,8 @@ void Ter_Dlk_KiWan::sendData() {
 
             std::vector<double> output = mlBox->predict(myFeatures_2);
             transmit = static_cast<bool>(output[0]);
+            if (output.size() > 1)
+                gateScore = output[1];
 
             EV << "After execute model transmit: " << transmit <<endl;
             double element_vector = transmissionId;
@@ -783,10 +791,19 @@ void Ter_Dlk_KiWan::sendData() {
         }
 
 
+        if (gateMode != GateMode::NONE)
+            transmit = applyGate(elevSat_temp, gateScore);
+
         if(transmit){
+            // The satellite can only count what reaches it from above the mask
+            if (loadBroadcast && elevSat_temp >= gateMaskDeg)
+                loadBroadcast->reportBurst();
             sendDown(frameCopy);
             this->numTransmissionsApproved++;
             currentTxCountML++;
+        }
+        else {
+            delete frameCopy;
         }
 
         //sendDown(frameCopy);
@@ -809,6 +826,75 @@ void Ter_Dlk_KiWan::sendData() {
             scheduleAt(simTime() + ttxIdle, this->eventTransmitData);
         }
     }
+}
+
+void Ter_Dlk_KiWan::initializeGate()
+{
+    std::string mode = par("gateMode").stdstringValue();
+    if (mode == "none") gateMode = GateMode::NONE;
+    else if (mode == "mask") gateMode = GateMode::MASK;
+    else if (mode == "random") gateMode = GateMode::RANDOM;
+    else if (mode == "elevation") gateMode = GateMode::ELEVATION;
+    else if (mode == "score") gateMode = GateMode::SCORE;
+    else throw cRuntimeError("Unknown gateMode '%s'", mode.c_str());
+
+    gateMaskDeg = par("gateMaskDeg").doubleValue();
+    gateSoftness = par("gateSoftness").doubleValue();
+    gateRng = par("gateRng").intValue();
+
+    // Same devices in every arm of a run: the choice depends only on the terminal index
+    double f = par("uncontrolledFraction").doubleValue();
+    if (f > 0) {
+        int index = getParentModule()->getParentModule()->getIndex();
+        hearsBroadcast = std::fmod(index * 0.6180339887498949, 1.0) >= f;
+    }
+
+    cModule *broadcast = getSystemModule()->getSubmodule("loadBroadcast");
+    if (broadcast && broadcast->par("enabled").boolValue())
+        loadBroadcast = check_and_cast<loadcontrol::LoadBroadcast *>(broadcast);
+
+    bool needsBroadcast = gateMode == GateMode::RANDOM || gateMode == GateMode::ELEVATION || gateMode == GateMode::SCORE;
+    if (needsBroadcast && !loadBroadcast)
+        throw cRuntimeError("gateMode '%s' needs an enabled loadBroadcast module", mode.c_str());
+    if (gateMode == GateMode::SCORE && !mlBoxAvailable)
+        throw cRuntimeError("gateMode 'score' needs useMLBox = true");
+
+    if (gateMode == GateMode::ELEVATION || gateMode == GateMode::SCORE) {
+        std::string table = par("gateTable").stdstringValue();
+        if (table.empty())
+            throw cRuntimeError("gateMode '%s' needs gateTable", mode.c_str());
+        gateTable = loadcontrol::ThresholdTable::fromCsv(table);
+    }
+}
+
+bool Ter_Dlk_KiWan::applyGate(double elevDeg, double score)
+{
+    // A device that cannot hear the downlink keeps its blind behaviour
+    if (!hearsBroadcast)
+        return true;
+
+    if (elevDeg < gateMaskDeg) {
+        gateMasked++;
+        return false;
+    }
+    if (gateMode == GateMode::MASK)
+        return true;
+
+    double u = loadBroadcast->admissionFactor();
+    if (u >= 1.0)
+        return true;
+
+    // The coin is access barring, and the fallback while the model has no score yet
+    double p = u;
+    if (gateMode == GateMode::ELEVATION)
+        p = loadcontrol::gateProbability(elevDeg, gateTable.tau(u), gateSoftness);
+    else if (gateMode == GateMode::SCORE && !std::isnan(score))
+        p = loadcontrol::gateProbability(score, gateTable.tau(u), gateSoftness);
+
+    bool admit = uniform(0, 1, gateRng) < p;
+    if (!admit)
+        gateBarred++;
+    return admit;
 }
 
 void Ter_Dlk_KiWan::sendDown(cMessage *message)

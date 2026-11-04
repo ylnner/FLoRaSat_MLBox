@@ -20,6 +20,7 @@
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.h"
+#include "Global/LoadControl/LoadBroadcast.h"
 
 
 using namespace mlbox;
@@ -172,6 +173,21 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         bool analyticalAvailable = false;
         bool mlBoxAvailableMLP = false;
         bool mlBoxAvailableTwoBranches = false;
+
+        // Load control gate
+        enum class GateMode { NONE, MASK, RANDOM, ELEVATION, SCORE };
+        GateMode gateMode = GateMode::NONE;
+        double gateMaskDeg = 10;
+        double gateSoftness = 0;
+        int gateRng = 0;
+        bool hearsBroadcast = true;
+        loadcontrol::ThresholdTable gateTable;
+        loadcontrol::LoadBroadcast *loadBroadcast = nullptr;
+        int gateMasked = 0;  // repetitions held back because no satellite was above the mask
+        int gateBarred = 0;  // repetitions held back by the broadcast admission factor
+
+        void initializeGate();
+        bool applyGate(double elevDeg, double score);
 
 }; // namespace mac
 

@@ -142,7 +142,7 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
            << " -> Decision: " << (transmit ? "TRANSMIT (1)" : "NOT TRANSMIT (0)") << "\n";
 
 
-        return {(double)transmit};
+        return {(double)transmit, (double)probability};
 
     } catch (const std::exception& e) {
         EV_ERROR << "Error running model: " << e.what() << "\n";
