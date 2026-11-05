@@ -61,6 +61,7 @@ void LoRaReceiver::initialize(int stage)
         // Logic to enable/disable different collision handling
         ///enableCollisions                = par("enableCollisions").boolValue();
         enableCollisionOverlap          = par("enableCollisionOverlap").boolValue();
+        collisionGuardBand_Hz           = par("collisionGuardBand").doubleValue();
     }
 
     if (stage == INITSTAGE_LAST && iAmGateway)
@@ -566,9 +567,9 @@ bool LoRaReceiver::detectCollisionOverlap(const LoRaReception *loraReception, co
 
         EV << "loraReception.freq: " << freq_x.get() <<endl;
         EV << "interference.freq: " << freq_y.get() <<endl;
-        // Frequency overlap check: separated by less than 1200 Hz
+        // Frequency overlap check: separated by less than the guard band
         double freqSeparation = std::abs(freq_x.get() - freq_y.get());
-        bool frequencyOverlap = freqSeparation < 1200.0;
+        bool frequencyOverlap = freqSeparation < collisionGuardBand_Hz;
 
         EV_INFO << "Temporal overlap: " << (temporalOverlap ? "YES" : "NO") << ", overlap duration: " << overlapDuration << endl;
         EV_INFO << "Overlap duration exceeds threshold: " << (overlapExceedsThreshold ? "YES" : "NO") << ", threshold: " << minCollisionOverlap << endl;

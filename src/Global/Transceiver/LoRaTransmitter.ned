@@ -23,5 +23,6 @@ module LoRaTransmitter extends NarrowbandTransmitterBase
         @signal[LoRaTransmissionCreated](type=bool); // optional
         @statistic[LoRaTransmissionCreated](source=LoRaTransmissionCreated; record=count);
         modulation = default("LoRaModulation");
+        bool legacyAirtime = default(false);    // earlier time-on-air formula, only to reproduce stored runs
         @class(transceiver::LoRaTransmitter);
 }
