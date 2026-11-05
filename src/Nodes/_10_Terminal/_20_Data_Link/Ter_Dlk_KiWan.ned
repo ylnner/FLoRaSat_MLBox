@@ -68,6 +68,7 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
         double gateSoftness = default(0);           // logistic width: degrees for elevation, logit units for score; 0 is a hard gate
         double gateSkipParam = default(4000);       // p_skip of Alvarez 2022, to fit per scenario
         int gateRng = default(0);                   // set to a spare RNG to keep arms paired
+        int gateRepCap = default(0);                // repetitions sent per message: 0 no limit, k at most k, -1 ceil(Ntx * u)
         double uncontrolledFraction = default(0);   // share of devices that never hear the broadcast
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {

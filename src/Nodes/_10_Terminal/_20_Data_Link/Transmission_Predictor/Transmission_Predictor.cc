@@ -7,6 +7,7 @@
  */
 
 
+#include <map>
 #include "Transmission_Predictor.h"
 
 Define_Module(Transmission_Predictor);
@@ -25,9 +26,18 @@ void Transmission_Predictor::initialize(int stage){
 void Transmission_Predictor::loadModel(){
     // Loading model
     EV << "Transformer model loaded "<<endl;
-    model = torch::jit::load(modelPath);
-    // Change to eval mode to predict
-    model.eval();
+    // Devices differ only in window_buffer, and a Module copy is a handle, so they share one load.
+    // At 960 devices a copy each cost about 5 minutes of startup and 14 GB per run. Never freed, so
+    // nothing depends on destruction order against LibTorch at exit.
+    static auto *loaded = new std::map<std::string, torch::jit::script::Module>();
+    auto entry = loaded->find(modelPath);
+    if (entry == loaded->end()) {
+        auto module = torch::jit::load(modelPath);
+        // Change to eval mode to predict
+        module.eval();
+        entry = loaded->emplace(modelPath, module).first;
+    }
+    model = entry->second;
 
     // Load Scaler
 }

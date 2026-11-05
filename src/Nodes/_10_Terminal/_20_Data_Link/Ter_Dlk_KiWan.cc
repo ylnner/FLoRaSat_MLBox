@@ -173,6 +173,7 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("gateMasked", this->gateMasked);
     recordScalar("gateBarred", this->gateBarred);
     recordScalar("gateReads", this->gateReads);
+    recordScalar("gateCapped", this->gateCapped);
     recordScalar("hearsBroadcast", this->hearsBroadcast ? 1 : 0);
     recordScalar("macModuleId", this->getId()); // joins the satellite's per-node counts to this device
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
@@ -845,6 +846,7 @@ void Ter_Dlk_KiWan::initializeGate()
     gateSoftness = par("gateSoftness").doubleValue();
     gateSkipParam = par("gateSkipParam").doubleValue();
     gateRng = par("gateRng").intValue();
+    gateRepCap = par("gateRepCap").intValue();
 
     // Same devices in every arm of a run: the choice depends only on the terminal index
     double f = par("uncontrolledFraction").doubleValue();
@@ -889,6 +891,16 @@ bool Ter_Dlk_KiWan::applyGate(double elevDeg, double score)
         return true;
 
     gateReads++;
+
+    // The repetitions of a message fall within a minute, so their scores are correlated and a rank
+    // gate alone passes all of them or none. This keeps u a share of each message.
+    if (gateRepCap != 0) {
+        int budget = gateRepCap > 0 ? gateRepCap : (int)std::ceil(Ntx * loadBroadcast->admissionFactor());
+        if (currentTxCountML >= budget) {
+            gateCapped++;
+            return false;
+        }
+    }
 
     double p;
     if (gateMode == GateMode::SKIP) {
