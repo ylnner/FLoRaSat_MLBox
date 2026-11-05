@@ -174,6 +174,7 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("gateBarred", this->gateBarred);
     recordScalar("gateReads", this->gateReads);
     recordScalar("hearsBroadcast", this->hearsBroadcast ? 1 : 0);
+    recordScalar("macModuleId", this->getId()); // joins the satellite's per-node counts to this device
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
     //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
 

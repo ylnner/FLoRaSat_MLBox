@@ -147,7 +147,7 @@ class ThresholdTable {
             return rows.front().second;
         if (u >= rows.back().first)
             return rows.back().second;
-        auto hi = std::lower_bound(rows.begin(), rows.end(), std::make_pair(u, -INFINITY));
+        auto hi = std::lower_bound(rows.begin(), rows.end(), std::pair<double, double>(u, -INFINITY));
         auto lo = hi - 1;
         double w = (u - lo->first) / (hi->first - lo->first);
         return lo->second + w * (hi->second - lo->second);
