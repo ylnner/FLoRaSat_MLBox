@@ -174,6 +174,7 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("gateBarred", this->gateBarred);
     recordScalar("gateReads", this->gateReads);
     recordScalar("gateCapped", this->gateCapped);
+    recordScalar("gateDeferred", this->gateDeferred);
     recordScalar("hearsBroadcast", this->hearsBroadcast ? 1 : 0);
     recordScalar("macModuleId", this->getId()); // joins the satellite's per-node counts to this device
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
@@ -847,6 +848,7 @@ void Ter_Dlk_KiWan::initializeGate()
     gateSkipParam = par("gateSkipParam").doubleValue();
     gateRng = par("gateRng").intValue();
     gateRepCap = par("gateRepCap").intValue();
+    gateRepSpread = par("gateRepSpread").boolValue();
 
     // Same devices in every arm of a run: the choice depends only on the terminal index
     double f = par("uncontrolledFraction").doubleValue();
@@ -883,12 +885,21 @@ bool Ter_Dlk_KiWan::applyGate(double elevDeg, double score)
     if (!hearsBroadcast)
         return true;
 
+    // Devices in lockstep would otherwise all spend a limited budget on the same repetition
+    if (gateRepSpread && currentTxCount == 0)
+        gateFirstSlot = intuniform(0, Ntx - 1, gateRng);
+
     if (elevDeg < gateMaskDeg) {
         gateMasked++;
         return false;
     }
     if (gateMode == GateMode::MASK)
         return true;
+
+    if (currentTxCount < gateFirstSlot) {
+        gateDeferred++;
+        return false;
+    }
 
     gateReads++;
 

@@ -182,6 +182,8 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         double gateSkipParam = 0;
         int gateRng = 0;
         int gateRepCap = 0;
+        bool gateRepSpread = false;
+        int gateFirstSlot = 0;
         bool hearsBroadcast = true;
         loadcontrol::ThresholdTable gateTable;
         loadcontrol::LoadBroadcast *loadBroadcast = nullptr;
@@ -189,6 +191,7 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         int gateBarred = 0;  // repetitions held back by the broadcast admission factor
         int gateReads = 0;   // times the device read the broadcast; listening energy is charged per read
         int gateCapped = 0;  // repetitions held back by the budget per message
+        int gateDeferred = 0; // repetitions held back before the drawn first slot
 
         void initializeGate();
         bool applyGate(double elevDeg, double score);
