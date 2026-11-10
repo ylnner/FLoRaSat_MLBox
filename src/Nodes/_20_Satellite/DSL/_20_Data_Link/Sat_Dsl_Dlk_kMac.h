@@ -95,6 +95,9 @@ class Sat_Dsl_Dlk_kMac : public Base_MacProtocol {
 
         // ACHF
         int numReceptions = 0;
+        int numUniqueMessages = 0;
+        std::map<int, int> uniqueMessagesPerNode;
+
         cOutVector vectorMethod_ReceptionResult;
 
         cOutVector successfulRepetitionVector;

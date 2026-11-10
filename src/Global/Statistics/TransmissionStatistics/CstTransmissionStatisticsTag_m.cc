@@ -202,6 +202,8 @@ void CstTransmissionStatisticsTag::copy(const CstTransmissionStatisticsTag& othe
     this->minPower_dbm = other.minPower_dbm;
     this->sensitivity_dbm = other.sensitivity_dbm;
     this->rx_power_dbm_dev = other.rx_power_dbm_dev;
+    this->mixId = other.mixId;
+    this->propensity = other.propensity;
 }
 
 void CstTransmissionStatisticsTag::parsimPack(omnetpp::cCommBuffer *b) const
@@ -232,6 +234,8 @@ void CstTransmissionStatisticsTag::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->minPower_dbm);
     doParsimPacking(b,this->sensitivity_dbm);
     doParsimPacking(b,this->rx_power_dbm_dev);
+    doParsimPacking(b,this->mixId);
+    doParsimPacking(b,this->propensity);
 }
 
 void CstTransmissionStatisticsTag::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -262,6 +266,8 @@ void CstTransmissionStatisticsTag::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->minPower_dbm);
     doParsimUnpacking(b,this->sensitivity_dbm);
     doParsimUnpacking(b,this->rx_power_dbm_dev);
+    doParsimUnpacking(b,this->mixId);
+    doParsimUnpacking(b,this->propensity);
 }
 
 int CstTransmissionStatisticsTag::getPacketId() const
@@ -514,6 +520,26 @@ void CstTransmissionStatisticsTag::setRx_power_dbm_dev(double rx_power_dbm_dev)
     this->rx_power_dbm_dev = rx_power_dbm_dev;
 }
 
+int CstTransmissionStatisticsTag::getMixId() const
+{
+    return this->mixId;
+}
+
+void CstTransmissionStatisticsTag::setMixId(int mixId)
+{
+    this->mixId = mixId;
+}
+
+double CstTransmissionStatisticsTag::getPropensity() const
+{
+    return this->propensity;
+}
+
+void CstTransmissionStatisticsTag::setPropensity(double propensity)
+{
+    this->propensity = propensity;
+}
+
 class CstTransmissionStatisticsTagDescriptor : public omnetpp::cClassDescriptor
 {
   private:
@@ -544,6 +570,8 @@ class CstTransmissionStatisticsTagDescriptor : public omnetpp::cClassDescriptor
         FIELD_minPower_dbm,
         FIELD_sensitivity_dbm,
         FIELD_rx_power_dbm_dev,
+        FIELD_mixId,
+        FIELD_propensity,
     };
   public:
     CstTransmissionStatisticsTagDescriptor();
@@ -610,7 +638,7 @@ const char *CstTransmissionStatisticsTagDescriptor::getProperty(const char *prop
 int CstTransmissionStatisticsTagDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
-    return base ? 25+base->getFieldCount() : 25;
+    return base ? 27+base->getFieldCount() : 27;
 }
 
 unsigned int CstTransmissionStatisticsTagDescriptor::getFieldTypeFlags(int field) const
@@ -647,8 +675,10 @@ unsigned int CstTransmissionStatisticsTagDescriptor::getFieldTypeFlags(int field
         FD_ISEDITABLE,    // FIELD_minPower_dbm
         FD_ISEDITABLE,    // FIELD_sensitivity_dbm
         FD_ISEDITABLE,    // FIELD_rx_power_dbm_dev
+        FD_ISEDITABLE,    // FIELD_mixId
+        FD_ISEDITABLE,    // FIELD_propensity
     };
-    return (field >= 0 && field < 25) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 27) ? fieldTypeFlags[field] : 0;
 }
 
 const char *CstTransmissionStatisticsTagDescriptor::getFieldName(int field) const
@@ -685,8 +715,10 @@ const char *CstTransmissionStatisticsTagDescriptor::getFieldName(int field) cons
         "minPower_dbm",
         "sensitivity_dbm",
         "rx_power_dbm_dev",
+        "mixId",
+        "propensity",
     };
-    return (field >= 0 && field < 25) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 27) ? fieldNames[field] : nullptr;
 }
 
 int CstTransmissionStatisticsTagDescriptor::findField(const char *fieldName) const
@@ -718,6 +750,8 @@ int CstTransmissionStatisticsTagDescriptor::findField(const char *fieldName) con
     if (strcmp(fieldName, "minPower_dbm") == 0) return baseIndex + 22;
     if (strcmp(fieldName, "sensitivity_dbm") == 0) return baseIndex + 23;
     if (strcmp(fieldName, "rx_power_dbm_dev") == 0) return baseIndex + 24;
+    if (strcmp(fieldName, "mixId") == 0) return baseIndex + 25;
+    if (strcmp(fieldName, "propensity") == 0) return baseIndex + 26;
     return base ? base->findField(fieldName) : -1;
 }
 
@@ -755,8 +789,10 @@ const char *CstTransmissionStatisticsTagDescriptor::getFieldTypeString(int field
         "double",    // FIELD_minPower_dbm
         "double",    // FIELD_sensitivity_dbm
         "double",    // FIELD_rx_power_dbm_dev
+        "int",    // FIELD_mixId
+        "double",    // FIELD_propensity
     };
-    return (field >= 0 && field < 25) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 27) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **CstTransmissionStatisticsTagDescriptor::getFieldPropertyNames(int field) const
@@ -864,6 +900,8 @@ std::string CstTransmissionStatisticsTagDescriptor::getFieldValueAsString(omnetp
         case FIELD_minPower_dbm: return double2string(pp->getMinPower_dbm());
         case FIELD_sensitivity_dbm: return double2string(pp->getSensitivity_dbm());
         case FIELD_rx_power_dbm_dev: return double2string(pp->getRx_power_dbm_dev());
+        case FIELD_mixId: return long2string(pp->getMixId());
+        case FIELD_propensity: return double2string(pp->getPropensity());
         default: return "";
     }
 }
@@ -905,6 +943,8 @@ void CstTransmissionStatisticsTagDescriptor::setFieldValueAsString(omnetpp::any_
         case FIELD_minPower_dbm: pp->setMinPower_dbm(string2double(value)); break;
         case FIELD_sensitivity_dbm: pp->setSensitivity_dbm(string2double(value)); break;
         case FIELD_rx_power_dbm_dev: pp->setRx_power_dbm_dev(string2double(value)); break;
+        case FIELD_mixId: pp->setMixId(string2long(value)); break;
+        case FIELD_propensity: pp->setPropensity(string2double(value)); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CstTransmissionStatisticsTag'", field);
     }
 }
@@ -944,6 +984,8 @@ omnetpp::cValue CstTransmissionStatisticsTagDescriptor::getFieldValue(omnetpp::a
         case FIELD_minPower_dbm: return pp->getMinPower_dbm();
         case FIELD_sensitivity_dbm: return pp->getSensitivity_dbm();
         case FIELD_rx_power_dbm_dev: return pp->getRx_power_dbm_dev();
+        case FIELD_mixId: return pp->getMixId();
+        case FIELD_propensity: return pp->getPropensity();
         default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'CstTransmissionStatisticsTag' as cValue -- field index out of range?", field);
     }
 }
@@ -985,6 +1027,8 @@ void CstTransmissionStatisticsTagDescriptor::setFieldValue(omnetpp::any_ptr obje
         case FIELD_minPower_dbm: pp->setMinPower_dbm(value.doubleValue()); break;
         case FIELD_sensitivity_dbm: pp->setSensitivity_dbm(value.doubleValue()); break;
         case FIELD_rx_power_dbm_dev: pp->setRx_power_dbm_dev(value.doubleValue()); break;
+        case FIELD_mixId: pp->setMixId(omnetpp::checked_int_cast<int>(value.intValue())); break;
+        case FIELD_propensity: pp->setPropensity(value.doubleValue()); break;
         default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'CstTransmissionStatisticsTag'", field);
     }
 }

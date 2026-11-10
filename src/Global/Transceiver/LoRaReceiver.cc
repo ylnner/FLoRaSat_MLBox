@@ -59,8 +59,8 @@ void LoRaReceiver::initialize(int stage)
 
         // ACHF
         // Logic to enable/disable different collision handling
-        ///enableCollisions                = par("enableCollisions").boolValue();
         enableCollisionOverlap          = par("enableCollisionOverlap").boolValue();
+        collisionGuardBand_Hz           = par("collisionGuardBand").doubleValue();
     }
 
     if (stage == INITSTAGE_LAST && iAmGateway)
@@ -206,11 +206,11 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
     EV << "Transmission time is " << 2*d_x << "s" << endl;
 
     double P_threshold = 6;
-    W signalRSSI_w = loRaReception->getPower();
-    double signalRSSI_mw = signalRSSI_w.get()*1000;
-    double signalRSSI_dBm = math::mW2dBmW(signalRSSI_mw);
-    EV << "Received signal RSSI is " << signalRSSI_mw << " mw" << endl;
-    EV << "Received signal RSSI is " << signalRSSI_dBm << " dBm" << endl;
+    //W signalRSSI_w = loRaReception->getPower();
+    //double signalRSSI_mw = signalRSSI_w.get()*1000;
+    //double signalRSSI_dBm = math::mW2dBmW(signalRSSI_mw);
+    //EV << "Received signal RSSI is " << signalRSSI_mw << " mw" << endl;
+    //EV << "Received signal RSSI is " << signalRSSI_dBm << " dBm" << endl;
 
     ////////////////////////////////////
     ////// ACHF
@@ -229,6 +229,32 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
     real_rssi_dbm       = aux_rssi_dBm;
     */
 
+
+    ////////////////////////////////////
+    ////// END ACHF
+    ////////////////////////////////////
+
+
+    ////////////////////////////////////
+    ////// ACHF - Additional characteristics
+    ////////////////////////////////////
+
+    W signalRSSI_w = loRaReception->getPower();
+    double signalRSSI_mw = signalRSSI_w.get()*1000;
+    double signalRSSI_dBm = math::mW2dBmW(signalRSSI_mw);
+    EV << "Received signal RSSI is " << signalRSSI_mw << " mw" << endl;
+    EV << "Received signal RSSI is " << signalRSSI_dBm << " dBm" << endl;
+    double aux_rssi_power_w = signalRSSI_w.get();
+    // ACHF - Added a new bucle to capturate all interferences without interrupting the other process.
+    for (auto interferingReception : *interferingReceptions) {
+       const LoRaReception *loRaInterference = check_and_cast<const LoRaReception *>(interferingReception);
+       double interference_w                 = loRaInterference->getPower().get();
+       aux_rssi_power_w                     += interference_w;
+
+    }
+    double aux_rssi_dBm = math::mW2dBmW(aux_rssi_power_w * 1000);
+    real_P_rx_dbm       = signalRSSI_dBm;
+    real_rssi_dbm       = aux_rssi_dBm;
 
     ////////////////////////////////////
     ////// END ACHF
@@ -404,84 +430,6 @@ bool LoRaReceiver::computeIsReceptionSuccessful(const IListening *listening, con
     EV_INFO << ", Enable collision overlap: " << (enableCollisionOverlap ? "YES" : "NO") << endl;
     //<< "Enable collisions: " << (enableCollisions ? "YES" : "NO")
 
-
-    /*
-    // Record start time of reception for validation
-    receptionStartTimeVector->record(customReception->getStartTime().dbl());
-
-    // ---- Doppler rate computation ----
-    // 1) Doppler shift at the START of reception (already stored in the reception object)
-    const CustomTransmission *customTransmission = check_and_cast<const CustomTransmission *>(customReception->getTransmission());
-    Hz originalFreq       = customTransmission->getActualTransmissionFrequency();
-    Hz dopplerFreqAtStart = customReception->getDopplerShiftedFrequency();
-    double dopplerShift_start = dopplerFreqAtStart.get() - originalFreq.get(); // Hz
-
-    // 2) Doppler shift at the END of reception: call the analog model again (satellite has moved)
-    const IRadio         *receiverRadio  = listening->getReceiver();
-    const IRadioMedium   *radioMedium    = receiverRadio->getMedium();
-    const channel::CustomPHYAnalogModel *analogModel =
-        check_and_cast<const channel::CustomPHYAnalogModel *>(radioMedium->getAnalogModel());
-    Hz dopplerFreqAtEnd   = analogModel->computeDopplerFrequency(receiverRadio, customTransmission);
-    double dopplerShift_end = dopplerFreqAtEnd.get() - originalFreq.get(); // Hz
-    endDopplerVector->record(dopplerFreqAtEnd.get());
-
-    // 3) Doppler rate = Δ(Doppler shift) / packet duration  [Hz/s]
-    double packetDuration = (customReception->getEndTime() - customReception->getStartTime()).dbl();
-    double dopplerRate    = (packetDuration > 0.0) ? (dopplerShift_end - dopplerShift_start) / packetDuration : 0.0;
-
-    EV_INFO << "Doppler shift at start: " << dopplerShift_start / 1e3 << " kHz"
-            << ", at end: "  << dopplerShift_end   / 1e3 << " kHz"
-            << ", packet duration: " << packetDuration << " s"
-            << ", Doppler rate: " << dopplerRate << " Hz/s" << endl;
-    dopplerRateVector->record(dopplerRate);
-    // ---- End Doppler rate computation ----
-     */
-
-    /*
-    // Always recompute C/N0 at reception decision time.
-    double cn0_dB = computeCn0Value(listening, customReception);
-    const_cast<CustomReception *>(customReception)->setCn0_dB(cn0_dB);
-    EV_INFO << "Reception C/N0: " << cn0_dB << " dB" << endl;
-
-    int overlappingInterferers = countOverlappingInterferers(customReception, interference);
-    int concurrentTransmissions = overlappingInterferers + 1; // include the current packet
-    double normalizedLoad = concurrentTransmissionsToNormalizedLoad(concurrentTransmissions);
-    double perFromLoad = computePerFromLoadAndCn0(normalizedLoad, cn0_dB);
-    auto *mutableReception = const_cast<CustomReception *>(customReception);
-    mutableReception->setInterferingPacketCount(overlappingInterferers);
-    mutableReception->setNormalizedLoad(normalizedLoad);
-    mutableReception->setPerFromLoad(perFromLoad);
-    normalizedLoadVector->record(normalizedLoad);
-    perFromLoadVector->record(perFromLoad);
-
-    EV_INFO << "Interfering packets during reception: " << overlappingInterferers
-            << ", concurrent transmissions: " << concurrentTransmissions
-            << ", normalized load: " << normalizedLoad
-            << ", PER(load,C/N0): " << perFromLoad
-            << " (mode=" << (useLoadCn0PerCsv ? "csv" : "average") << ")" << endl;
-
-    // If collision handling is disabled, keep C/N0-only behavior.
-    if (!enableCollisions) {
-        expectedCN0Vector->record(cn0_dB);
-        if (decideCN0Reception(cn0_dB)) {
-            W receivedPower = customReception->getPower();
-            double receivedPower_dBm = math::mW2dBmW(receivedPower.get() * 1000);
-            receivedPowerVector->record(receivedPower_dBm);
-            return true;
-        }
-        return false;
-    }
-
-    // Independent per-packet collision decision from PER(load,C/N0).
-    // This does not propagate collision status to any concurrent packet.
-    if (!ComputeSuccessUsingPerFromLoad(perFromLoad)) {
-        const_cast<CustomReceiver *>(this)->emit(receptionCollisionSignal, true);
-        const_cast<CustomReceiver *>(this)->numCollisions++;
-        collisionEventVector->record(1);
-        return false;
-    }
-    */
-
     // ACHF
     collision_flag = 0;
     num_colliding_packets = interference->getInterferingReceptions()->size();
@@ -501,40 +449,12 @@ bool LoRaReceiver::computeIsReceptionSuccessful(const IListening *listening, con
     EV_INFO << "num_colliding_packets: " << num_colliding_packets <<endl;
     return true; // No collision detected, reception successful
 
-
-
-    //return true;
-    //we don't check the SINR level, it is done in collision checking by P_threshold level evaluation
 }
 
 bool LoRaReceiver::detectCollisionOverlap(const LoRaReception *loraReception, const IInterference *interference) const
 {
     EV << "LoRaReceiver::detectCollisionOverlap "<<endl;
     auto interferingReceptions = interference->getInterferingReceptions();
-
-    ////////////////////////////////////
-    ////// ACHF
-    ////////////////////////////////////
-
-    W signalRSSI_w = loraReception->getPower();
-    double signalRSSI_mw = signalRSSI_w.get()*1000;
-    double signalRSSI_dBm = math::mW2dBmW(signalRSSI_mw);
-
-    double aux_rssi_power_w = signalRSSI_w.get();
-    // ACHF - Added a new bucle to capturate all interferences without interrupting the other process.
-    for (auto interferingReception : *interferingReceptions) {
-       const LoRaReception *loRaInterference = check_and_cast<const LoRaReception *>(interferingReception);
-       double interference_w                 = loRaInterference->getPower().get();
-       aux_rssi_power_w                     += interference_w;
-
-    }
-    double aux_rssi_dBm = math::mW2dBmW(aux_rssi_power_w * 1000);
-    real_P_rx_dbm       = signalRSSI_dBm;
-    real_rssi_dbm       = aux_rssi_dBm;
-
-    ////////////////////////////////////
-    ////// END ACHF
-    ////////////////////////////////////
 
 
     if (interferingReceptions->empty()) {
@@ -566,9 +486,11 @@ bool LoRaReceiver::detectCollisionOverlap(const LoRaReception *loraReception, co
 
         EV << "loraReception.freq: " << freq_x.get() <<endl;
         EV << "interference.freq: " << freq_y.get() <<endl;
-        // Frequency overlap check: separated by less than 1200 Hz
+        // Frequency overlap check: separated by less than the guard band
         double freqSeparation = std::abs(freq_x.get() - freq_y.get());
-        bool frequencyOverlap = freqSeparation < 1200.0;
+        //bool frequencyOverlap = freqSeparation < 1200.0;
+        // Took it from the Juan's commit
+        bool frequencyOverlap = freqSeparation < collisionGuardBand_Hz;
 
         EV_INFO << "Temporal overlap: " << (temporalOverlap ? "YES" : "NO") << ", overlap duration: " << overlapDuration << endl;
         EV_INFO << "Overlap duration exceeds threshold: " << (overlapExceedsThreshold ? "YES" : "NO") << ", threshold: " << minCollisionOverlap << endl;

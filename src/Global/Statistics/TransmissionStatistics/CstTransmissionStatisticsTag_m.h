@@ -66,6 +66,10 @@ namespace statistics {
  * 
  *    	//This value is calculated at the device, not in the satellite. 
  *     double rx_power_dbm_dev = 0;
+ * 
+ *     // Mezcla de la corrida y P(SF, TP usados) segun esa mezcla
+ *     int mixId = -1;
+ *     double propensity = -1;
  * }
  * </pre>
  */
@@ -97,6 +101,8 @@ class CstTransmissionStatisticsTag : public ::inet::TagBase
     double minPower_dbm = 0;
     double sensitivity_dbm = 0;
     double rx_power_dbm_dev = 0;
+    int mixId = -1;
+    double propensity = -1;
 
   private:
     void copy(const CstTransmissionStatisticsTag& other);
@@ -187,6 +193,12 @@ class CstTransmissionStatisticsTag : public ::inet::TagBase
 
     virtual double getRx_power_dbm_dev() const;
     virtual void setRx_power_dbm_dev(double rx_power_dbm_dev);
+
+    virtual int getMixId() const;
+    virtual void setMixId(int mixId);
+
+    virtual double getPropensity() const;
+    virtual void setPropensity(double propensity);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const CstTransmissionStatisticsTag& obj) {obj.parsimPack(b);}

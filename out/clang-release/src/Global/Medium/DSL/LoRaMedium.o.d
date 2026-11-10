@@ -178,8 +178,21 @@
   Global/Mobility/INorad.h Global/Utilities/libnorad/cEci.h \
   Global/Utilities/libnorad/cVector.h \
   Global/Utilities/libnorad/cJulian.h \
+  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h \
+  Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h \
+  Global/Utilities/libnorad/cOrbitA.h Global/Utilities/libnorad/cTLE.h \
+  Global/Utilities/libnorad/cSite.h \
   Nodes/_30_Station/_60_Mobility/Sta_Mob_StationMobility.h \
-  Global/Messages/_30_Network/SendAtTag_m.h
+  Global/Messages/_30_Network/SendAtTag_m.h \
+  Global/Statistics/TransmissionStatistics/TransmissionStatistics.h \
+  Global/Messages/_30_Network/Net_CstRoutingTag_m.h \
+  Global/Messages/_10_Physical/LoRaPhyPreamble_m.h \
+  Global/Statistics/TransmissionStatistics/CstTransmissionStatisticsTag_m.h \
+  Nodes/_10_Terminal/Ter.h Nodes/_10_Terminal/_60_Mobility/Ter_Mob.h \
+  Global/Utilities/Constants.h Global/Utilities/PositionAwareBase.h \
+  Global/Utilities/utils/SetUtils.h Nodes/_20_Satellite/Sat.h \
+  Global/Utilities/ISLDirection.h Global/Utilities/ISLDirection_m.h \
+  Global/Utilities/ISLState.h
 Global/Medium/DSL/LoRaMedium.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/physicallayer/wireless/common/medium/RadioMedium.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/IntervalTree.h:
@@ -361,5 +374,23 @@ Global/Mobility/INorad.h:
 Global/Utilities/libnorad/cEci.h:
 Global/Utilities/libnorad/cVector.h:
 Global/Utilities/libnorad/cJulian.h:
+Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h:
+Nodes/_20_Satellite/_60_Mobility/Sat_Mob_NoradA.h:
+Global/Utilities/libnorad/cOrbitA.h:
+Global/Utilities/libnorad/cTLE.h:
+Global/Utilities/libnorad/cSite.h:
 Nodes/_30_Station/_60_Mobility/Sta_Mob_StationMobility.h:
 Global/Messages/_30_Network/SendAtTag_m.h:
+Global/Statistics/TransmissionStatistics/TransmissionStatistics.h:
+Global/Messages/_30_Network/Net_CstRoutingTag_m.h:
+Global/Messages/_10_Physical/LoRaPhyPreamble_m.h:
+Global/Statistics/TransmissionStatistics/CstTransmissionStatisticsTag_m.h:
+Nodes/_10_Terminal/Ter.h:
+Nodes/_10_Terminal/_60_Mobility/Ter_Mob.h:
+Global/Utilities/Constants.h:
+Global/Utilities/PositionAwareBase.h:
+Global/Utilities/utils/SetUtils.h:
+Nodes/_20_Satellite/Sat.h:
+Global/Utilities/ISLDirection.h:
+Global/Utilities/ISLDirection_m.h:
+Global/Utilities/ISLState.h:

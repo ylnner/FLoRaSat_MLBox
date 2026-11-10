@@ -46,6 +46,13 @@ void Sat_Net_PacketHandler::initialize(int stage) {
 
         cModule* trxStats = getSystemModule()->getSubmodule("transmissionStatistics");
         if(trxStats != nullptr){
+            std::string className = trxStats->getClassName();
+            if (className == "TransmissionStatistics") {
+                transmissionStatistics = check_and_cast<statistics::TransmissionStatistics *>(trxStats);
+            } else if (className == "KD_TransmissionStatistics") {
+                transmissionStatistics = check_and_cast<statistics::KD_TransmissionStatistics *>(trxStats);
+            }
+
             transmissionStatistics = check_and_cast<statistics:: TransmissionStatistics *>(trxStats);
             //transmissionStatistics = check_and_cast<statistics:: KD_TransmissionStatistics *>(trxStats);
         }

@@ -20,6 +20,6 @@ simple KD_TransmissionStatistics
 {
     parameters:
         @class(statistics::KD_TransmissionStatistics);
-
+		string outputDir = default("results/KD_TransmissionStatistics");
 
 }

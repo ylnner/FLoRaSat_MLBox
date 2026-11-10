@@ -53,4 +53,8 @@ class CstTransmissionStatisticsTag extends inet::TagBase {
    	
    	//This value is calculated at the device, not in the satellite. 
     double rx_power_dbm_dev = 0;
+    
+    // Mezcla de la corrida y P(SF, TP usados) segun esa mezcla
+    int mixId = -1;
+    double propensity = -1;    
 }

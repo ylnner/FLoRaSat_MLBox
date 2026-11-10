@@ -4868,6 +4868,8 @@
   Global/Utilities/ISLDirection.h Global/Utilities/ISLDirection_m.h \
   Global/Utilities/ISLState.h Global/Utilities/PositionAwareBase.h \
   Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h \
+  Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.h \
+  Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.h \
   Global/Messages/_30_Network/Net_CstRoutingTag_m.h \
   Global/Messages/_30_Network/DDRARoutingHeader_m.h \
   Nodes/_10_Terminal/_40_Application/Ter_App.h \
@@ -9754,6 +9756,8 @@ Global/Utilities/ISLDirection_m.h:
 Global/Utilities/ISLState.h:
 Global/Utilities/PositionAwareBase.h:
 Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h:
+Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.h:
+Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.h:
 Global/Messages/_30_Network/Net_CstRoutingTag_m.h:
 Global/Messages/_30_Network/DDRARoutingHeader_m.h:
 Nodes/_10_Terminal/_40_Application/Ter_App.h:

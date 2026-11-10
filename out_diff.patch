@@ -1,0 +1,3792 @@
+diff --git a/Files_of_ml_models/scripts/make_gate_tables.py b/Files_of_ml_models/scripts/make_gate_tables.py
+deleted file mode 100644
+index d36ff9295..000000000
+--- a/Files_of_ml_models/scripts/make_gate_tables.py
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#!/usr/bin/env python3
+-"""Write the u -> threshold tables the load control gate reads.
+-
+-For an admission factor u, a device keeps the top fraction u of its opportunities, so tau(u) is the
+-(1 - u) quantile of the score above the elevation mask, taken on the validation split of seed 2,
+-the seed of the deployed Transformer. The closed loop corrects any mismatch, because u follows the
+-measured load, so these tables only need the right order and rough scale.
+-
+-Usage: make_gate_tables.py <repo> [--no-model]
+-Needs numpy and pandas, plus torch and joblib (with scikit-learn) unless --no-model is given.
+-"""
+-import sys
+-from pathlib import Path
+-
+-import numpy as np
+-import pandas as pd
+-
+-REPO = Path(sys.argv[1])
+-SCRIPTS = REPO / "Files_of_ml_models/scripts"
+-OUT = REPO / "simulations/Test_Individual/gate"
+-FEATS = ["latDev", "longDev", "elevSat", "loraTP", "loraSF", "doppler", "alt", "raan"]
+-SEQ, MASK = 8, 10.0
+-US = np.round(np.arange(0.02, 1.0001, 0.02), 2)
+-
+-
+-def write(name, scores):
+-    table = pd.DataFrame({"u": US, "tau": np.quantile(scores, 1 - US)})
+-    table.to_csv(OUT / name, index=False, float_format="%.6f")
+-    print(f"{name}: {len(scores)} frames, tau(0.5) = {np.quantile(scores, 0.5):.4f}")
+-
+-
+-OUT.mkdir(exist_ok=True)
+-val = pd.read_csv(SCRIPTS / "data/repetitions/seed_2_final_val_data_transmission.csv")
+-write("tau_elevation.csv", val.elevSat[val.elevSat >= MASK].values)
+-
+-if "--no-model" not in sys.argv:
+-    import joblib
+-    import torch
+-
+-    model = torch.jit.load(str(SCRIPTS / "best_models/transformer_scripted.pt")).eval()
+-    scaler = joblib.load(SCRIPTS / "best_models/transformer_scaler_seed2.pkl")
+-    scaler_dt = joblib.load(SCRIPTS / "best_models/transformer_scaler_delta_t_seed2.pkl")
+-    windows, elevation = [], []
+-    for _, g in val.groupby(["id_simulation", "srcId"]):
+-        g = g.sort_values("time")
+-        f, t = scaler.transform(g[FEATS]), g.time.values
+-        for i in range(len(g) - SEQ + 1):
+-            dt = (t[i + SEQ - 1] - t[i:i + SEQ]).reshape(-1, 1)
+-            windows.append(np.hstack((f[i:i + SEQ], scaler_dt.transform(dt), dt)))
+-            elevation.append(g.elevSat.values[i + SEQ - 1])
+-    with torch.no_grad():
+-        logits = model(torch.tensor(np.array(windows), dtype=torch.float32)).numpy().ravel()
+-    p = 1 / (1 + np.exp(-logits))
+-    write("tau_transformer.csv", p[np.array(elevation) >= MASK])
+diff --git a/simulations/Test_Individual/Test_LoadControl.ini b/simulations/Test_Individual/Test_LoadControl.ini
+deleted file mode 100644
+index d1344a230..000000000
+--- a/simulations/Test_Individual/Test_LoadControl.ini
++++ /dev/null
+@@ -1,701 +0,0 @@
+-# Load control experiments for the LatinIoT 2027 paper.
+-#
+-# Physical scenario copied from Test_MLModel_8.ini (the deployed Transformer, with cold start).
+-# Run from this folder. Arms:
+-#   A0_Blind      blind repetition, the LATINCOM baseline
+-#   A1_Mask       no transmission below the elevation mask
+-#   A2_Thin       open-loop random thinning at fixed u: the throughput curve and the random-thinning
+-#                 control that PAPER.md N5 asked for
+-#   A2_Random     closed loop, broadcast u, device draws a coin (access barring)
+-#   A3_Skip       trajectory skip (Alvarez 2022) adapted to this MAC: mask plus a sigmoid in the
+-#                 beaconed device count, suppressing a repetition, SF kept fixed. pSkip is swept
+-#                 because the paper fits it per scenario; N is the true above-mask demand per window,
+-#                 the strongest setting for this baseline
+-#   A4_FixedTau   Transformer with a fixed threshold, as published
+-#   A5_Elevation  closed loop, device spends u on its highest elevations
+-#   A6_Score      closed loop, device spends u on its best Transformer scores
+-#
+-# Targets bracket the A2_Thin and S2_Thin peaks, which sit near 20 bursts per 10 s window at every size.
+-# Regenerate inputs with devices/make_load_devices.py and Files_of_ml_models/scripts/make_gate_tables.py.
+-
+-[General]
+-network = Florasat.Test_Individual.Florasat_Individual_Sats
+-
+-rng-class = "cMersenneTwister"
+-
+-
+-
+-sim-time-limit 		= 749s #50s # 
+-simtime-resolution 	= -11
+-
+-# Initial parameters, they are overwritten running throug sh file
+-**.stats_altitude = 670 
+-**.stats_raan = 185
+-
+-# Medium 
+-*.radioMedium.backgroundNoise.power 					= -110dBm # Original value -96.616dBm
+-*.radioMedium.mediumLimitCache.centerFrequency 			= 868MHz #Original Value Nan
+-*.radioMedium.mediumLimitCache.maxTransmissionDuration 	= 4s #original value 0.01s
+-*.radioMedium.mediumLimitCache.minInterferenceTime 		= 0s
+-
+-# Satellites
+-**.numSatellites = 1
+-
+-*.satellite[*].mobilityType 	= "Sat_Mob_SatelliteMobility_Standalone"
+-*.satellite[*].noradModuleType 	= "Sat_Mob_NoradA"
+-
+-**.satellite[*].**.initFromDisplayString = false
+-*.satellite[*].mobility.faceForward 	 = true#false
+-*.satellite[*].mobility.updateInterval 	 = 20s # disable self-message update mechanism
+-
+-*.satellite[*].NoradModule.satName  = "FLoRaSat"
+-*.satellite[*].NoradModule.satIndex = -1
+-*.satellite[*].NoradModule.baseYear = 20
+-*.satellite[*].NoradModule.baseDay  = 1.5
+-
+-*.satellite[*].NoradModule.planes 		= 1
+-*.satellite[*].NoradModule.satPerPlane  = 1
+-*.satellite[*].NoradModule.eccentricity = 0.000001
+-*.satellite[*].NoradModule.inclination 	= 98
+-*.satellite[*].NoradModule.altitude 	= 670 # 660  
+-
+-# Single pass satellite
+-# Uncomment these line to execute with several raan. This is executed by sh file.
+-#*.satellite[0].NoradModule.raan 		= ${165, 175, 185, 195, 205}
+-*.satellite[0].NoradModule.raan = ${myraan = 165, 175, 185, 195, 205}  #185
+-*.satellite[0].NoradModule.meanAnomaly  = 195#205 
+-
+-
+-#### Detecta Doppler
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = true
+-*.satellite[*].phyDSL.radio.receiver.minCollisionOverlap = 0s
+-
+-# Set antenna mobility modules for satellite radios
+-*.satellite[*].phyDSL.radio.antenna.typename 		= "ConstantGainAntenna"
+-*.satellite[*].phyDSL.radio.antenna.mobilityModule  = "^.^.^.mobility"
+-*.satellite[*].phyISL.radio.antenna.mobilityModule  = "^.^.^.mobility"
+-*.satellite[*].phyGSL.radio.antenna.mobilityModule  = "^.^.^.mobility"
+-
+-# Set antenna gain for radio 
+-*.satellite[*].phyDSL.radio.antenna.gain = 12dB
+-
+-*.satellite[*].net.routingType = "Null_Routing" #"Base_Routing"
+-*.terminal[*].net.routingType  = "Ter_Null_Routing" #"Base_Routing"
+-
+-*.**.numGroundLinks 					  = 40
+-*.satellite[*].**.interfaceTableModule    = ""
+-
+-# LoRa PHY Configuration
+-**.radioMedium.typename 			= "LoRaMedium"
+-**.radioMedium.analogModel.typename = "LoRaAnalogModel"
+-							   
+-# Disable ISLs
+-**.intraPlaneIslDisabled = false
+-**.interPlaneIslDisabled = false
+-
+-# LoRa Nodes (devices on ground)
+-
+-
+-*.terminal[*].phy.radio.antenna.mobilityModule 	= "^.^.^.mob"
+-*.terminal[*].dlk.mac.interfaceTableModule 		= ""
+-*.terminal[*].dlk.energySourceModule 			= ""
+-
+-# Toda la informacion de LoraPhyPreamble se jala desde MacFrame
+-# El lora TP esta en dBm aunque no tiene unidad
+-*.terminal[*].dlk.mac.LoRaTP = intuniform(12, 14) #* 1dBm  #14
+-*.terminal[*].dlk.mac.LoRaSF = intuniform(10, 12) #11
+-
+-
+-
+-
+-# Application
+-**.numberOfPacketsToSend = 0  	#${numberOfPAckets = 200..5000 step 200}  # 0 means infinite number of packets
+-**.timeToFirstPacket 	 = 1s   #time to first packet can be set at any moment
+-**.timeToNextPacket 	 = 115s #50s	#time to next packet must follow the 1% duty cycle, you can find the limit time on SimpleLoRaApp
+-
+-
+-# Stations
+-**.numStations = 3
+-include stations/WorldWide-20.ini
+-
+-# Visualizer
+-# Disable medium visualizer completely
+-*.visualizer.canvasVisualizer.mediumVisualizer.typename = ""
+-*.visualizer.*.radioVisualizer.displayAntennaLobes = true
+-*.visualizer.*.dataLinkVisualizer.displayLinks = true
+-*.visualizer.*.mobilityVisualizer.displayMovementTrails = true
+-*.visualizer.*.mobilityVisualizer.movementTrailLineWidth = 1
+-*.visualizer.*.mobilityVisualizer.trailLength = 3000
+-
+-
+-# Mac parameters
+-**.ttxStart_max = 1s
+-**.ttxIdle_min = 10s                            # Minimum idle time between transmissions
+-**.ttxIdle_max = 15s                           	# Maximum idle time between transmissions
+-**.Ntw = 1										# Number of transmission windows
+-**.Ntx = 5										# Number of transmission windows
+-**.ttwDuration = 100s                           # Duration of the transmission window
+-
+-
+-
+-#####################
+-# Load control
+-#####################
+-repeat = 10
+-seed-0-mt = ${23542, 84242, 15937, 42781, 63029, 88143, 27456, 51904, 76328, 92115 ! repetition}
+-num-rngs = 2
+-seed-1-mt = ${13541, 74243, 25938, 32782, 53030, 78144, 37457, 41905, 66329, 82116 ! repetition}
+-**.gateRng = 1
+-
+-**.numTerminals = ${numDev = 60, 120, 240, 480, 960}
+-include devices/WorldWide-960_closed_loop_load.ini
+-
+-*.loadBroadcast.enabled = true
+-*.loadBroadcast.window = 10s
+-*.terminal[*].dlk.mac.gateMaskDeg = 10
+-*.terminal[*].dlk.mac.mlBox.modelPath = "mlmodels/transformer_scripted.pt"
+-*.terminal[*].dlk.mac.mlBox.coldStart = true
+-*.terminal[*].dlk.mac.mlBox.threshold = 0.5
+-
+-# As in Test_MLModel_8.ini. Some NED statistics record a Packet signal as a vector, which stops the
+-# run at the first reception. recordScalar and cOutVector do not go through these modes.
+-**.result-recording-modes = -
+-
+-# Parameters are most of a .sca file, and 9000 runs of them would pass the Grid'5000 quota.
+-**.param-recording = false
+-
+-# Vectors are what made this repo 22 GB: keep only what the KPIs read. Delivered messages are a
+-# scalar at the satellite, so they do not depend on this filter.
+-**.scalar-recording = true
+-*.loadBroadcast.**.vector-recording = true
+-**.*Message Generation Delay at Satellite.vector-recording = true
+-**.vector-recording = false
+-**.vector-record-eventnumbers = false
+-
+-output-scalar-file = results/lc/${configname}-n${numDev}-raan${myraan}-${iterationvarsf}-r${repetition}.sca
+-output-vector-file = results/lc/${configname}-n${numDev}-raan${myraan}-${iterationvarsf}-r${repetition}.vec
+-
+-[Config A0_Blind]
+-*.terminal[*].dlk.mac.gateMode = "none"
+-
+-[Config A1_Mask]
+-*.terminal[*].dlk.mac.gateMode = "mask"
+-
+-[Config A2_Thin]
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.loadBroadcast.fixedU = ${fixedU = 1, 0.8, 0.6, 0.4, 0.3, 0.2, 0.1, 0.05, 0.025, 0.0125}
+-
+-[Config A2_Random]
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.loadBroadcast.targetBursts = ${target = 10, 15, 20, 30}
+-
+-[Config A3_Skip]
+-*.terminal[*].dlk.mac.gateMode = "skip"
+-*.terminal[*].dlk.mac.gateSkipParam = ${pSkip = 30, 60, 120, 240, 480, 960}
+-
+-[Config A4_FixedTau]
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "none"
+-
+-[Config A5_Elevation]
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.loadBroadcast.targetBursts = ${target = 10, 15, 20, 30}
+-
+-[Config A6_Score]
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.loadBroadcast.targetBursts = ${target = 10, 15, 20, 30}
+-
+-# Fleet share that never hears the broadcast
+-[Config A2_Uncontrolled]
+-extends = A2_Random
+-*.terminal[*].dlk.mac.uncontrolledFraction = ${f = 0.25, 0.5, 0.75}
+-
+-[Config A6_Uncontrolled]
+-extends = A6_Score
+-*.terminal[*].dlk.mac.uncontrolledFraction = ${f = 0.25, 0.5, 0.75}
+-
+-# Broadcast budget: bits per update and update period
+-[Config A6_Budget]
+-extends = A6_Score
+-*.loadBroadcast.bits = ${bits = 1, 2, 4, 8}
+-*.loadBroadcast.window = ${updateS = 10, 30, 60}s
+-
+-# Staggered traffic. In the arms above every device starts within the same second and repeats every
+-# 115 s, as in Test_MLModel_8.ini, so load arrives in waves with silence between them. Here each device
+-# keeps the 115 s period from its own random offset, which gives steady load. These configs are
+-# appended on purpose: workers re-read this file at every launch, so existing run numbers must not move.
+-[Config S0_Blind]
+-extends = A0_Blind
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-[Config S1_Mask]
+-extends = A1_Mask
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-[Config S2_Thin]
+-extends = A2_Thin
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-[Config S2_Random]
+-extends = A2_Random
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-[Config S3_Skip]
+-extends = A3_Skip
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-[Config S4_FixedTau]
+-extends = A4_FixedTau
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-[Config S5_Elevation]
+-extends = A5_Elevation
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-[Config S6_Score]
+-extends = A6_Score
+-**.timeToFirstPacket = uniform(1s, 115s)
+-
+-# Selection arms with targets above the range bracketing the random peak: at targets 10 to 30 both
+-# kept improving up to the top value, so their own peak was not reached.
+-[Config S5_Wide]
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.loadBroadcast.targetBursts = ${target = 40, 60, 80, 120}
+-
+-[Config S6_Wide]
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.loadBroadcast.targetBursts = ${target = 40, 60, 80, 120}
+-
+-# Repetition budget per message. A rank gate passes all of a message's repetitions or none, which
+-# wastes bursts on messages already through. cap = -1 sends at most ceil(Ntx * u), cap = 1 only one.
+-[Config S2_Cap]
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = ${cap = -1, 1}
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config S5_Cap]
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.terminal[*].dlk.mac.gateRepCap = ${cap = -1, 1}
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config S6_Cap]
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = ${cap = -1, 1}
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-# The budget without the controller: fixedU = 1 is the budget alone, and the rest give the best a
+-# tuned fixed u can do, so the loop's own contribution can be isolated.
+-[Config S2_CapFixed]
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.loadBroadcast.fixedU = ${fixedU = 1, 0.8, 0.6, 0.4, 0.3, 0.2, 0.1}
+-
+-# Trajectory skip with the same budget, so the strongest non-learned baseline gets it too
+-[Config S3_Cap]
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "skip"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateSkipParam = ${pSkip = 30, 60, 120, 240, 480, 960}
+-
+-# The budget under lockstep traffic
+-[Config A2_Cap]
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config A5_Cap]
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config A6_Cap]
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-# Send once from a random slot. Sending the first eligible repetition fails in lockstep, probably
+-# because every device then spends its one transmission together. Here each message may start only
+-# from a randomly drawn repetition. Vectors stay off: these runs only need scalars.
+-[Config A2_SlotFixed]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.fixedU = ${fixedU = 1, 0.6, 0.3, 0.1}
+-
+-[Config A2_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config A5_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config A6_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config S2_SlotFixed]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.fixedU = ${fixedU = 1, 0.6, 0.3, 0.1}
+-
+-[Config S2_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config S5_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-[Config S6_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.loadBroadcast.targetBursts = ${target = 20, 30, 40, 60}
+-
+-# Robustness, asked for by the second review. Run with the filter $numDev>=240, except the skip arms.
+-# L*: random loss per burst at the satellite, on its own RNG so device timing stays paired with the
+-# arms above. loss = 0 must reproduce those arms exactly. LS2_Slot2 allows two repetitions.
+-[Config LS1_Mask]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "mask"
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-
+-[Config LS2_Random]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-*.loadBroadcast.targetBursts = ${target = 20, 30}
+-
+-[Config LS2_SlotFixed]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-*.loadBroadcast.fixedU = 1
+-
+-[Config LS2_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-*.loadBroadcast.targetBursts = ${target = 20, 30}
+-
+-[Config LS2_Slot2]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 2
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-*.loadBroadcast.targetBursts = ${target = 20, 30}
+-
+-[Config LS6_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-*.loadBroadcast.targetBursts = ${target = 20, 30}
+-
+-[Config LA1_Mask]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "mask"
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-
+-[Config LA2_Random]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-*.loadBroadcast.targetBursts = ${target = 20, 30}
+-
+-[Config LA2_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-num-rngs = 3
+-*.satellite[*].dlkDSL.mac.rng-0 = 2
+-*.satellite[*].dlkDSL.mac.fixedLossRate = ${loss = 0, 0.1, 0.2, 0.3}
+-*.loadBroadcast.targetBursts = ${target = 20, 30}
+-
+-# R*: the 1200 Hz Doppler rule switched off, so only the FLoRa collision check applies. Capacity is
+-# higher without it, hence the higher targets.
+-[Config RS1_Mask]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "mask"
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-
+-[Config RS2_Random]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.targetBursts = ${target = 30, 60, 120, 240}
+-
+-[Config RS2_SlotFixed]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.fixedU = 1
+-
+-[Config RS2_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.targetBursts = ${target = 30, 60, 120, 240}
+-
+-[Config RS5_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.targetBursts = ${target = 30, 60, 120, 240}
+-
+-[Config RS6_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.targetBursts = ${target = 30, 60, 120, 240}
+-
+-[Config RA1_Mask]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "mask"
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-
+-[Config RA2_Random]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.targetBursts = ${target = 30, 60, 120, 240}
+-
+-[Config RA2_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.targetBursts = ${target = 30, 60, 120, 240}
+-
+-[Config RA6_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.enableCollisionOverlap = false
+-*.loadBroadcast.targetBursts = ${target = 30, 60, 120, 240}
+-
+-# Trajectory skip under the same send-once rules, the fairest baseline for the loop.
+-[Config S3_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "skip"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.terminal[*].dlk.mac.gateSkipParam = ${pSkip = 60, 120, 240, 480}
+-
+-[Config A3_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "skip"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.terminal[*].dlk.mac.gateSkipParam = ${pSkip = 60, 120, 240, 480}
+-
+-[Config A3_Cap]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "skip"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateSkipParam = ${pSkip = 60, 120, 240, 480}
+-
+-
+-# P*: guard band of 125 kHz, the LoRa bandwidth, so every time overlap collides whatever the SF, the
+-# power or the Doppler. With R* (FLoRa check only) this brackets the collision model from both sides.
+-[Config PS1_Mask]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "mask"
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-
+-[Config PS2_Random]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.targetBursts = ${target = 5, 10, 20, 30}
+-
+-[Config PS2_SlotFixed]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.fixedU = 1
+-
+-[Config PS2_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.targetBursts = ${target = 5, 10, 20, 30}
+-
+-[Config PS5_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.gateMode = "elevation"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_elevation.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 3
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.targetBursts = ${target = 5, 10, 20, 30}
+-
+-[Config PS6_Slot]
+-**.vector-recording = false
+-**.timeToFirstPacket = uniform(1s, 115s)
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.targetBursts = ${target = 5, 10, 20, 30}
+-
+-[Config PA1_Mask]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "mask"
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-
+-[Config PA2_Random]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.targetBursts = ${target = 5, 10, 20, 30}
+-
+-[Config PA2_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.gateMode = "random"
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.targetBursts = ${target = 5, 10, 20, 30}
+-
+-[Config PA6_Slot]
+-**.vector-recording = false
+-*.terminal[*].dlk.mac.useMLBox = true
+-*.terminal[*].dlk.mac.gateMode = "score"
+-*.terminal[*].dlk.mac.gateTable = "gate/tau_transformer.csv"
+-*.terminal[*].dlk.mac.gateSoftness = 0.25
+-*.terminal[*].dlk.mac.gateRepCap = 1
+-*.terminal[*].dlk.mac.gateRepSpread = true
+-*.satellite[*].phyDSL.radio.receiver.collisionGuardBand = 125000Hz
+-*.loadBroadcast.targetBursts = ${target = 5, 10, 20, 30}
+-
+diff --git a/simulations/Test_Individual/devices/WorldWide-960_closed_loop_load.ini b/simulations/Test_Individual/devices/WorldWide-960_closed_loop_load.ini
+deleted file mode 100644
+index 4231cd473..000000000
+--- a/simulations/Test_Individual/devices/WorldWide-960_closed_loop_load.ini
++++ /dev/null
+@@ -1,1922 +0,0 @@
+-# Generated by make_load_devices.py: 960 terminals over the 60 closed-loop centres.
+-
+-*.terminal[0].mob.centerLatitude = 54.978
+-*.terminal[0].mob.centerLongitude = -1.617
+-*.terminal[1].mob.centerLatitude = 57.150
+-*.terminal[1].mob.centerLongitude = -2.094
+-*.terminal[2].mob.centerLatitude = 57.478
+-*.terminal[2].mob.centerLongitude = -4.225
+-*.terminal[3].mob.centerLatitude = 50.376
+-*.terminal[3].mob.centerLongitude = -4.143
+-*.terminal[4].mob.centerLatitude = 52.630
+-*.terminal[4].mob.centerLongitude = 1.297
+-*.terminal[5].mob.centerLatitude = 53.271
+-*.terminal[5].mob.centerLongitude = -9.057
+-*.terminal[6].mob.centerLatitude = 47.243
+-*.terminal[6].mob.centerLongitude = 6.024
+-*.terminal[7].mob.centerLatitude = 43.610
+-*.terminal[7].mob.centerLongitude = 3.876
+-*.terminal[8].mob.centerLatitude = 49.443
+-*.terminal[8].mob.centerLongitude = 1.099
+-*.terminal[9].mob.centerLatitude = 48.390
+-*.terminal[9].mob.centerLongitude = -4.486
+-*.terminal[10].mob.centerLatitude = 48.117
+-*.terminal[10].mob.centerLongitude = -1.678
+-*.terminal[11].mob.centerLatitude = 45.834
+-*.terminal[11].mob.centerLongitude = 1.262
+-*.terminal[12].mob.centerLatitude = 37.992
+-*.terminal[12].mob.centerLongitude = -1.130
+-*.terminal[13].mob.centerLatitude = 40.965
+-*.terminal[13].mob.centerLongitude = -5.664
+-*.terminal[14].mob.centerLatitude = 43.263
+-*.terminal[14].mob.centerLongitude = -2.935
+-*.terminal[15].mob.centerLatitude = 41.652
+-*.terminal[15].mob.centerLongitude = -4.724
+-*.terminal[16].mob.centerLatitude = 37.177
+-*.terminal[16].mob.centerLongitude = -3.599
+-*.terminal[17].mob.centerLatitude = 38.879
+-*.terminal[17].mob.centerLongitude = -6.970
+-*.terminal[18].mob.centerLatitude = 51.340
+-*.terminal[18].mob.centerLongitude = 12.373
+-*.terminal[19].mob.centerLatitude = 49.452
+-*.terminal[19].mob.centerLongitude = 11.076
+-*.terminal[20].mob.centerLatitude = 54.092
+-*.terminal[20].mob.centerLongitude = 12.099
+-*.terminal[21].mob.centerLatitude = 51.312
+-*.terminal[21].mob.centerLongitude = 9.479
+-*.terminal[22].mob.centerLatitude = 50.978
+-*.terminal[22].mob.centerLongitude = 11.029
+-*.terminal[23].mob.centerLatitude = 51.961
+-*.terminal[23].mob.centerLongitude = 7.626
+-*.terminal[24].mob.centerLatitude = 43.769
+-*.terminal[24].mob.centerLongitude = 11.255
+-*.terminal[25].mob.centerLatitude = 41.117
+-*.terminal[25].mob.centerLongitude = 16.871
+-*.terminal[26].mob.centerLatitude = 45.441
+-*.terminal[26].mob.centerLongitude = 12.316
+-*.terminal[27].mob.centerLatitude = 42.464
+-*.terminal[27].mob.centerLongitude = 14.214
+-*.terminal[28].mob.centerLatitude = 53.219
+-*.terminal[28].mob.centerLongitude = 6.567
+-*.terminal[29].mob.centerLatitude = 49.612
+-*.terminal[29].mob.centerLongitude = 6.130
+-*.terminal[30].mob.centerLatitude = 47.809
+-*.terminal[30].mob.centerLongitude = 13.055
+-*.terminal[31].mob.centerLatitude = 48.306
+-*.terminal[31].mob.centerLongitude = 14.286
+-*.terminal[32].mob.centerLatitude = 46.804
+-*.terminal[32].mob.centerLongitude = 9.837
+-*.terminal[33].mob.centerLatitude = 46.829
+-*.terminal[33].mob.centerLongitude = 12.769
+-*.terminal[34].mob.centerLatitude = 60.451
+-*.terminal[34].mob.centerLongitude = 22.266
+-*.terminal[35].mob.centerLatitude = 63.431
+-*.terminal[35].mob.centerLongitude = 10.395
+-*.terminal[36].mob.centerLatitude = 63.826
+-*.terminal[36].mob.centerLongitude = 20.263
+-*.terminal[37].mob.centerLatitude = 65.584
+-*.terminal[37].mob.centerLongitude = 22.155
+-*.terminal[38].mob.centerLatitude = 58.146
+-*.terminal[38].mob.centerLongitude = 7.995
+-*.terminal[39].mob.centerLatitude = 62.472
+-*.terminal[39].mob.centerLongitude = 6.150
+-*.terminal[40].mob.centerLatitude = 65.012
+-*.terminal[40].mob.centerLongitude = 25.465
+-*.terminal[41].mob.centerLatitude = 49.883
+-*.terminal[41].mob.centerLongitude = 18.568
+-*.terminal[42].mob.centerLatitude = 47.531
+-*.terminal[42].mob.centerLongitude = 21.627
+-*.terminal[43].mob.centerLatitude = 44.179
+-*.terminal[43].mob.centerLongitude = 28.649
+-*.terminal[44].mob.centerLatitude = 45.327
+-*.terminal[44].mob.centerLongitude = 14.442
+-*.terminal[45].mob.centerLatitude = 52.406
+-*.terminal[45].mob.centerLongitude = 16.925
+-*.terminal[46].mob.centerLatitude = 51.247
+-*.terminal[46].mob.centerLongitude = 22.568
+-*.terminal[47].mob.centerLatitude = 53.133
+-*.terminal[47].mob.centerLongitude = 23.169
+-*.terminal[48].mob.centerLatitude = 48.716
+-*.terminal[48].mob.centerLongitude = 21.261
+-*.terminal[49].mob.centerLatitude = 40.694
+-*.terminal[49].mob.centerLongitude = 30.400
+-*.terminal[50].mob.centerLatitude = 37.066
+-*.terminal[50].mob.centerLongitude = 37.383
+-*.terminal[51].mob.centerLatitude = 37.871
+-*.terminal[51].mob.centerLongitude = 32.485
+-*.terminal[52].mob.centerLatitude = 38.721
+-*.terminal[52].mob.centerLongitude = 35.487
+-*.terminal[53].mob.centerLatitude = 64.836
+-*.terminal[53].mob.centerLongitude = -23.708
+-*.terminal[54].mob.centerLatitude = 38.907
+-*.terminal[54].mob.centerLongitude = 1.421
+-*.terminal[55].mob.centerLatitude = 39.889
+-*.terminal[55].mob.centerLongitude = 4.265
+-*.terminal[56].mob.centerLatitude = 36.434
+-*.terminal[56].mob.centerLongitude = 28.217
+-*.terminal[57].mob.centerLatitude = 35.339
+-*.terminal[57].mob.centerLongitude = 25.144
+-*.terminal[58].mob.centerLatitude = 28.963
+-*.terminal[58].mob.centerLongitude = -13.548
+-*.terminal[59].mob.centerLatitude = 67.856
+-*.terminal[59].mob.centerLongitude = 20.225
+-*.terminal[60].mob.centerLatitude = 54.978
+-*.terminal[60].mob.centerLongitude = -1.617
+-*.terminal[61].mob.centerLatitude = 57.150
+-*.terminal[61].mob.centerLongitude = -2.094
+-*.terminal[62].mob.centerLatitude = 57.478
+-*.terminal[62].mob.centerLongitude = -4.225
+-*.terminal[63].mob.centerLatitude = 50.376
+-*.terminal[63].mob.centerLongitude = -4.143
+-*.terminal[64].mob.centerLatitude = 52.630
+-*.terminal[64].mob.centerLongitude = 1.297
+-*.terminal[65].mob.centerLatitude = 53.271
+-*.terminal[65].mob.centerLongitude = -9.057
+-*.terminal[66].mob.centerLatitude = 47.243
+-*.terminal[66].mob.centerLongitude = 6.024
+-*.terminal[67].mob.centerLatitude = 43.610
+-*.terminal[67].mob.centerLongitude = 3.876
+-*.terminal[68].mob.centerLatitude = 49.443
+-*.terminal[68].mob.centerLongitude = 1.099
+-*.terminal[69].mob.centerLatitude = 48.390
+-*.terminal[69].mob.centerLongitude = -4.486
+-*.terminal[70].mob.centerLatitude = 48.117
+-*.terminal[70].mob.centerLongitude = -1.678
+-*.terminal[71].mob.centerLatitude = 45.834
+-*.terminal[71].mob.centerLongitude = 1.262
+-*.terminal[72].mob.centerLatitude = 37.992
+-*.terminal[72].mob.centerLongitude = -1.130
+-*.terminal[73].mob.centerLatitude = 40.965
+-*.terminal[73].mob.centerLongitude = -5.664
+-*.terminal[74].mob.centerLatitude = 43.263
+-*.terminal[74].mob.centerLongitude = -2.935
+-*.terminal[75].mob.centerLatitude = 41.652
+-*.terminal[75].mob.centerLongitude = -4.724
+-*.terminal[76].mob.centerLatitude = 37.177
+-*.terminal[76].mob.centerLongitude = -3.599
+-*.terminal[77].mob.centerLatitude = 38.879
+-*.terminal[77].mob.centerLongitude = -6.970
+-*.terminal[78].mob.centerLatitude = 51.340
+-*.terminal[78].mob.centerLongitude = 12.373
+-*.terminal[79].mob.centerLatitude = 49.452
+-*.terminal[79].mob.centerLongitude = 11.076
+-*.terminal[80].mob.centerLatitude = 54.092
+-*.terminal[80].mob.centerLongitude = 12.099
+-*.terminal[81].mob.centerLatitude = 51.312
+-*.terminal[81].mob.centerLongitude = 9.479
+-*.terminal[82].mob.centerLatitude = 50.978
+-*.terminal[82].mob.centerLongitude = 11.029
+-*.terminal[83].mob.centerLatitude = 51.961
+-*.terminal[83].mob.centerLongitude = 7.626
+-*.terminal[84].mob.centerLatitude = 43.769
+-*.terminal[84].mob.centerLongitude = 11.255
+-*.terminal[85].mob.centerLatitude = 41.117
+-*.terminal[85].mob.centerLongitude = 16.871
+-*.terminal[86].mob.centerLatitude = 45.441
+-*.terminal[86].mob.centerLongitude = 12.316
+-*.terminal[87].mob.centerLatitude = 42.464
+-*.terminal[87].mob.centerLongitude = 14.214
+-*.terminal[88].mob.centerLatitude = 53.219
+-*.terminal[88].mob.centerLongitude = 6.567
+-*.terminal[89].mob.centerLatitude = 49.612
+-*.terminal[89].mob.centerLongitude = 6.130
+-*.terminal[90].mob.centerLatitude = 47.809
+-*.terminal[90].mob.centerLongitude = 13.055
+-*.terminal[91].mob.centerLatitude = 48.306
+-*.terminal[91].mob.centerLongitude = 14.286
+-*.terminal[92].mob.centerLatitude = 46.804
+-*.terminal[92].mob.centerLongitude = 9.837
+-*.terminal[93].mob.centerLatitude = 46.829
+-*.terminal[93].mob.centerLongitude = 12.769
+-*.terminal[94].mob.centerLatitude = 60.451
+-*.terminal[94].mob.centerLongitude = 22.266
+-*.terminal[95].mob.centerLatitude = 63.431
+-*.terminal[95].mob.centerLongitude = 10.395
+-*.terminal[96].mob.centerLatitude = 63.826
+-*.terminal[96].mob.centerLongitude = 20.263
+-*.terminal[97].mob.centerLatitude = 65.584
+-*.terminal[97].mob.centerLongitude = 22.155
+-*.terminal[98].mob.centerLatitude = 58.146
+-*.terminal[98].mob.centerLongitude = 7.995
+-*.terminal[99].mob.centerLatitude = 62.472
+-*.terminal[99].mob.centerLongitude = 6.150
+-*.terminal[100].mob.centerLatitude = 65.012
+-*.terminal[100].mob.centerLongitude = 25.465
+-*.terminal[101].mob.centerLatitude = 49.883
+-*.terminal[101].mob.centerLongitude = 18.568
+-*.terminal[102].mob.centerLatitude = 47.531
+-*.terminal[102].mob.centerLongitude = 21.627
+-*.terminal[103].mob.centerLatitude = 44.179
+-*.terminal[103].mob.centerLongitude = 28.649
+-*.terminal[104].mob.centerLatitude = 45.327
+-*.terminal[104].mob.centerLongitude = 14.442
+-*.terminal[105].mob.centerLatitude = 52.406
+-*.terminal[105].mob.centerLongitude = 16.925
+-*.terminal[106].mob.centerLatitude = 51.247
+-*.terminal[106].mob.centerLongitude = 22.568
+-*.terminal[107].mob.centerLatitude = 53.133
+-*.terminal[107].mob.centerLongitude = 23.169
+-*.terminal[108].mob.centerLatitude = 48.716
+-*.terminal[108].mob.centerLongitude = 21.261
+-*.terminal[109].mob.centerLatitude = 40.694
+-*.terminal[109].mob.centerLongitude = 30.400
+-*.terminal[110].mob.centerLatitude = 37.066
+-*.terminal[110].mob.centerLongitude = 37.383
+-*.terminal[111].mob.centerLatitude = 37.871
+-*.terminal[111].mob.centerLongitude = 32.485
+-*.terminal[112].mob.centerLatitude = 38.721
+-*.terminal[112].mob.centerLongitude = 35.487
+-*.terminal[113].mob.centerLatitude = 64.836
+-*.terminal[113].mob.centerLongitude = -23.708
+-*.terminal[114].mob.centerLatitude = 38.907
+-*.terminal[114].mob.centerLongitude = 1.421
+-*.terminal[115].mob.centerLatitude = 39.889
+-*.terminal[115].mob.centerLongitude = 4.265
+-*.terminal[116].mob.centerLatitude = 36.434
+-*.terminal[116].mob.centerLongitude = 28.217
+-*.terminal[117].mob.centerLatitude = 35.339
+-*.terminal[117].mob.centerLongitude = 25.144
+-*.terminal[118].mob.centerLatitude = 28.963
+-*.terminal[118].mob.centerLongitude = -13.548
+-*.terminal[119].mob.centerLatitude = 67.856
+-*.terminal[119].mob.centerLongitude = 20.225
+-*.terminal[120].mob.centerLatitude = 54.978
+-*.terminal[120].mob.centerLongitude = -1.617
+-*.terminal[121].mob.centerLatitude = 57.150
+-*.terminal[121].mob.centerLongitude = -2.094
+-*.terminal[122].mob.centerLatitude = 57.478
+-*.terminal[122].mob.centerLongitude = -4.225
+-*.terminal[123].mob.centerLatitude = 50.376
+-*.terminal[123].mob.centerLongitude = -4.143
+-*.terminal[124].mob.centerLatitude = 52.630
+-*.terminal[124].mob.centerLongitude = 1.297
+-*.terminal[125].mob.centerLatitude = 53.271
+-*.terminal[125].mob.centerLongitude = -9.057
+-*.terminal[126].mob.centerLatitude = 47.243
+-*.terminal[126].mob.centerLongitude = 6.024
+-*.terminal[127].mob.centerLatitude = 43.610
+-*.terminal[127].mob.centerLongitude = 3.876
+-*.terminal[128].mob.centerLatitude = 49.443
+-*.terminal[128].mob.centerLongitude = 1.099
+-*.terminal[129].mob.centerLatitude = 48.390
+-*.terminal[129].mob.centerLongitude = -4.486
+-*.terminal[130].mob.centerLatitude = 48.117
+-*.terminal[130].mob.centerLongitude = -1.678
+-*.terminal[131].mob.centerLatitude = 45.834
+-*.terminal[131].mob.centerLongitude = 1.262
+-*.terminal[132].mob.centerLatitude = 37.992
+-*.terminal[132].mob.centerLongitude = -1.130
+-*.terminal[133].mob.centerLatitude = 40.965
+-*.terminal[133].mob.centerLongitude = -5.664
+-*.terminal[134].mob.centerLatitude = 43.263
+-*.terminal[134].mob.centerLongitude = -2.935
+-*.terminal[135].mob.centerLatitude = 41.652
+-*.terminal[135].mob.centerLongitude = -4.724
+-*.terminal[136].mob.centerLatitude = 37.177
+-*.terminal[136].mob.centerLongitude = -3.599
+-*.terminal[137].mob.centerLatitude = 38.879
+-*.terminal[137].mob.centerLongitude = -6.970
+-*.terminal[138].mob.centerLatitude = 51.340
+-*.terminal[138].mob.centerLongitude = 12.373
+-*.terminal[139].mob.centerLatitude = 49.452
+-*.terminal[139].mob.centerLongitude = 11.076
+-*.terminal[140].mob.centerLatitude = 54.092
+-*.terminal[140].mob.centerLongitude = 12.099
+-*.terminal[141].mob.centerLatitude = 51.312
+-*.terminal[141].mob.centerLongitude = 9.479
+-*.terminal[142].mob.centerLatitude = 50.978
+-*.terminal[142].mob.centerLongitude = 11.029
+-*.terminal[143].mob.centerLatitude = 51.961
+-*.terminal[143].mob.centerLongitude = 7.626
+-*.terminal[144].mob.centerLatitude = 43.769
+-*.terminal[144].mob.centerLongitude = 11.255
+-*.terminal[145].mob.centerLatitude = 41.117
+-*.terminal[145].mob.centerLongitude = 16.871
+-*.terminal[146].mob.centerLatitude = 45.441
+-*.terminal[146].mob.centerLongitude = 12.316
+-*.terminal[147].mob.centerLatitude = 42.464
+-*.terminal[147].mob.centerLongitude = 14.214
+-*.terminal[148].mob.centerLatitude = 53.219
+-*.terminal[148].mob.centerLongitude = 6.567
+-*.terminal[149].mob.centerLatitude = 49.612
+-*.terminal[149].mob.centerLongitude = 6.130
+-*.terminal[150].mob.centerLatitude = 47.809
+-*.terminal[150].mob.centerLongitude = 13.055
+-*.terminal[151].mob.centerLatitude = 48.306
+-*.terminal[151].mob.centerLongitude = 14.286
+-*.terminal[152].mob.centerLatitude = 46.804
+-*.terminal[152].mob.centerLongitude = 9.837
+-*.terminal[153].mob.centerLatitude = 46.829
+-*.terminal[153].mob.centerLongitude = 12.769
+-*.terminal[154].mob.centerLatitude = 60.451
+-*.terminal[154].mob.centerLongitude = 22.266
+-*.terminal[155].mob.centerLatitude = 63.431
+-*.terminal[155].mob.centerLongitude = 10.395
+-*.terminal[156].mob.centerLatitude = 63.826
+-*.terminal[156].mob.centerLongitude = 20.263
+-*.terminal[157].mob.centerLatitude = 65.584
+-*.terminal[157].mob.centerLongitude = 22.155
+-*.terminal[158].mob.centerLatitude = 58.146
+-*.terminal[158].mob.centerLongitude = 7.995
+-*.terminal[159].mob.centerLatitude = 62.472
+-*.terminal[159].mob.centerLongitude = 6.150
+-*.terminal[160].mob.centerLatitude = 65.012
+-*.terminal[160].mob.centerLongitude = 25.465
+-*.terminal[161].mob.centerLatitude = 49.883
+-*.terminal[161].mob.centerLongitude = 18.568
+-*.terminal[162].mob.centerLatitude = 47.531
+-*.terminal[162].mob.centerLongitude = 21.627
+-*.terminal[163].mob.centerLatitude = 44.179
+-*.terminal[163].mob.centerLongitude = 28.649
+-*.terminal[164].mob.centerLatitude = 45.327
+-*.terminal[164].mob.centerLongitude = 14.442
+-*.terminal[165].mob.centerLatitude = 52.406
+-*.terminal[165].mob.centerLongitude = 16.925
+-*.terminal[166].mob.centerLatitude = 51.247
+-*.terminal[166].mob.centerLongitude = 22.568
+-*.terminal[167].mob.centerLatitude = 53.133
+-*.terminal[167].mob.centerLongitude = 23.169
+-*.terminal[168].mob.centerLatitude = 48.716
+-*.terminal[168].mob.centerLongitude = 21.261
+-*.terminal[169].mob.centerLatitude = 40.694
+-*.terminal[169].mob.centerLongitude = 30.400
+-*.terminal[170].mob.centerLatitude = 37.066
+-*.terminal[170].mob.centerLongitude = 37.383
+-*.terminal[171].mob.centerLatitude = 37.871
+-*.terminal[171].mob.centerLongitude = 32.485
+-*.terminal[172].mob.centerLatitude = 38.721
+-*.terminal[172].mob.centerLongitude = 35.487
+-*.terminal[173].mob.centerLatitude = 64.836
+-*.terminal[173].mob.centerLongitude = -23.708
+-*.terminal[174].mob.centerLatitude = 38.907
+-*.terminal[174].mob.centerLongitude = 1.421
+-*.terminal[175].mob.centerLatitude = 39.889
+-*.terminal[175].mob.centerLongitude = 4.265
+-*.terminal[176].mob.centerLatitude = 36.434
+-*.terminal[176].mob.centerLongitude = 28.217
+-*.terminal[177].mob.centerLatitude = 35.339
+-*.terminal[177].mob.centerLongitude = 25.144
+-*.terminal[178].mob.centerLatitude = 28.963
+-*.terminal[178].mob.centerLongitude = -13.548
+-*.terminal[179].mob.centerLatitude = 67.856
+-*.terminal[179].mob.centerLongitude = 20.225
+-*.terminal[180].mob.centerLatitude = 54.978
+-*.terminal[180].mob.centerLongitude = -1.617
+-*.terminal[181].mob.centerLatitude = 57.150
+-*.terminal[181].mob.centerLongitude = -2.094
+-*.terminal[182].mob.centerLatitude = 57.478
+-*.terminal[182].mob.centerLongitude = -4.225
+-*.terminal[183].mob.centerLatitude = 50.376
+-*.terminal[183].mob.centerLongitude = -4.143
+-*.terminal[184].mob.centerLatitude = 52.630
+-*.terminal[184].mob.centerLongitude = 1.297
+-*.terminal[185].mob.centerLatitude = 53.271
+-*.terminal[185].mob.centerLongitude = -9.057
+-*.terminal[186].mob.centerLatitude = 47.243
+-*.terminal[186].mob.centerLongitude = 6.024
+-*.terminal[187].mob.centerLatitude = 43.610
+-*.terminal[187].mob.centerLongitude = 3.876
+-*.terminal[188].mob.centerLatitude = 49.443
+-*.terminal[188].mob.centerLongitude = 1.099
+-*.terminal[189].mob.centerLatitude = 48.390
+-*.terminal[189].mob.centerLongitude = -4.486
+-*.terminal[190].mob.centerLatitude = 48.117
+-*.terminal[190].mob.centerLongitude = -1.678
+-*.terminal[191].mob.centerLatitude = 45.834
+-*.terminal[191].mob.centerLongitude = 1.262
+-*.terminal[192].mob.centerLatitude = 37.992
+-*.terminal[192].mob.centerLongitude = -1.130
+-*.terminal[193].mob.centerLatitude = 40.965
+-*.terminal[193].mob.centerLongitude = -5.664
+-*.terminal[194].mob.centerLatitude = 43.263
+-*.terminal[194].mob.centerLongitude = -2.935
+-*.terminal[195].mob.centerLatitude = 41.652
+-*.terminal[195].mob.centerLongitude = -4.724
+-*.terminal[196].mob.centerLatitude = 37.177
+-*.terminal[196].mob.centerLongitude = -3.599
+-*.terminal[197].mob.centerLatitude = 38.879
+-*.terminal[197].mob.centerLongitude = -6.970
+-*.terminal[198].mob.centerLatitude = 51.340
+-*.terminal[198].mob.centerLongitude = 12.373
+-*.terminal[199].mob.centerLatitude = 49.452
+-*.terminal[199].mob.centerLongitude = 11.076
+-*.terminal[200].mob.centerLatitude = 54.092
+-*.terminal[200].mob.centerLongitude = 12.099
+-*.terminal[201].mob.centerLatitude = 51.312
+-*.terminal[201].mob.centerLongitude = 9.479
+-*.terminal[202].mob.centerLatitude = 50.978
+-*.terminal[202].mob.centerLongitude = 11.029
+-*.terminal[203].mob.centerLatitude = 51.961
+-*.terminal[203].mob.centerLongitude = 7.626
+-*.terminal[204].mob.centerLatitude = 43.769
+-*.terminal[204].mob.centerLongitude = 11.255
+-*.terminal[205].mob.centerLatitude = 41.117
+-*.terminal[205].mob.centerLongitude = 16.871
+-*.terminal[206].mob.centerLatitude = 45.441
+-*.terminal[206].mob.centerLongitude = 12.316
+-*.terminal[207].mob.centerLatitude = 42.464
+-*.terminal[207].mob.centerLongitude = 14.214
+-*.terminal[208].mob.centerLatitude = 53.219
+-*.terminal[208].mob.centerLongitude = 6.567
+-*.terminal[209].mob.centerLatitude = 49.612
+-*.terminal[209].mob.centerLongitude = 6.130
+-*.terminal[210].mob.centerLatitude = 47.809
+-*.terminal[210].mob.centerLongitude = 13.055
+-*.terminal[211].mob.centerLatitude = 48.306
+-*.terminal[211].mob.centerLongitude = 14.286
+-*.terminal[212].mob.centerLatitude = 46.804
+-*.terminal[212].mob.centerLongitude = 9.837
+-*.terminal[213].mob.centerLatitude = 46.829
+-*.terminal[213].mob.centerLongitude = 12.769
+-*.terminal[214].mob.centerLatitude = 60.451
+-*.terminal[214].mob.centerLongitude = 22.266
+-*.terminal[215].mob.centerLatitude = 63.431
+-*.terminal[215].mob.centerLongitude = 10.395
+-*.terminal[216].mob.centerLatitude = 63.826
+-*.terminal[216].mob.centerLongitude = 20.263
+-*.terminal[217].mob.centerLatitude = 65.584
+-*.terminal[217].mob.centerLongitude = 22.155
+-*.terminal[218].mob.centerLatitude = 58.146
+-*.terminal[218].mob.centerLongitude = 7.995
+-*.terminal[219].mob.centerLatitude = 62.472
+-*.terminal[219].mob.centerLongitude = 6.150
+-*.terminal[220].mob.centerLatitude = 65.012
+-*.terminal[220].mob.centerLongitude = 25.465
+-*.terminal[221].mob.centerLatitude = 49.883
+-*.terminal[221].mob.centerLongitude = 18.568
+-*.terminal[222].mob.centerLatitude = 47.531
+-*.terminal[222].mob.centerLongitude = 21.627
+-*.terminal[223].mob.centerLatitude = 44.179
+-*.terminal[223].mob.centerLongitude = 28.649
+-*.terminal[224].mob.centerLatitude = 45.327
+-*.terminal[224].mob.centerLongitude = 14.442
+-*.terminal[225].mob.centerLatitude = 52.406
+-*.terminal[225].mob.centerLongitude = 16.925
+-*.terminal[226].mob.centerLatitude = 51.247
+-*.terminal[226].mob.centerLongitude = 22.568
+-*.terminal[227].mob.centerLatitude = 53.133
+-*.terminal[227].mob.centerLongitude = 23.169
+-*.terminal[228].mob.centerLatitude = 48.716
+-*.terminal[228].mob.centerLongitude = 21.261
+-*.terminal[229].mob.centerLatitude = 40.694
+-*.terminal[229].mob.centerLongitude = 30.400
+-*.terminal[230].mob.centerLatitude = 37.066
+-*.terminal[230].mob.centerLongitude = 37.383
+-*.terminal[231].mob.centerLatitude = 37.871
+-*.terminal[231].mob.centerLongitude = 32.485
+-*.terminal[232].mob.centerLatitude = 38.721
+-*.terminal[232].mob.centerLongitude = 35.487
+-*.terminal[233].mob.centerLatitude = 64.836
+-*.terminal[233].mob.centerLongitude = -23.708
+-*.terminal[234].mob.centerLatitude = 38.907
+-*.terminal[234].mob.centerLongitude = 1.421
+-*.terminal[235].mob.centerLatitude = 39.889
+-*.terminal[235].mob.centerLongitude = 4.265
+-*.terminal[236].mob.centerLatitude = 36.434
+-*.terminal[236].mob.centerLongitude = 28.217
+-*.terminal[237].mob.centerLatitude = 35.339
+-*.terminal[237].mob.centerLongitude = 25.144
+-*.terminal[238].mob.centerLatitude = 28.963
+-*.terminal[238].mob.centerLongitude = -13.548
+-*.terminal[239].mob.centerLatitude = 67.856
+-*.terminal[239].mob.centerLongitude = 20.225
+-*.terminal[240].mob.centerLatitude = 54.978
+-*.terminal[240].mob.centerLongitude = -1.617
+-*.terminal[241].mob.centerLatitude = 57.150
+-*.terminal[241].mob.centerLongitude = -2.094
+-*.terminal[242].mob.centerLatitude = 57.478
+-*.terminal[242].mob.centerLongitude = -4.225
+-*.terminal[243].mob.centerLatitude = 50.376
+-*.terminal[243].mob.centerLongitude = -4.143
+-*.terminal[244].mob.centerLatitude = 52.630
+-*.terminal[244].mob.centerLongitude = 1.297
+-*.terminal[245].mob.centerLatitude = 53.271
+-*.terminal[245].mob.centerLongitude = -9.057
+-*.terminal[246].mob.centerLatitude = 47.243
+-*.terminal[246].mob.centerLongitude = 6.024
+-*.terminal[247].mob.centerLatitude = 43.610
+-*.terminal[247].mob.centerLongitude = 3.876
+-*.terminal[248].mob.centerLatitude = 49.443
+-*.terminal[248].mob.centerLongitude = 1.099
+-*.terminal[249].mob.centerLatitude = 48.390
+-*.terminal[249].mob.centerLongitude = -4.486
+-*.terminal[250].mob.centerLatitude = 48.117
+-*.terminal[250].mob.centerLongitude = -1.678
+-*.terminal[251].mob.centerLatitude = 45.834
+-*.terminal[251].mob.centerLongitude = 1.262
+-*.terminal[252].mob.centerLatitude = 37.992
+-*.terminal[252].mob.centerLongitude = -1.130
+-*.terminal[253].mob.centerLatitude = 40.965
+-*.terminal[253].mob.centerLongitude = -5.664
+-*.terminal[254].mob.centerLatitude = 43.263
+-*.terminal[254].mob.centerLongitude = -2.935
+-*.terminal[255].mob.centerLatitude = 41.652
+-*.terminal[255].mob.centerLongitude = -4.724
+-*.terminal[256].mob.centerLatitude = 37.177
+-*.terminal[256].mob.centerLongitude = -3.599
+-*.terminal[257].mob.centerLatitude = 38.879
+-*.terminal[257].mob.centerLongitude = -6.970
+-*.terminal[258].mob.centerLatitude = 51.340
+-*.terminal[258].mob.centerLongitude = 12.373
+-*.terminal[259].mob.centerLatitude = 49.452
+-*.terminal[259].mob.centerLongitude = 11.076
+-*.terminal[260].mob.centerLatitude = 54.092
+-*.terminal[260].mob.centerLongitude = 12.099
+-*.terminal[261].mob.centerLatitude = 51.312
+-*.terminal[261].mob.centerLongitude = 9.479
+-*.terminal[262].mob.centerLatitude = 50.978
+-*.terminal[262].mob.centerLongitude = 11.029
+-*.terminal[263].mob.centerLatitude = 51.961
+-*.terminal[263].mob.centerLongitude = 7.626
+-*.terminal[264].mob.centerLatitude = 43.769
+-*.terminal[264].mob.centerLongitude = 11.255
+-*.terminal[265].mob.centerLatitude = 41.117
+-*.terminal[265].mob.centerLongitude = 16.871
+-*.terminal[266].mob.centerLatitude = 45.441
+-*.terminal[266].mob.centerLongitude = 12.316
+-*.terminal[267].mob.centerLatitude = 42.464
+-*.terminal[267].mob.centerLongitude = 14.214
+-*.terminal[268].mob.centerLatitude = 53.219
+-*.terminal[268].mob.centerLongitude = 6.567
+-*.terminal[269].mob.centerLatitude = 49.612
+-*.terminal[269].mob.centerLongitude = 6.130
+-*.terminal[270].mob.centerLatitude = 47.809
+-*.terminal[270].mob.centerLongitude = 13.055
+-*.terminal[271].mob.centerLatitude = 48.306
+-*.terminal[271].mob.centerLongitude = 14.286
+-*.terminal[272].mob.centerLatitude = 46.804
+-*.terminal[272].mob.centerLongitude = 9.837
+-*.terminal[273].mob.centerLatitude = 46.829
+-*.terminal[273].mob.centerLongitude = 12.769
+-*.terminal[274].mob.centerLatitude = 60.451
+-*.terminal[274].mob.centerLongitude = 22.266
+-*.terminal[275].mob.centerLatitude = 63.431
+-*.terminal[275].mob.centerLongitude = 10.395
+-*.terminal[276].mob.centerLatitude = 63.826
+-*.terminal[276].mob.centerLongitude = 20.263
+-*.terminal[277].mob.centerLatitude = 65.584
+-*.terminal[277].mob.centerLongitude = 22.155
+-*.terminal[278].mob.centerLatitude = 58.146
+-*.terminal[278].mob.centerLongitude = 7.995
+-*.terminal[279].mob.centerLatitude = 62.472
+-*.terminal[279].mob.centerLongitude = 6.150
+-*.terminal[280].mob.centerLatitude = 65.012
+-*.terminal[280].mob.centerLongitude = 25.465
+-*.terminal[281].mob.centerLatitude = 49.883
+-*.terminal[281].mob.centerLongitude = 18.568
+-*.terminal[282].mob.centerLatitude = 47.531
+-*.terminal[282].mob.centerLongitude = 21.627
+-*.terminal[283].mob.centerLatitude = 44.179
+-*.terminal[283].mob.centerLongitude = 28.649
+-*.terminal[284].mob.centerLatitude = 45.327
+-*.terminal[284].mob.centerLongitude = 14.442
+-*.terminal[285].mob.centerLatitude = 52.406
+-*.terminal[285].mob.centerLongitude = 16.925
+-*.terminal[286].mob.centerLatitude = 51.247
+-*.terminal[286].mob.centerLongitude = 22.568
+-*.terminal[287].mob.centerLatitude = 53.133
+-*.terminal[287].mob.centerLongitude = 23.169
+-*.terminal[288].mob.centerLatitude = 48.716
+-*.terminal[288].mob.centerLongitude = 21.261
+-*.terminal[289].mob.centerLatitude = 40.694
+-*.terminal[289].mob.centerLongitude = 30.400
+-*.terminal[290].mob.centerLatitude = 37.066
+-*.terminal[290].mob.centerLongitude = 37.383
+-*.terminal[291].mob.centerLatitude = 37.871
+-*.terminal[291].mob.centerLongitude = 32.485
+-*.terminal[292].mob.centerLatitude = 38.721
+-*.terminal[292].mob.centerLongitude = 35.487
+-*.terminal[293].mob.centerLatitude = 64.836
+-*.terminal[293].mob.centerLongitude = -23.708
+-*.terminal[294].mob.centerLatitude = 38.907
+-*.terminal[294].mob.centerLongitude = 1.421
+-*.terminal[295].mob.centerLatitude = 39.889
+-*.terminal[295].mob.centerLongitude = 4.265
+-*.terminal[296].mob.centerLatitude = 36.434
+-*.terminal[296].mob.centerLongitude = 28.217
+-*.terminal[297].mob.centerLatitude = 35.339
+-*.terminal[297].mob.centerLongitude = 25.144
+-*.terminal[298].mob.centerLatitude = 28.963
+-*.terminal[298].mob.centerLongitude = -13.548
+-*.terminal[299].mob.centerLatitude = 67.856
+-*.terminal[299].mob.centerLongitude = 20.225
+-*.terminal[300].mob.centerLatitude = 54.978
+-*.terminal[300].mob.centerLongitude = -1.617
+-*.terminal[301].mob.centerLatitude = 57.150
+-*.terminal[301].mob.centerLongitude = -2.094
+-*.terminal[302].mob.centerLatitude = 57.478
+-*.terminal[302].mob.centerLongitude = -4.225
+-*.terminal[303].mob.centerLatitude = 50.376
+-*.terminal[303].mob.centerLongitude = -4.143
+-*.terminal[304].mob.centerLatitude = 52.630
+-*.terminal[304].mob.centerLongitude = 1.297
+-*.terminal[305].mob.centerLatitude = 53.271
+-*.terminal[305].mob.centerLongitude = -9.057
+-*.terminal[306].mob.centerLatitude = 47.243
+-*.terminal[306].mob.centerLongitude = 6.024
+-*.terminal[307].mob.centerLatitude = 43.610
+-*.terminal[307].mob.centerLongitude = 3.876
+-*.terminal[308].mob.centerLatitude = 49.443
+-*.terminal[308].mob.centerLongitude = 1.099
+-*.terminal[309].mob.centerLatitude = 48.390
+-*.terminal[309].mob.centerLongitude = -4.486
+-*.terminal[310].mob.centerLatitude = 48.117
+-*.terminal[310].mob.centerLongitude = -1.678
+-*.terminal[311].mob.centerLatitude = 45.834
+-*.terminal[311].mob.centerLongitude = 1.262
+-*.terminal[312].mob.centerLatitude = 37.992
+-*.terminal[312].mob.centerLongitude = -1.130
+-*.terminal[313].mob.centerLatitude = 40.965
+-*.terminal[313].mob.centerLongitude = -5.664
+-*.terminal[314].mob.centerLatitude = 43.263
+-*.terminal[314].mob.centerLongitude = -2.935
+-*.terminal[315].mob.centerLatitude = 41.652
+-*.terminal[315].mob.centerLongitude = -4.724
+-*.terminal[316].mob.centerLatitude = 37.177
+-*.terminal[316].mob.centerLongitude = -3.599
+-*.terminal[317].mob.centerLatitude = 38.879
+-*.terminal[317].mob.centerLongitude = -6.970
+-*.terminal[318].mob.centerLatitude = 51.340
+-*.terminal[318].mob.centerLongitude = 12.373
+-*.terminal[319].mob.centerLatitude = 49.452
+-*.terminal[319].mob.centerLongitude = 11.076
+-*.terminal[320].mob.centerLatitude = 54.092
+-*.terminal[320].mob.centerLongitude = 12.099
+-*.terminal[321].mob.centerLatitude = 51.312
+-*.terminal[321].mob.centerLongitude = 9.479
+-*.terminal[322].mob.centerLatitude = 50.978
+-*.terminal[322].mob.centerLongitude = 11.029
+-*.terminal[323].mob.centerLatitude = 51.961
+-*.terminal[323].mob.centerLongitude = 7.626
+-*.terminal[324].mob.centerLatitude = 43.769
+-*.terminal[324].mob.centerLongitude = 11.255
+-*.terminal[325].mob.centerLatitude = 41.117
+-*.terminal[325].mob.centerLongitude = 16.871
+-*.terminal[326].mob.centerLatitude = 45.441
+-*.terminal[326].mob.centerLongitude = 12.316
+-*.terminal[327].mob.centerLatitude = 42.464
+-*.terminal[327].mob.centerLongitude = 14.214
+-*.terminal[328].mob.centerLatitude = 53.219
+-*.terminal[328].mob.centerLongitude = 6.567
+-*.terminal[329].mob.centerLatitude = 49.612
+-*.terminal[329].mob.centerLongitude = 6.130
+-*.terminal[330].mob.centerLatitude = 47.809
+-*.terminal[330].mob.centerLongitude = 13.055
+-*.terminal[331].mob.centerLatitude = 48.306
+-*.terminal[331].mob.centerLongitude = 14.286
+-*.terminal[332].mob.centerLatitude = 46.804
+-*.terminal[332].mob.centerLongitude = 9.837
+-*.terminal[333].mob.centerLatitude = 46.829
+-*.terminal[333].mob.centerLongitude = 12.769
+-*.terminal[334].mob.centerLatitude = 60.451
+-*.terminal[334].mob.centerLongitude = 22.266
+-*.terminal[335].mob.centerLatitude = 63.431
+-*.terminal[335].mob.centerLongitude = 10.395
+-*.terminal[336].mob.centerLatitude = 63.826
+-*.terminal[336].mob.centerLongitude = 20.263
+-*.terminal[337].mob.centerLatitude = 65.584
+-*.terminal[337].mob.centerLongitude = 22.155
+-*.terminal[338].mob.centerLatitude = 58.146
+-*.terminal[338].mob.centerLongitude = 7.995
+-*.terminal[339].mob.centerLatitude = 62.472
+-*.terminal[339].mob.centerLongitude = 6.150
+-*.terminal[340].mob.centerLatitude = 65.012
+-*.terminal[340].mob.centerLongitude = 25.465
+-*.terminal[341].mob.centerLatitude = 49.883
+-*.terminal[341].mob.centerLongitude = 18.568
+-*.terminal[342].mob.centerLatitude = 47.531
+-*.terminal[342].mob.centerLongitude = 21.627
+-*.terminal[343].mob.centerLatitude = 44.179
+-*.terminal[343].mob.centerLongitude = 28.649
+-*.terminal[344].mob.centerLatitude = 45.327
+-*.terminal[344].mob.centerLongitude = 14.442
+-*.terminal[345].mob.centerLatitude = 52.406
+-*.terminal[345].mob.centerLongitude = 16.925
+-*.terminal[346].mob.centerLatitude = 51.247
+-*.terminal[346].mob.centerLongitude = 22.568
+-*.terminal[347].mob.centerLatitude = 53.133
+-*.terminal[347].mob.centerLongitude = 23.169
+-*.terminal[348].mob.centerLatitude = 48.716
+-*.terminal[348].mob.centerLongitude = 21.261
+-*.terminal[349].mob.centerLatitude = 40.694
+-*.terminal[349].mob.centerLongitude = 30.400
+-*.terminal[350].mob.centerLatitude = 37.066
+-*.terminal[350].mob.centerLongitude = 37.383
+-*.terminal[351].mob.centerLatitude = 37.871
+-*.terminal[351].mob.centerLongitude = 32.485
+-*.terminal[352].mob.centerLatitude = 38.721
+-*.terminal[352].mob.centerLongitude = 35.487
+-*.terminal[353].mob.centerLatitude = 64.836
+-*.terminal[353].mob.centerLongitude = -23.708
+-*.terminal[354].mob.centerLatitude = 38.907
+-*.terminal[354].mob.centerLongitude = 1.421
+-*.terminal[355].mob.centerLatitude = 39.889
+-*.terminal[355].mob.centerLongitude = 4.265
+-*.terminal[356].mob.centerLatitude = 36.434
+-*.terminal[356].mob.centerLongitude = 28.217
+-*.terminal[357].mob.centerLatitude = 35.339
+-*.terminal[357].mob.centerLongitude = 25.144
+-*.terminal[358].mob.centerLatitude = 28.963
+-*.terminal[358].mob.centerLongitude = -13.548
+-*.terminal[359].mob.centerLatitude = 67.856
+-*.terminal[359].mob.centerLongitude = 20.225
+-*.terminal[360].mob.centerLatitude = 54.978
+-*.terminal[360].mob.centerLongitude = -1.617
+-*.terminal[361].mob.centerLatitude = 57.150
+-*.terminal[361].mob.centerLongitude = -2.094
+-*.terminal[362].mob.centerLatitude = 57.478
+-*.terminal[362].mob.centerLongitude = -4.225
+-*.terminal[363].mob.centerLatitude = 50.376
+-*.terminal[363].mob.centerLongitude = -4.143
+-*.terminal[364].mob.centerLatitude = 52.630
+-*.terminal[364].mob.centerLongitude = 1.297
+-*.terminal[365].mob.centerLatitude = 53.271
+-*.terminal[365].mob.centerLongitude = -9.057
+-*.terminal[366].mob.centerLatitude = 47.243
+-*.terminal[366].mob.centerLongitude = 6.024
+-*.terminal[367].mob.centerLatitude = 43.610
+-*.terminal[367].mob.centerLongitude = 3.876
+-*.terminal[368].mob.centerLatitude = 49.443
+-*.terminal[368].mob.centerLongitude = 1.099
+-*.terminal[369].mob.centerLatitude = 48.390
+-*.terminal[369].mob.centerLongitude = -4.486
+-*.terminal[370].mob.centerLatitude = 48.117
+-*.terminal[370].mob.centerLongitude = -1.678
+-*.terminal[371].mob.centerLatitude = 45.834
+-*.terminal[371].mob.centerLongitude = 1.262
+-*.terminal[372].mob.centerLatitude = 37.992
+-*.terminal[372].mob.centerLongitude = -1.130
+-*.terminal[373].mob.centerLatitude = 40.965
+-*.terminal[373].mob.centerLongitude = -5.664
+-*.terminal[374].mob.centerLatitude = 43.263
+-*.terminal[374].mob.centerLongitude = -2.935
+-*.terminal[375].mob.centerLatitude = 41.652
+-*.terminal[375].mob.centerLongitude = -4.724
+-*.terminal[376].mob.centerLatitude = 37.177
+-*.terminal[376].mob.centerLongitude = -3.599
+-*.terminal[377].mob.centerLatitude = 38.879
+-*.terminal[377].mob.centerLongitude = -6.970
+-*.terminal[378].mob.centerLatitude = 51.340
+-*.terminal[378].mob.centerLongitude = 12.373
+-*.terminal[379].mob.centerLatitude = 49.452
+-*.terminal[379].mob.centerLongitude = 11.076
+-*.terminal[380].mob.centerLatitude = 54.092
+-*.terminal[380].mob.centerLongitude = 12.099
+-*.terminal[381].mob.centerLatitude = 51.312
+-*.terminal[381].mob.centerLongitude = 9.479
+-*.terminal[382].mob.centerLatitude = 50.978
+-*.terminal[382].mob.centerLongitude = 11.029
+-*.terminal[383].mob.centerLatitude = 51.961
+-*.terminal[383].mob.centerLongitude = 7.626
+-*.terminal[384].mob.centerLatitude = 43.769
+-*.terminal[384].mob.centerLongitude = 11.255
+-*.terminal[385].mob.centerLatitude = 41.117
+-*.terminal[385].mob.centerLongitude = 16.871
+-*.terminal[386].mob.centerLatitude = 45.441
+-*.terminal[386].mob.centerLongitude = 12.316
+-*.terminal[387].mob.centerLatitude = 42.464
+-*.terminal[387].mob.centerLongitude = 14.214
+-*.terminal[388].mob.centerLatitude = 53.219
+-*.terminal[388].mob.centerLongitude = 6.567
+-*.terminal[389].mob.centerLatitude = 49.612
+-*.terminal[389].mob.centerLongitude = 6.130
+-*.terminal[390].mob.centerLatitude = 47.809
+-*.terminal[390].mob.centerLongitude = 13.055
+-*.terminal[391].mob.centerLatitude = 48.306
+-*.terminal[391].mob.centerLongitude = 14.286
+-*.terminal[392].mob.centerLatitude = 46.804
+-*.terminal[392].mob.centerLongitude = 9.837
+-*.terminal[393].mob.centerLatitude = 46.829
+-*.terminal[393].mob.centerLongitude = 12.769
+-*.terminal[394].mob.centerLatitude = 60.451
+-*.terminal[394].mob.centerLongitude = 22.266
+-*.terminal[395].mob.centerLatitude = 63.431
+-*.terminal[395].mob.centerLongitude = 10.395
+-*.terminal[396].mob.centerLatitude = 63.826
+-*.terminal[396].mob.centerLongitude = 20.263
+-*.terminal[397].mob.centerLatitude = 65.584
+-*.terminal[397].mob.centerLongitude = 22.155
+-*.terminal[398].mob.centerLatitude = 58.146
+-*.terminal[398].mob.centerLongitude = 7.995
+-*.terminal[399].mob.centerLatitude = 62.472
+-*.terminal[399].mob.centerLongitude = 6.150
+-*.terminal[400].mob.centerLatitude = 65.012
+-*.terminal[400].mob.centerLongitude = 25.465
+-*.terminal[401].mob.centerLatitude = 49.883
+-*.terminal[401].mob.centerLongitude = 18.568
+-*.terminal[402].mob.centerLatitude = 47.531
+-*.terminal[402].mob.centerLongitude = 21.627
+-*.terminal[403].mob.centerLatitude = 44.179
+-*.terminal[403].mob.centerLongitude = 28.649
+-*.terminal[404].mob.centerLatitude = 45.327
+-*.terminal[404].mob.centerLongitude = 14.442
+-*.terminal[405].mob.centerLatitude = 52.406
+-*.terminal[405].mob.centerLongitude = 16.925
+-*.terminal[406].mob.centerLatitude = 51.247
+-*.terminal[406].mob.centerLongitude = 22.568
+-*.terminal[407].mob.centerLatitude = 53.133
+-*.terminal[407].mob.centerLongitude = 23.169
+-*.terminal[408].mob.centerLatitude = 48.716
+-*.terminal[408].mob.centerLongitude = 21.261
+-*.terminal[409].mob.centerLatitude = 40.694
+-*.terminal[409].mob.centerLongitude = 30.400
+-*.terminal[410].mob.centerLatitude = 37.066
+-*.terminal[410].mob.centerLongitude = 37.383
+-*.terminal[411].mob.centerLatitude = 37.871
+-*.terminal[411].mob.centerLongitude = 32.485
+-*.terminal[412].mob.centerLatitude = 38.721
+-*.terminal[412].mob.centerLongitude = 35.487
+-*.terminal[413].mob.centerLatitude = 64.836
+-*.terminal[413].mob.centerLongitude = -23.708
+-*.terminal[414].mob.centerLatitude = 38.907
+-*.terminal[414].mob.centerLongitude = 1.421
+-*.terminal[415].mob.centerLatitude = 39.889
+-*.terminal[415].mob.centerLongitude = 4.265
+-*.terminal[416].mob.centerLatitude = 36.434
+-*.terminal[416].mob.centerLongitude = 28.217
+-*.terminal[417].mob.centerLatitude = 35.339
+-*.terminal[417].mob.centerLongitude = 25.144
+-*.terminal[418].mob.centerLatitude = 28.963
+-*.terminal[418].mob.centerLongitude = -13.548
+-*.terminal[419].mob.centerLatitude = 67.856
+-*.terminal[419].mob.centerLongitude = 20.225
+-*.terminal[420].mob.centerLatitude = 54.978
+-*.terminal[420].mob.centerLongitude = -1.617
+-*.terminal[421].mob.centerLatitude = 57.150
+-*.terminal[421].mob.centerLongitude = -2.094
+-*.terminal[422].mob.centerLatitude = 57.478
+-*.terminal[422].mob.centerLongitude = -4.225
+-*.terminal[423].mob.centerLatitude = 50.376
+-*.terminal[423].mob.centerLongitude = -4.143
+-*.terminal[424].mob.centerLatitude = 52.630
+-*.terminal[424].mob.centerLongitude = 1.297
+-*.terminal[425].mob.centerLatitude = 53.271
+-*.terminal[425].mob.centerLongitude = -9.057
+-*.terminal[426].mob.centerLatitude = 47.243
+-*.terminal[426].mob.centerLongitude = 6.024
+-*.terminal[427].mob.centerLatitude = 43.610
+-*.terminal[427].mob.centerLongitude = 3.876
+-*.terminal[428].mob.centerLatitude = 49.443
+-*.terminal[428].mob.centerLongitude = 1.099
+-*.terminal[429].mob.centerLatitude = 48.390
+-*.terminal[429].mob.centerLongitude = -4.486
+-*.terminal[430].mob.centerLatitude = 48.117
+-*.terminal[430].mob.centerLongitude = -1.678
+-*.terminal[431].mob.centerLatitude = 45.834
+-*.terminal[431].mob.centerLongitude = 1.262
+-*.terminal[432].mob.centerLatitude = 37.992
+-*.terminal[432].mob.centerLongitude = -1.130
+-*.terminal[433].mob.centerLatitude = 40.965
+-*.terminal[433].mob.centerLongitude = -5.664
+-*.terminal[434].mob.centerLatitude = 43.263
+-*.terminal[434].mob.centerLongitude = -2.935
+-*.terminal[435].mob.centerLatitude = 41.652
+-*.terminal[435].mob.centerLongitude = -4.724
+-*.terminal[436].mob.centerLatitude = 37.177
+-*.terminal[436].mob.centerLongitude = -3.599
+-*.terminal[437].mob.centerLatitude = 38.879
+-*.terminal[437].mob.centerLongitude = -6.970
+-*.terminal[438].mob.centerLatitude = 51.340
+-*.terminal[438].mob.centerLongitude = 12.373
+-*.terminal[439].mob.centerLatitude = 49.452
+-*.terminal[439].mob.centerLongitude = 11.076
+-*.terminal[440].mob.centerLatitude = 54.092
+-*.terminal[440].mob.centerLongitude = 12.099
+-*.terminal[441].mob.centerLatitude = 51.312
+-*.terminal[441].mob.centerLongitude = 9.479
+-*.terminal[442].mob.centerLatitude = 50.978
+-*.terminal[442].mob.centerLongitude = 11.029
+-*.terminal[443].mob.centerLatitude = 51.961
+-*.terminal[443].mob.centerLongitude = 7.626
+-*.terminal[444].mob.centerLatitude = 43.769
+-*.terminal[444].mob.centerLongitude = 11.255
+-*.terminal[445].mob.centerLatitude = 41.117
+-*.terminal[445].mob.centerLongitude = 16.871
+-*.terminal[446].mob.centerLatitude = 45.441
+-*.terminal[446].mob.centerLongitude = 12.316
+-*.terminal[447].mob.centerLatitude = 42.464
+-*.terminal[447].mob.centerLongitude = 14.214
+-*.terminal[448].mob.centerLatitude = 53.219
+-*.terminal[448].mob.centerLongitude = 6.567
+-*.terminal[449].mob.centerLatitude = 49.612
+-*.terminal[449].mob.centerLongitude = 6.130
+-*.terminal[450].mob.centerLatitude = 47.809
+-*.terminal[450].mob.centerLongitude = 13.055
+-*.terminal[451].mob.centerLatitude = 48.306
+-*.terminal[451].mob.centerLongitude = 14.286
+-*.terminal[452].mob.centerLatitude = 46.804
+-*.terminal[452].mob.centerLongitude = 9.837
+-*.terminal[453].mob.centerLatitude = 46.829
+-*.terminal[453].mob.centerLongitude = 12.769
+-*.terminal[454].mob.centerLatitude = 60.451
+-*.terminal[454].mob.centerLongitude = 22.266
+-*.terminal[455].mob.centerLatitude = 63.431
+-*.terminal[455].mob.centerLongitude = 10.395
+-*.terminal[456].mob.centerLatitude = 63.826
+-*.terminal[456].mob.centerLongitude = 20.263
+-*.terminal[457].mob.centerLatitude = 65.584
+-*.terminal[457].mob.centerLongitude = 22.155
+-*.terminal[458].mob.centerLatitude = 58.146
+-*.terminal[458].mob.centerLongitude = 7.995
+-*.terminal[459].mob.centerLatitude = 62.472
+-*.terminal[459].mob.centerLongitude = 6.150
+-*.terminal[460].mob.centerLatitude = 65.012
+-*.terminal[460].mob.centerLongitude = 25.465
+-*.terminal[461].mob.centerLatitude = 49.883
+-*.terminal[461].mob.centerLongitude = 18.568
+-*.terminal[462].mob.centerLatitude = 47.531
+-*.terminal[462].mob.centerLongitude = 21.627
+-*.terminal[463].mob.centerLatitude = 44.179
+-*.terminal[463].mob.centerLongitude = 28.649
+-*.terminal[464].mob.centerLatitude = 45.327
+-*.terminal[464].mob.centerLongitude = 14.442
+-*.terminal[465].mob.centerLatitude = 52.406
+-*.terminal[465].mob.centerLongitude = 16.925
+-*.terminal[466].mob.centerLatitude = 51.247
+-*.terminal[466].mob.centerLongitude = 22.568
+-*.terminal[467].mob.centerLatitude = 53.133
+-*.terminal[467].mob.centerLongitude = 23.169
+-*.terminal[468].mob.centerLatitude = 48.716
+-*.terminal[468].mob.centerLongitude = 21.261
+-*.terminal[469].mob.centerLatitude = 40.694
+-*.terminal[469].mob.centerLongitude = 30.400
+-*.terminal[470].mob.centerLatitude = 37.066
+-*.terminal[470].mob.centerLongitude = 37.383
+-*.terminal[471].mob.centerLatitude = 37.871
+-*.terminal[471].mob.centerLongitude = 32.485
+-*.terminal[472].mob.centerLatitude = 38.721
+-*.terminal[472].mob.centerLongitude = 35.487
+-*.terminal[473].mob.centerLatitude = 64.836
+-*.terminal[473].mob.centerLongitude = -23.708
+-*.terminal[474].mob.centerLatitude = 38.907
+-*.terminal[474].mob.centerLongitude = 1.421
+-*.terminal[475].mob.centerLatitude = 39.889
+-*.terminal[475].mob.centerLongitude = 4.265
+-*.terminal[476].mob.centerLatitude = 36.434
+-*.terminal[476].mob.centerLongitude = 28.217
+-*.terminal[477].mob.centerLatitude = 35.339
+-*.terminal[477].mob.centerLongitude = 25.144
+-*.terminal[478].mob.centerLatitude = 28.963
+-*.terminal[478].mob.centerLongitude = -13.548
+-*.terminal[479].mob.centerLatitude = 67.856
+-*.terminal[479].mob.centerLongitude = 20.225
+-*.terminal[480].mob.centerLatitude = 54.978
+-*.terminal[480].mob.centerLongitude = -1.617
+-*.terminal[481].mob.centerLatitude = 57.150
+-*.terminal[481].mob.centerLongitude = -2.094
+-*.terminal[482].mob.centerLatitude = 57.478
+-*.terminal[482].mob.centerLongitude = -4.225
+-*.terminal[483].mob.centerLatitude = 50.376
+-*.terminal[483].mob.centerLongitude = -4.143
+-*.terminal[484].mob.centerLatitude = 52.630
+-*.terminal[484].mob.centerLongitude = 1.297
+-*.terminal[485].mob.centerLatitude = 53.271
+-*.terminal[485].mob.centerLongitude = -9.057
+-*.terminal[486].mob.centerLatitude = 47.243
+-*.terminal[486].mob.centerLongitude = 6.024
+-*.terminal[487].mob.centerLatitude = 43.610
+-*.terminal[487].mob.centerLongitude = 3.876
+-*.terminal[488].mob.centerLatitude = 49.443
+-*.terminal[488].mob.centerLongitude = 1.099
+-*.terminal[489].mob.centerLatitude = 48.390
+-*.terminal[489].mob.centerLongitude = -4.486
+-*.terminal[490].mob.centerLatitude = 48.117
+-*.terminal[490].mob.centerLongitude = -1.678
+-*.terminal[491].mob.centerLatitude = 45.834
+-*.terminal[491].mob.centerLongitude = 1.262
+-*.terminal[492].mob.centerLatitude = 37.992
+-*.terminal[492].mob.centerLongitude = -1.130
+-*.terminal[493].mob.centerLatitude = 40.965
+-*.terminal[493].mob.centerLongitude = -5.664
+-*.terminal[494].mob.centerLatitude = 43.263
+-*.terminal[494].mob.centerLongitude = -2.935
+-*.terminal[495].mob.centerLatitude = 41.652
+-*.terminal[495].mob.centerLongitude = -4.724
+-*.terminal[496].mob.centerLatitude = 37.177
+-*.terminal[496].mob.centerLongitude = -3.599
+-*.terminal[497].mob.centerLatitude = 38.879
+-*.terminal[497].mob.centerLongitude = -6.970
+-*.terminal[498].mob.centerLatitude = 51.340
+-*.terminal[498].mob.centerLongitude = 12.373
+-*.terminal[499].mob.centerLatitude = 49.452
+-*.terminal[499].mob.centerLongitude = 11.076
+-*.terminal[500].mob.centerLatitude = 54.092
+-*.terminal[500].mob.centerLongitude = 12.099
+-*.terminal[501].mob.centerLatitude = 51.312
+-*.terminal[501].mob.centerLongitude = 9.479
+-*.terminal[502].mob.centerLatitude = 50.978
+-*.terminal[502].mob.centerLongitude = 11.029
+-*.terminal[503].mob.centerLatitude = 51.961
+-*.terminal[503].mob.centerLongitude = 7.626
+-*.terminal[504].mob.centerLatitude = 43.769
+-*.terminal[504].mob.centerLongitude = 11.255
+-*.terminal[505].mob.centerLatitude = 41.117
+-*.terminal[505].mob.centerLongitude = 16.871
+-*.terminal[506].mob.centerLatitude = 45.441
+-*.terminal[506].mob.centerLongitude = 12.316
+-*.terminal[507].mob.centerLatitude = 42.464
+-*.terminal[507].mob.centerLongitude = 14.214
+-*.terminal[508].mob.centerLatitude = 53.219
+-*.terminal[508].mob.centerLongitude = 6.567
+-*.terminal[509].mob.centerLatitude = 49.612
+-*.terminal[509].mob.centerLongitude = 6.130
+-*.terminal[510].mob.centerLatitude = 47.809
+-*.terminal[510].mob.centerLongitude = 13.055
+-*.terminal[511].mob.centerLatitude = 48.306
+-*.terminal[511].mob.centerLongitude = 14.286
+-*.terminal[512].mob.centerLatitude = 46.804
+-*.terminal[512].mob.centerLongitude = 9.837
+-*.terminal[513].mob.centerLatitude = 46.829
+-*.terminal[513].mob.centerLongitude = 12.769
+-*.terminal[514].mob.centerLatitude = 60.451
+-*.terminal[514].mob.centerLongitude = 22.266
+-*.terminal[515].mob.centerLatitude = 63.431
+-*.terminal[515].mob.centerLongitude = 10.395
+-*.terminal[516].mob.centerLatitude = 63.826
+-*.terminal[516].mob.centerLongitude = 20.263
+-*.terminal[517].mob.centerLatitude = 65.584
+-*.terminal[517].mob.centerLongitude = 22.155
+-*.terminal[518].mob.centerLatitude = 58.146
+-*.terminal[518].mob.centerLongitude = 7.995
+-*.terminal[519].mob.centerLatitude = 62.472
+-*.terminal[519].mob.centerLongitude = 6.150
+-*.terminal[520].mob.centerLatitude = 65.012
+-*.terminal[520].mob.centerLongitude = 25.465
+-*.terminal[521].mob.centerLatitude = 49.883
+-*.terminal[521].mob.centerLongitude = 18.568
+-*.terminal[522].mob.centerLatitude = 47.531
+-*.terminal[522].mob.centerLongitude = 21.627
+-*.terminal[523].mob.centerLatitude = 44.179
+-*.terminal[523].mob.centerLongitude = 28.649
+-*.terminal[524].mob.centerLatitude = 45.327
+-*.terminal[524].mob.centerLongitude = 14.442
+-*.terminal[525].mob.centerLatitude = 52.406
+-*.terminal[525].mob.centerLongitude = 16.925
+-*.terminal[526].mob.centerLatitude = 51.247
+-*.terminal[526].mob.centerLongitude = 22.568
+-*.terminal[527].mob.centerLatitude = 53.133
+-*.terminal[527].mob.centerLongitude = 23.169
+-*.terminal[528].mob.centerLatitude = 48.716
+-*.terminal[528].mob.centerLongitude = 21.261
+-*.terminal[529].mob.centerLatitude = 40.694
+-*.terminal[529].mob.centerLongitude = 30.400
+-*.terminal[530].mob.centerLatitude = 37.066
+-*.terminal[530].mob.centerLongitude = 37.383
+-*.terminal[531].mob.centerLatitude = 37.871
+-*.terminal[531].mob.centerLongitude = 32.485
+-*.terminal[532].mob.centerLatitude = 38.721
+-*.terminal[532].mob.centerLongitude = 35.487
+-*.terminal[533].mob.centerLatitude = 64.836
+-*.terminal[533].mob.centerLongitude = -23.708
+-*.terminal[534].mob.centerLatitude = 38.907
+-*.terminal[534].mob.centerLongitude = 1.421
+-*.terminal[535].mob.centerLatitude = 39.889
+-*.terminal[535].mob.centerLongitude = 4.265
+-*.terminal[536].mob.centerLatitude = 36.434
+-*.terminal[536].mob.centerLongitude = 28.217
+-*.terminal[537].mob.centerLatitude = 35.339
+-*.terminal[537].mob.centerLongitude = 25.144
+-*.terminal[538].mob.centerLatitude = 28.963
+-*.terminal[538].mob.centerLongitude = -13.548
+-*.terminal[539].mob.centerLatitude = 67.856
+-*.terminal[539].mob.centerLongitude = 20.225
+-*.terminal[540].mob.centerLatitude = 54.978
+-*.terminal[540].mob.centerLongitude = -1.617
+-*.terminal[541].mob.centerLatitude = 57.150
+-*.terminal[541].mob.centerLongitude = -2.094
+-*.terminal[542].mob.centerLatitude = 57.478
+-*.terminal[542].mob.centerLongitude = -4.225
+-*.terminal[543].mob.centerLatitude = 50.376
+-*.terminal[543].mob.centerLongitude = -4.143
+-*.terminal[544].mob.centerLatitude = 52.630
+-*.terminal[544].mob.centerLongitude = 1.297
+-*.terminal[545].mob.centerLatitude = 53.271
+-*.terminal[545].mob.centerLongitude = -9.057
+-*.terminal[546].mob.centerLatitude = 47.243
+-*.terminal[546].mob.centerLongitude = 6.024
+-*.terminal[547].mob.centerLatitude = 43.610
+-*.terminal[547].mob.centerLongitude = 3.876
+-*.terminal[548].mob.centerLatitude = 49.443
+-*.terminal[548].mob.centerLongitude = 1.099
+-*.terminal[549].mob.centerLatitude = 48.390
+-*.terminal[549].mob.centerLongitude = -4.486
+-*.terminal[550].mob.centerLatitude = 48.117
+-*.terminal[550].mob.centerLongitude = -1.678
+-*.terminal[551].mob.centerLatitude = 45.834
+-*.terminal[551].mob.centerLongitude = 1.262
+-*.terminal[552].mob.centerLatitude = 37.992
+-*.terminal[552].mob.centerLongitude = -1.130
+-*.terminal[553].mob.centerLatitude = 40.965
+-*.terminal[553].mob.centerLongitude = -5.664
+-*.terminal[554].mob.centerLatitude = 43.263
+-*.terminal[554].mob.centerLongitude = -2.935
+-*.terminal[555].mob.centerLatitude = 41.652
+-*.terminal[555].mob.centerLongitude = -4.724
+-*.terminal[556].mob.centerLatitude = 37.177
+-*.terminal[556].mob.centerLongitude = -3.599
+-*.terminal[557].mob.centerLatitude = 38.879
+-*.terminal[557].mob.centerLongitude = -6.970
+-*.terminal[558].mob.centerLatitude = 51.340
+-*.terminal[558].mob.centerLongitude = 12.373
+-*.terminal[559].mob.centerLatitude = 49.452
+-*.terminal[559].mob.centerLongitude = 11.076
+-*.terminal[560].mob.centerLatitude = 54.092
+-*.terminal[560].mob.centerLongitude = 12.099
+-*.terminal[561].mob.centerLatitude = 51.312
+-*.terminal[561].mob.centerLongitude = 9.479
+-*.terminal[562].mob.centerLatitude = 50.978
+-*.terminal[562].mob.centerLongitude = 11.029
+-*.terminal[563].mob.centerLatitude = 51.961
+-*.terminal[563].mob.centerLongitude = 7.626
+-*.terminal[564].mob.centerLatitude = 43.769
+-*.terminal[564].mob.centerLongitude = 11.255
+-*.terminal[565].mob.centerLatitude = 41.117
+-*.terminal[565].mob.centerLongitude = 16.871
+-*.terminal[566].mob.centerLatitude = 45.441
+-*.terminal[566].mob.centerLongitude = 12.316
+-*.terminal[567].mob.centerLatitude = 42.464
+-*.terminal[567].mob.centerLongitude = 14.214
+-*.terminal[568].mob.centerLatitude = 53.219
+-*.terminal[568].mob.centerLongitude = 6.567
+-*.terminal[569].mob.centerLatitude = 49.612
+-*.terminal[569].mob.centerLongitude = 6.130
+-*.terminal[570].mob.centerLatitude = 47.809
+-*.terminal[570].mob.centerLongitude = 13.055
+-*.terminal[571].mob.centerLatitude = 48.306
+-*.terminal[571].mob.centerLongitude = 14.286
+-*.terminal[572].mob.centerLatitude = 46.804
+-*.terminal[572].mob.centerLongitude = 9.837
+-*.terminal[573].mob.centerLatitude = 46.829
+-*.terminal[573].mob.centerLongitude = 12.769
+-*.terminal[574].mob.centerLatitude = 60.451
+-*.terminal[574].mob.centerLongitude = 22.266
+-*.terminal[575].mob.centerLatitude = 63.431
+-*.terminal[575].mob.centerLongitude = 10.395
+-*.terminal[576].mob.centerLatitude = 63.826
+-*.terminal[576].mob.centerLongitude = 20.263
+-*.terminal[577].mob.centerLatitude = 65.584
+-*.terminal[577].mob.centerLongitude = 22.155
+-*.terminal[578].mob.centerLatitude = 58.146
+-*.terminal[578].mob.centerLongitude = 7.995
+-*.terminal[579].mob.centerLatitude = 62.472
+-*.terminal[579].mob.centerLongitude = 6.150
+-*.terminal[580].mob.centerLatitude = 65.012
+-*.terminal[580].mob.centerLongitude = 25.465
+-*.terminal[581].mob.centerLatitude = 49.883
+-*.terminal[581].mob.centerLongitude = 18.568
+-*.terminal[582].mob.centerLatitude = 47.531
+-*.terminal[582].mob.centerLongitude = 21.627
+-*.terminal[583].mob.centerLatitude = 44.179
+-*.terminal[583].mob.centerLongitude = 28.649
+-*.terminal[584].mob.centerLatitude = 45.327
+-*.terminal[584].mob.centerLongitude = 14.442
+-*.terminal[585].mob.centerLatitude = 52.406
+-*.terminal[585].mob.centerLongitude = 16.925
+-*.terminal[586].mob.centerLatitude = 51.247
+-*.terminal[586].mob.centerLongitude = 22.568
+-*.terminal[587].mob.centerLatitude = 53.133
+-*.terminal[587].mob.centerLongitude = 23.169
+-*.terminal[588].mob.centerLatitude = 48.716
+-*.terminal[588].mob.centerLongitude = 21.261
+-*.terminal[589].mob.centerLatitude = 40.694
+-*.terminal[589].mob.centerLongitude = 30.400
+-*.terminal[590].mob.centerLatitude = 37.066
+-*.terminal[590].mob.centerLongitude = 37.383
+-*.terminal[591].mob.centerLatitude = 37.871
+-*.terminal[591].mob.centerLongitude = 32.485
+-*.terminal[592].mob.centerLatitude = 38.721
+-*.terminal[592].mob.centerLongitude = 35.487
+-*.terminal[593].mob.centerLatitude = 64.836
+-*.terminal[593].mob.centerLongitude = -23.708
+-*.terminal[594].mob.centerLatitude = 38.907
+-*.terminal[594].mob.centerLongitude = 1.421
+-*.terminal[595].mob.centerLatitude = 39.889
+-*.terminal[595].mob.centerLongitude = 4.265
+-*.terminal[596].mob.centerLatitude = 36.434
+-*.terminal[596].mob.centerLongitude = 28.217
+-*.terminal[597].mob.centerLatitude = 35.339
+-*.terminal[597].mob.centerLongitude = 25.144
+-*.terminal[598].mob.centerLatitude = 28.963
+-*.terminal[598].mob.centerLongitude = -13.548
+-*.terminal[599].mob.centerLatitude = 67.856
+-*.terminal[599].mob.centerLongitude = 20.225
+-*.terminal[600].mob.centerLatitude = 54.978
+-*.terminal[600].mob.centerLongitude = -1.617
+-*.terminal[601].mob.centerLatitude = 57.150
+-*.terminal[601].mob.centerLongitude = -2.094
+-*.terminal[602].mob.centerLatitude = 57.478
+-*.terminal[602].mob.centerLongitude = -4.225
+-*.terminal[603].mob.centerLatitude = 50.376
+-*.terminal[603].mob.centerLongitude = -4.143
+-*.terminal[604].mob.centerLatitude = 52.630
+-*.terminal[604].mob.centerLongitude = 1.297
+-*.terminal[605].mob.centerLatitude = 53.271
+-*.terminal[605].mob.centerLongitude = -9.057
+-*.terminal[606].mob.centerLatitude = 47.243
+-*.terminal[606].mob.centerLongitude = 6.024
+-*.terminal[607].mob.centerLatitude = 43.610
+-*.terminal[607].mob.centerLongitude = 3.876
+-*.terminal[608].mob.centerLatitude = 49.443
+-*.terminal[608].mob.centerLongitude = 1.099
+-*.terminal[609].mob.centerLatitude = 48.390
+-*.terminal[609].mob.centerLongitude = -4.486
+-*.terminal[610].mob.centerLatitude = 48.117
+-*.terminal[610].mob.centerLongitude = -1.678
+-*.terminal[611].mob.centerLatitude = 45.834
+-*.terminal[611].mob.centerLongitude = 1.262
+-*.terminal[612].mob.centerLatitude = 37.992
+-*.terminal[612].mob.centerLongitude = -1.130
+-*.terminal[613].mob.centerLatitude = 40.965
+-*.terminal[613].mob.centerLongitude = -5.664
+-*.terminal[614].mob.centerLatitude = 43.263
+-*.terminal[614].mob.centerLongitude = -2.935
+-*.terminal[615].mob.centerLatitude = 41.652
+-*.terminal[615].mob.centerLongitude = -4.724
+-*.terminal[616].mob.centerLatitude = 37.177
+-*.terminal[616].mob.centerLongitude = -3.599
+-*.terminal[617].mob.centerLatitude = 38.879
+-*.terminal[617].mob.centerLongitude = -6.970
+-*.terminal[618].mob.centerLatitude = 51.340
+-*.terminal[618].mob.centerLongitude = 12.373
+-*.terminal[619].mob.centerLatitude = 49.452
+-*.terminal[619].mob.centerLongitude = 11.076
+-*.terminal[620].mob.centerLatitude = 54.092
+-*.terminal[620].mob.centerLongitude = 12.099
+-*.terminal[621].mob.centerLatitude = 51.312
+-*.terminal[621].mob.centerLongitude = 9.479
+-*.terminal[622].mob.centerLatitude = 50.978
+-*.terminal[622].mob.centerLongitude = 11.029
+-*.terminal[623].mob.centerLatitude = 51.961
+-*.terminal[623].mob.centerLongitude = 7.626
+-*.terminal[624].mob.centerLatitude = 43.769
+-*.terminal[624].mob.centerLongitude = 11.255
+-*.terminal[625].mob.centerLatitude = 41.117
+-*.terminal[625].mob.centerLongitude = 16.871
+-*.terminal[626].mob.centerLatitude = 45.441
+-*.terminal[626].mob.centerLongitude = 12.316
+-*.terminal[627].mob.centerLatitude = 42.464
+-*.terminal[627].mob.centerLongitude = 14.214
+-*.terminal[628].mob.centerLatitude = 53.219
+-*.terminal[628].mob.centerLongitude = 6.567
+-*.terminal[629].mob.centerLatitude = 49.612
+-*.terminal[629].mob.centerLongitude = 6.130
+-*.terminal[630].mob.centerLatitude = 47.809
+-*.terminal[630].mob.centerLongitude = 13.055
+-*.terminal[631].mob.centerLatitude = 48.306
+-*.terminal[631].mob.centerLongitude = 14.286
+-*.terminal[632].mob.centerLatitude = 46.804
+-*.terminal[632].mob.centerLongitude = 9.837
+-*.terminal[633].mob.centerLatitude = 46.829
+-*.terminal[633].mob.centerLongitude = 12.769
+-*.terminal[634].mob.centerLatitude = 60.451
+-*.terminal[634].mob.centerLongitude = 22.266
+-*.terminal[635].mob.centerLatitude = 63.431
+-*.terminal[635].mob.centerLongitude = 10.395
+-*.terminal[636].mob.centerLatitude = 63.826
+-*.terminal[636].mob.centerLongitude = 20.263
+-*.terminal[637].mob.centerLatitude = 65.584
+-*.terminal[637].mob.centerLongitude = 22.155
+-*.terminal[638].mob.centerLatitude = 58.146
+-*.terminal[638].mob.centerLongitude = 7.995
+-*.terminal[639].mob.centerLatitude = 62.472
+-*.terminal[639].mob.centerLongitude = 6.150
+-*.terminal[640].mob.centerLatitude = 65.012
+-*.terminal[640].mob.centerLongitude = 25.465
+-*.terminal[641].mob.centerLatitude = 49.883
+-*.terminal[641].mob.centerLongitude = 18.568
+-*.terminal[642].mob.centerLatitude = 47.531
+-*.terminal[642].mob.centerLongitude = 21.627
+-*.terminal[643].mob.centerLatitude = 44.179
+-*.terminal[643].mob.centerLongitude = 28.649
+-*.terminal[644].mob.centerLatitude = 45.327
+-*.terminal[644].mob.centerLongitude = 14.442
+-*.terminal[645].mob.centerLatitude = 52.406
+-*.terminal[645].mob.centerLongitude = 16.925
+-*.terminal[646].mob.centerLatitude = 51.247
+-*.terminal[646].mob.centerLongitude = 22.568
+-*.terminal[647].mob.centerLatitude = 53.133
+-*.terminal[647].mob.centerLongitude = 23.169
+-*.terminal[648].mob.centerLatitude = 48.716
+-*.terminal[648].mob.centerLongitude = 21.261
+-*.terminal[649].mob.centerLatitude = 40.694
+-*.terminal[649].mob.centerLongitude = 30.400
+-*.terminal[650].mob.centerLatitude = 37.066
+-*.terminal[650].mob.centerLongitude = 37.383
+-*.terminal[651].mob.centerLatitude = 37.871
+-*.terminal[651].mob.centerLongitude = 32.485
+-*.terminal[652].mob.centerLatitude = 38.721
+-*.terminal[652].mob.centerLongitude = 35.487
+-*.terminal[653].mob.centerLatitude = 64.836
+-*.terminal[653].mob.centerLongitude = -23.708
+-*.terminal[654].mob.centerLatitude = 38.907
+-*.terminal[654].mob.centerLongitude = 1.421
+-*.terminal[655].mob.centerLatitude = 39.889
+-*.terminal[655].mob.centerLongitude = 4.265
+-*.terminal[656].mob.centerLatitude = 36.434
+-*.terminal[656].mob.centerLongitude = 28.217
+-*.terminal[657].mob.centerLatitude = 35.339
+-*.terminal[657].mob.centerLongitude = 25.144
+-*.terminal[658].mob.centerLatitude = 28.963
+-*.terminal[658].mob.centerLongitude = -13.548
+-*.terminal[659].mob.centerLatitude = 67.856
+-*.terminal[659].mob.centerLongitude = 20.225
+-*.terminal[660].mob.centerLatitude = 54.978
+-*.terminal[660].mob.centerLongitude = -1.617
+-*.terminal[661].mob.centerLatitude = 57.150
+-*.terminal[661].mob.centerLongitude = -2.094
+-*.terminal[662].mob.centerLatitude = 57.478
+-*.terminal[662].mob.centerLongitude = -4.225
+-*.terminal[663].mob.centerLatitude = 50.376
+-*.terminal[663].mob.centerLongitude = -4.143
+-*.terminal[664].mob.centerLatitude = 52.630
+-*.terminal[664].mob.centerLongitude = 1.297
+-*.terminal[665].mob.centerLatitude = 53.271
+-*.terminal[665].mob.centerLongitude = -9.057
+-*.terminal[666].mob.centerLatitude = 47.243
+-*.terminal[666].mob.centerLongitude = 6.024
+-*.terminal[667].mob.centerLatitude = 43.610
+-*.terminal[667].mob.centerLongitude = 3.876
+-*.terminal[668].mob.centerLatitude = 49.443
+-*.terminal[668].mob.centerLongitude = 1.099
+-*.terminal[669].mob.centerLatitude = 48.390
+-*.terminal[669].mob.centerLongitude = -4.486
+-*.terminal[670].mob.centerLatitude = 48.117
+-*.terminal[670].mob.centerLongitude = -1.678
+-*.terminal[671].mob.centerLatitude = 45.834
+-*.terminal[671].mob.centerLongitude = 1.262
+-*.terminal[672].mob.centerLatitude = 37.992
+-*.terminal[672].mob.centerLongitude = -1.130
+-*.terminal[673].mob.centerLatitude = 40.965
+-*.terminal[673].mob.centerLongitude = -5.664
+-*.terminal[674].mob.centerLatitude = 43.263
+-*.terminal[674].mob.centerLongitude = -2.935
+-*.terminal[675].mob.centerLatitude = 41.652
+-*.terminal[675].mob.centerLongitude = -4.724
+-*.terminal[676].mob.centerLatitude = 37.177
+-*.terminal[676].mob.centerLongitude = -3.599
+-*.terminal[677].mob.centerLatitude = 38.879
+-*.terminal[677].mob.centerLongitude = -6.970
+-*.terminal[678].mob.centerLatitude = 51.340
+-*.terminal[678].mob.centerLongitude = 12.373
+-*.terminal[679].mob.centerLatitude = 49.452
+-*.terminal[679].mob.centerLongitude = 11.076
+-*.terminal[680].mob.centerLatitude = 54.092
+-*.terminal[680].mob.centerLongitude = 12.099
+-*.terminal[681].mob.centerLatitude = 51.312
+-*.terminal[681].mob.centerLongitude = 9.479
+-*.terminal[682].mob.centerLatitude = 50.978
+-*.terminal[682].mob.centerLongitude = 11.029
+-*.terminal[683].mob.centerLatitude = 51.961
+-*.terminal[683].mob.centerLongitude = 7.626
+-*.terminal[684].mob.centerLatitude = 43.769
+-*.terminal[684].mob.centerLongitude = 11.255
+-*.terminal[685].mob.centerLatitude = 41.117
+-*.terminal[685].mob.centerLongitude = 16.871
+-*.terminal[686].mob.centerLatitude = 45.441
+-*.terminal[686].mob.centerLongitude = 12.316
+-*.terminal[687].mob.centerLatitude = 42.464
+-*.terminal[687].mob.centerLongitude = 14.214
+-*.terminal[688].mob.centerLatitude = 53.219
+-*.terminal[688].mob.centerLongitude = 6.567
+-*.terminal[689].mob.centerLatitude = 49.612
+-*.terminal[689].mob.centerLongitude = 6.130
+-*.terminal[690].mob.centerLatitude = 47.809
+-*.terminal[690].mob.centerLongitude = 13.055
+-*.terminal[691].mob.centerLatitude = 48.306
+-*.terminal[691].mob.centerLongitude = 14.286
+-*.terminal[692].mob.centerLatitude = 46.804
+-*.terminal[692].mob.centerLongitude = 9.837
+-*.terminal[693].mob.centerLatitude = 46.829
+-*.terminal[693].mob.centerLongitude = 12.769
+-*.terminal[694].mob.centerLatitude = 60.451
+-*.terminal[694].mob.centerLongitude = 22.266
+-*.terminal[695].mob.centerLatitude = 63.431
+-*.terminal[695].mob.centerLongitude = 10.395
+-*.terminal[696].mob.centerLatitude = 63.826
+-*.terminal[696].mob.centerLongitude = 20.263
+-*.terminal[697].mob.centerLatitude = 65.584
+-*.terminal[697].mob.centerLongitude = 22.155
+-*.terminal[698].mob.centerLatitude = 58.146
+-*.terminal[698].mob.centerLongitude = 7.995
+-*.terminal[699].mob.centerLatitude = 62.472
+-*.terminal[699].mob.centerLongitude = 6.150
+-*.terminal[700].mob.centerLatitude = 65.012
+-*.terminal[700].mob.centerLongitude = 25.465
+-*.terminal[701].mob.centerLatitude = 49.883
+-*.terminal[701].mob.centerLongitude = 18.568
+-*.terminal[702].mob.centerLatitude = 47.531
+-*.terminal[702].mob.centerLongitude = 21.627
+-*.terminal[703].mob.centerLatitude = 44.179
+-*.terminal[703].mob.centerLongitude = 28.649
+-*.terminal[704].mob.centerLatitude = 45.327
+-*.terminal[704].mob.centerLongitude = 14.442
+-*.terminal[705].mob.centerLatitude = 52.406
+-*.terminal[705].mob.centerLongitude = 16.925
+-*.terminal[706].mob.centerLatitude = 51.247
+-*.terminal[706].mob.centerLongitude = 22.568
+-*.terminal[707].mob.centerLatitude = 53.133
+-*.terminal[707].mob.centerLongitude = 23.169
+-*.terminal[708].mob.centerLatitude = 48.716
+-*.terminal[708].mob.centerLongitude = 21.261
+-*.terminal[709].mob.centerLatitude = 40.694
+-*.terminal[709].mob.centerLongitude = 30.400
+-*.terminal[710].mob.centerLatitude = 37.066
+-*.terminal[710].mob.centerLongitude = 37.383
+-*.terminal[711].mob.centerLatitude = 37.871
+-*.terminal[711].mob.centerLongitude = 32.485
+-*.terminal[712].mob.centerLatitude = 38.721
+-*.terminal[712].mob.centerLongitude = 35.487
+-*.terminal[713].mob.centerLatitude = 64.836
+-*.terminal[713].mob.centerLongitude = -23.708
+-*.terminal[714].mob.centerLatitude = 38.907
+-*.terminal[714].mob.centerLongitude = 1.421
+-*.terminal[715].mob.centerLatitude = 39.889
+-*.terminal[715].mob.centerLongitude = 4.265
+-*.terminal[716].mob.centerLatitude = 36.434
+-*.terminal[716].mob.centerLongitude = 28.217
+-*.terminal[717].mob.centerLatitude = 35.339
+-*.terminal[717].mob.centerLongitude = 25.144
+-*.terminal[718].mob.centerLatitude = 28.963
+-*.terminal[718].mob.centerLongitude = -13.548
+-*.terminal[719].mob.centerLatitude = 67.856
+-*.terminal[719].mob.centerLongitude = 20.225
+-*.terminal[720].mob.centerLatitude = 54.978
+-*.terminal[720].mob.centerLongitude = -1.617
+-*.terminal[721].mob.centerLatitude = 57.150
+-*.terminal[721].mob.centerLongitude = -2.094
+-*.terminal[722].mob.centerLatitude = 57.478
+-*.terminal[722].mob.centerLongitude = -4.225
+-*.terminal[723].mob.centerLatitude = 50.376
+-*.terminal[723].mob.centerLongitude = -4.143
+-*.terminal[724].mob.centerLatitude = 52.630
+-*.terminal[724].mob.centerLongitude = 1.297
+-*.terminal[725].mob.centerLatitude = 53.271
+-*.terminal[725].mob.centerLongitude = -9.057
+-*.terminal[726].mob.centerLatitude = 47.243
+-*.terminal[726].mob.centerLongitude = 6.024
+-*.terminal[727].mob.centerLatitude = 43.610
+-*.terminal[727].mob.centerLongitude = 3.876
+-*.terminal[728].mob.centerLatitude = 49.443
+-*.terminal[728].mob.centerLongitude = 1.099
+-*.terminal[729].mob.centerLatitude = 48.390
+-*.terminal[729].mob.centerLongitude = -4.486
+-*.terminal[730].mob.centerLatitude = 48.117
+-*.terminal[730].mob.centerLongitude = -1.678
+-*.terminal[731].mob.centerLatitude = 45.834
+-*.terminal[731].mob.centerLongitude = 1.262
+-*.terminal[732].mob.centerLatitude = 37.992
+-*.terminal[732].mob.centerLongitude = -1.130
+-*.terminal[733].mob.centerLatitude = 40.965
+-*.terminal[733].mob.centerLongitude = -5.664
+-*.terminal[734].mob.centerLatitude = 43.263
+-*.terminal[734].mob.centerLongitude = -2.935
+-*.terminal[735].mob.centerLatitude = 41.652
+-*.terminal[735].mob.centerLongitude = -4.724
+-*.terminal[736].mob.centerLatitude = 37.177
+-*.terminal[736].mob.centerLongitude = -3.599
+-*.terminal[737].mob.centerLatitude = 38.879
+-*.terminal[737].mob.centerLongitude = -6.970
+-*.terminal[738].mob.centerLatitude = 51.340
+-*.terminal[738].mob.centerLongitude = 12.373
+-*.terminal[739].mob.centerLatitude = 49.452
+-*.terminal[739].mob.centerLongitude = 11.076
+-*.terminal[740].mob.centerLatitude = 54.092
+-*.terminal[740].mob.centerLongitude = 12.099
+-*.terminal[741].mob.centerLatitude = 51.312
+-*.terminal[741].mob.centerLongitude = 9.479
+-*.terminal[742].mob.centerLatitude = 50.978
+-*.terminal[742].mob.centerLongitude = 11.029
+-*.terminal[743].mob.centerLatitude = 51.961
+-*.terminal[743].mob.centerLongitude = 7.626
+-*.terminal[744].mob.centerLatitude = 43.769
+-*.terminal[744].mob.centerLongitude = 11.255
+-*.terminal[745].mob.centerLatitude = 41.117
+-*.terminal[745].mob.centerLongitude = 16.871
+-*.terminal[746].mob.centerLatitude = 45.441
+-*.terminal[746].mob.centerLongitude = 12.316
+-*.terminal[747].mob.centerLatitude = 42.464
+-*.terminal[747].mob.centerLongitude = 14.214
+-*.terminal[748].mob.centerLatitude = 53.219
+-*.terminal[748].mob.centerLongitude = 6.567
+-*.terminal[749].mob.centerLatitude = 49.612
+-*.terminal[749].mob.centerLongitude = 6.130
+-*.terminal[750].mob.centerLatitude = 47.809
+-*.terminal[750].mob.centerLongitude = 13.055
+-*.terminal[751].mob.centerLatitude = 48.306
+-*.terminal[751].mob.centerLongitude = 14.286
+-*.terminal[752].mob.centerLatitude = 46.804
+-*.terminal[752].mob.centerLongitude = 9.837
+-*.terminal[753].mob.centerLatitude = 46.829
+-*.terminal[753].mob.centerLongitude = 12.769
+-*.terminal[754].mob.centerLatitude = 60.451
+-*.terminal[754].mob.centerLongitude = 22.266
+-*.terminal[755].mob.centerLatitude = 63.431
+-*.terminal[755].mob.centerLongitude = 10.395
+-*.terminal[756].mob.centerLatitude = 63.826
+-*.terminal[756].mob.centerLongitude = 20.263
+-*.terminal[757].mob.centerLatitude = 65.584
+-*.terminal[757].mob.centerLongitude = 22.155
+-*.terminal[758].mob.centerLatitude = 58.146
+-*.terminal[758].mob.centerLongitude = 7.995
+-*.terminal[759].mob.centerLatitude = 62.472
+-*.terminal[759].mob.centerLongitude = 6.150
+-*.terminal[760].mob.centerLatitude = 65.012
+-*.terminal[760].mob.centerLongitude = 25.465
+-*.terminal[761].mob.centerLatitude = 49.883
+-*.terminal[761].mob.centerLongitude = 18.568
+-*.terminal[762].mob.centerLatitude = 47.531
+-*.terminal[762].mob.centerLongitude = 21.627
+-*.terminal[763].mob.centerLatitude = 44.179
+-*.terminal[763].mob.centerLongitude = 28.649
+-*.terminal[764].mob.centerLatitude = 45.327
+-*.terminal[764].mob.centerLongitude = 14.442
+-*.terminal[765].mob.centerLatitude = 52.406
+-*.terminal[765].mob.centerLongitude = 16.925
+-*.terminal[766].mob.centerLatitude = 51.247
+-*.terminal[766].mob.centerLongitude = 22.568
+-*.terminal[767].mob.centerLatitude = 53.133
+-*.terminal[767].mob.centerLongitude = 23.169
+-*.terminal[768].mob.centerLatitude = 48.716
+-*.terminal[768].mob.centerLongitude = 21.261
+-*.terminal[769].mob.centerLatitude = 40.694
+-*.terminal[769].mob.centerLongitude = 30.400
+-*.terminal[770].mob.centerLatitude = 37.066
+-*.terminal[770].mob.centerLongitude = 37.383
+-*.terminal[771].mob.centerLatitude = 37.871
+-*.terminal[771].mob.centerLongitude = 32.485
+-*.terminal[772].mob.centerLatitude = 38.721
+-*.terminal[772].mob.centerLongitude = 35.487
+-*.terminal[773].mob.centerLatitude = 64.836
+-*.terminal[773].mob.centerLongitude = -23.708
+-*.terminal[774].mob.centerLatitude = 38.907
+-*.terminal[774].mob.centerLongitude = 1.421
+-*.terminal[775].mob.centerLatitude = 39.889
+-*.terminal[775].mob.centerLongitude = 4.265
+-*.terminal[776].mob.centerLatitude = 36.434
+-*.terminal[776].mob.centerLongitude = 28.217
+-*.terminal[777].mob.centerLatitude = 35.339
+-*.terminal[777].mob.centerLongitude = 25.144
+-*.terminal[778].mob.centerLatitude = 28.963
+-*.terminal[778].mob.centerLongitude = -13.548
+-*.terminal[779].mob.centerLatitude = 67.856
+-*.terminal[779].mob.centerLongitude = 20.225
+-*.terminal[780].mob.centerLatitude = 54.978
+-*.terminal[780].mob.centerLongitude = -1.617
+-*.terminal[781].mob.centerLatitude = 57.150
+-*.terminal[781].mob.centerLongitude = -2.094
+-*.terminal[782].mob.centerLatitude = 57.478
+-*.terminal[782].mob.centerLongitude = -4.225
+-*.terminal[783].mob.centerLatitude = 50.376
+-*.terminal[783].mob.centerLongitude = -4.143
+-*.terminal[784].mob.centerLatitude = 52.630
+-*.terminal[784].mob.centerLongitude = 1.297
+-*.terminal[785].mob.centerLatitude = 53.271
+-*.terminal[785].mob.centerLongitude = -9.057
+-*.terminal[786].mob.centerLatitude = 47.243
+-*.terminal[786].mob.centerLongitude = 6.024
+-*.terminal[787].mob.centerLatitude = 43.610
+-*.terminal[787].mob.centerLongitude = 3.876
+-*.terminal[788].mob.centerLatitude = 49.443
+-*.terminal[788].mob.centerLongitude = 1.099
+-*.terminal[789].mob.centerLatitude = 48.390
+-*.terminal[789].mob.centerLongitude = -4.486
+-*.terminal[790].mob.centerLatitude = 48.117
+-*.terminal[790].mob.centerLongitude = -1.678
+-*.terminal[791].mob.centerLatitude = 45.834
+-*.terminal[791].mob.centerLongitude = 1.262
+-*.terminal[792].mob.centerLatitude = 37.992
+-*.terminal[792].mob.centerLongitude = -1.130
+-*.terminal[793].mob.centerLatitude = 40.965
+-*.terminal[793].mob.centerLongitude = -5.664
+-*.terminal[794].mob.centerLatitude = 43.263
+-*.terminal[794].mob.centerLongitude = -2.935
+-*.terminal[795].mob.centerLatitude = 41.652
+-*.terminal[795].mob.centerLongitude = -4.724
+-*.terminal[796].mob.centerLatitude = 37.177
+-*.terminal[796].mob.centerLongitude = -3.599
+-*.terminal[797].mob.centerLatitude = 38.879
+-*.terminal[797].mob.centerLongitude = -6.970
+-*.terminal[798].mob.centerLatitude = 51.340
+-*.terminal[798].mob.centerLongitude = 12.373
+-*.terminal[799].mob.centerLatitude = 49.452
+-*.terminal[799].mob.centerLongitude = 11.076
+-*.terminal[800].mob.centerLatitude = 54.092
+-*.terminal[800].mob.centerLongitude = 12.099
+-*.terminal[801].mob.centerLatitude = 51.312
+-*.terminal[801].mob.centerLongitude = 9.479
+-*.terminal[802].mob.centerLatitude = 50.978
+-*.terminal[802].mob.centerLongitude = 11.029
+-*.terminal[803].mob.centerLatitude = 51.961
+-*.terminal[803].mob.centerLongitude = 7.626
+-*.terminal[804].mob.centerLatitude = 43.769
+-*.terminal[804].mob.centerLongitude = 11.255
+-*.terminal[805].mob.centerLatitude = 41.117
+-*.terminal[805].mob.centerLongitude = 16.871
+-*.terminal[806].mob.centerLatitude = 45.441
+-*.terminal[806].mob.centerLongitude = 12.316
+-*.terminal[807].mob.centerLatitude = 42.464
+-*.terminal[807].mob.centerLongitude = 14.214
+-*.terminal[808].mob.centerLatitude = 53.219
+-*.terminal[808].mob.centerLongitude = 6.567
+-*.terminal[809].mob.centerLatitude = 49.612
+-*.terminal[809].mob.centerLongitude = 6.130
+-*.terminal[810].mob.centerLatitude = 47.809
+-*.terminal[810].mob.centerLongitude = 13.055
+-*.terminal[811].mob.centerLatitude = 48.306
+-*.terminal[811].mob.centerLongitude = 14.286
+-*.terminal[812].mob.centerLatitude = 46.804
+-*.terminal[812].mob.centerLongitude = 9.837
+-*.terminal[813].mob.centerLatitude = 46.829
+-*.terminal[813].mob.centerLongitude = 12.769
+-*.terminal[814].mob.centerLatitude = 60.451
+-*.terminal[814].mob.centerLongitude = 22.266
+-*.terminal[815].mob.centerLatitude = 63.431
+-*.terminal[815].mob.centerLongitude = 10.395
+-*.terminal[816].mob.centerLatitude = 63.826
+-*.terminal[816].mob.centerLongitude = 20.263
+-*.terminal[817].mob.centerLatitude = 65.584
+-*.terminal[817].mob.centerLongitude = 22.155
+-*.terminal[818].mob.centerLatitude = 58.146
+-*.terminal[818].mob.centerLongitude = 7.995
+-*.terminal[819].mob.centerLatitude = 62.472
+-*.terminal[819].mob.centerLongitude = 6.150
+-*.terminal[820].mob.centerLatitude = 65.012
+-*.terminal[820].mob.centerLongitude = 25.465
+-*.terminal[821].mob.centerLatitude = 49.883
+-*.terminal[821].mob.centerLongitude = 18.568
+-*.terminal[822].mob.centerLatitude = 47.531
+-*.terminal[822].mob.centerLongitude = 21.627
+-*.terminal[823].mob.centerLatitude = 44.179
+-*.terminal[823].mob.centerLongitude = 28.649
+-*.terminal[824].mob.centerLatitude = 45.327
+-*.terminal[824].mob.centerLongitude = 14.442
+-*.terminal[825].mob.centerLatitude = 52.406
+-*.terminal[825].mob.centerLongitude = 16.925
+-*.terminal[826].mob.centerLatitude = 51.247
+-*.terminal[826].mob.centerLongitude = 22.568
+-*.terminal[827].mob.centerLatitude = 53.133
+-*.terminal[827].mob.centerLongitude = 23.169
+-*.terminal[828].mob.centerLatitude = 48.716
+-*.terminal[828].mob.centerLongitude = 21.261
+-*.terminal[829].mob.centerLatitude = 40.694
+-*.terminal[829].mob.centerLongitude = 30.400
+-*.terminal[830].mob.centerLatitude = 37.066
+-*.terminal[830].mob.centerLongitude = 37.383
+-*.terminal[831].mob.centerLatitude = 37.871
+-*.terminal[831].mob.centerLongitude = 32.485
+-*.terminal[832].mob.centerLatitude = 38.721
+-*.terminal[832].mob.centerLongitude = 35.487
+-*.terminal[833].mob.centerLatitude = 64.836
+-*.terminal[833].mob.centerLongitude = -23.708
+-*.terminal[834].mob.centerLatitude = 38.907
+-*.terminal[834].mob.centerLongitude = 1.421
+-*.terminal[835].mob.centerLatitude = 39.889
+-*.terminal[835].mob.centerLongitude = 4.265
+-*.terminal[836].mob.centerLatitude = 36.434
+-*.terminal[836].mob.centerLongitude = 28.217
+-*.terminal[837].mob.centerLatitude = 35.339
+-*.terminal[837].mob.centerLongitude = 25.144
+-*.terminal[838].mob.centerLatitude = 28.963
+-*.terminal[838].mob.centerLongitude = -13.548
+-*.terminal[839].mob.centerLatitude = 67.856
+-*.terminal[839].mob.centerLongitude = 20.225
+-*.terminal[840].mob.centerLatitude = 54.978
+-*.terminal[840].mob.centerLongitude = -1.617
+-*.terminal[841].mob.centerLatitude = 57.150
+-*.terminal[841].mob.centerLongitude = -2.094
+-*.terminal[842].mob.centerLatitude = 57.478
+-*.terminal[842].mob.centerLongitude = -4.225
+-*.terminal[843].mob.centerLatitude = 50.376
+-*.terminal[843].mob.centerLongitude = -4.143
+-*.terminal[844].mob.centerLatitude = 52.630
+-*.terminal[844].mob.centerLongitude = 1.297
+-*.terminal[845].mob.centerLatitude = 53.271
+-*.terminal[845].mob.centerLongitude = -9.057
+-*.terminal[846].mob.centerLatitude = 47.243
+-*.terminal[846].mob.centerLongitude = 6.024
+-*.terminal[847].mob.centerLatitude = 43.610
+-*.terminal[847].mob.centerLongitude = 3.876
+-*.terminal[848].mob.centerLatitude = 49.443
+-*.terminal[848].mob.centerLongitude = 1.099
+-*.terminal[849].mob.centerLatitude = 48.390
+-*.terminal[849].mob.centerLongitude = -4.486
+-*.terminal[850].mob.centerLatitude = 48.117
+-*.terminal[850].mob.centerLongitude = -1.678
+-*.terminal[851].mob.centerLatitude = 45.834
+-*.terminal[851].mob.centerLongitude = 1.262
+-*.terminal[852].mob.centerLatitude = 37.992
+-*.terminal[852].mob.centerLongitude = -1.130
+-*.terminal[853].mob.centerLatitude = 40.965
+-*.terminal[853].mob.centerLongitude = -5.664
+-*.terminal[854].mob.centerLatitude = 43.263
+-*.terminal[854].mob.centerLongitude = -2.935
+-*.terminal[855].mob.centerLatitude = 41.652
+-*.terminal[855].mob.centerLongitude = -4.724
+-*.terminal[856].mob.centerLatitude = 37.177
+-*.terminal[856].mob.centerLongitude = -3.599
+-*.terminal[857].mob.centerLatitude = 38.879
+-*.terminal[857].mob.centerLongitude = -6.970
+-*.terminal[858].mob.centerLatitude = 51.340
+-*.terminal[858].mob.centerLongitude = 12.373
+-*.terminal[859].mob.centerLatitude = 49.452
+-*.terminal[859].mob.centerLongitude = 11.076
+-*.terminal[860].mob.centerLatitude = 54.092
+-*.terminal[860].mob.centerLongitude = 12.099
+-*.terminal[861].mob.centerLatitude = 51.312
+-*.terminal[861].mob.centerLongitude = 9.479
+-*.terminal[862].mob.centerLatitude = 50.978
+-*.terminal[862].mob.centerLongitude = 11.029
+-*.terminal[863].mob.centerLatitude = 51.961
+-*.terminal[863].mob.centerLongitude = 7.626
+-*.terminal[864].mob.centerLatitude = 43.769
+-*.terminal[864].mob.centerLongitude = 11.255
+-*.terminal[865].mob.centerLatitude = 41.117
+-*.terminal[865].mob.centerLongitude = 16.871
+-*.terminal[866].mob.centerLatitude = 45.441
+-*.terminal[866].mob.centerLongitude = 12.316
+-*.terminal[867].mob.centerLatitude = 42.464
+-*.terminal[867].mob.centerLongitude = 14.214
+-*.terminal[868].mob.centerLatitude = 53.219
+-*.terminal[868].mob.centerLongitude = 6.567
+-*.terminal[869].mob.centerLatitude = 49.612
+-*.terminal[869].mob.centerLongitude = 6.130
+-*.terminal[870].mob.centerLatitude = 47.809
+-*.terminal[870].mob.centerLongitude = 13.055
+-*.terminal[871].mob.centerLatitude = 48.306
+-*.terminal[871].mob.centerLongitude = 14.286
+-*.terminal[872].mob.centerLatitude = 46.804
+-*.terminal[872].mob.centerLongitude = 9.837
+-*.terminal[873].mob.centerLatitude = 46.829
+-*.terminal[873].mob.centerLongitude = 12.769
+-*.terminal[874].mob.centerLatitude = 60.451
+-*.terminal[874].mob.centerLongitude = 22.266
+-*.terminal[875].mob.centerLatitude = 63.431
+-*.terminal[875].mob.centerLongitude = 10.395
+-*.terminal[876].mob.centerLatitude = 63.826
+-*.terminal[876].mob.centerLongitude = 20.263
+-*.terminal[877].mob.centerLatitude = 65.584
+-*.terminal[877].mob.centerLongitude = 22.155
+-*.terminal[878].mob.centerLatitude = 58.146
+-*.terminal[878].mob.centerLongitude = 7.995
+-*.terminal[879].mob.centerLatitude = 62.472
+-*.terminal[879].mob.centerLongitude = 6.150
+-*.terminal[880].mob.centerLatitude = 65.012
+-*.terminal[880].mob.centerLongitude = 25.465
+-*.terminal[881].mob.centerLatitude = 49.883
+-*.terminal[881].mob.centerLongitude = 18.568
+-*.terminal[882].mob.centerLatitude = 47.531
+-*.terminal[882].mob.centerLongitude = 21.627
+-*.terminal[883].mob.centerLatitude = 44.179
+-*.terminal[883].mob.centerLongitude = 28.649
+-*.terminal[884].mob.centerLatitude = 45.327
+-*.terminal[884].mob.centerLongitude = 14.442
+-*.terminal[885].mob.centerLatitude = 52.406
+-*.terminal[885].mob.centerLongitude = 16.925
+-*.terminal[886].mob.centerLatitude = 51.247
+-*.terminal[886].mob.centerLongitude = 22.568
+-*.terminal[887].mob.centerLatitude = 53.133
+-*.terminal[887].mob.centerLongitude = 23.169
+-*.terminal[888].mob.centerLatitude = 48.716
+-*.terminal[888].mob.centerLongitude = 21.261
+-*.terminal[889].mob.centerLatitude = 40.694
+-*.terminal[889].mob.centerLongitude = 30.400
+-*.terminal[890].mob.centerLatitude = 37.066
+-*.terminal[890].mob.centerLongitude = 37.383
+-*.terminal[891].mob.centerLatitude = 37.871
+-*.terminal[891].mob.centerLongitude = 32.485
+-*.terminal[892].mob.centerLatitude = 38.721
+-*.terminal[892].mob.centerLongitude = 35.487
+-*.terminal[893].mob.centerLatitude = 64.836
+-*.terminal[893].mob.centerLongitude = -23.708
+-*.terminal[894].mob.centerLatitude = 38.907
+-*.terminal[894].mob.centerLongitude = 1.421
+-*.terminal[895].mob.centerLatitude = 39.889
+-*.terminal[895].mob.centerLongitude = 4.265
+-*.terminal[896].mob.centerLatitude = 36.434
+-*.terminal[896].mob.centerLongitude = 28.217
+-*.terminal[897].mob.centerLatitude = 35.339
+-*.terminal[897].mob.centerLongitude = 25.144
+-*.terminal[898].mob.centerLatitude = 28.963
+-*.terminal[898].mob.centerLongitude = -13.548
+-*.terminal[899].mob.centerLatitude = 67.856
+-*.terminal[899].mob.centerLongitude = 20.225
+-*.terminal[900].mob.centerLatitude = 54.978
+-*.terminal[900].mob.centerLongitude = -1.617
+-*.terminal[901].mob.centerLatitude = 57.150
+-*.terminal[901].mob.centerLongitude = -2.094
+-*.terminal[902].mob.centerLatitude = 57.478
+-*.terminal[902].mob.centerLongitude = -4.225
+-*.terminal[903].mob.centerLatitude = 50.376
+-*.terminal[903].mob.centerLongitude = -4.143
+-*.terminal[904].mob.centerLatitude = 52.630
+-*.terminal[904].mob.centerLongitude = 1.297
+-*.terminal[905].mob.centerLatitude = 53.271
+-*.terminal[905].mob.centerLongitude = -9.057
+-*.terminal[906].mob.centerLatitude = 47.243
+-*.terminal[906].mob.centerLongitude = 6.024
+-*.terminal[907].mob.centerLatitude = 43.610
+-*.terminal[907].mob.centerLongitude = 3.876
+-*.terminal[908].mob.centerLatitude = 49.443
+-*.terminal[908].mob.centerLongitude = 1.099
+-*.terminal[909].mob.centerLatitude = 48.390
+-*.terminal[909].mob.centerLongitude = -4.486
+-*.terminal[910].mob.centerLatitude = 48.117
+-*.terminal[910].mob.centerLongitude = -1.678
+-*.terminal[911].mob.centerLatitude = 45.834
+-*.terminal[911].mob.centerLongitude = 1.262
+-*.terminal[912].mob.centerLatitude = 37.992
+-*.terminal[912].mob.centerLongitude = -1.130
+-*.terminal[913].mob.centerLatitude = 40.965
+-*.terminal[913].mob.centerLongitude = -5.664
+-*.terminal[914].mob.centerLatitude = 43.263
+-*.terminal[914].mob.centerLongitude = -2.935
+-*.terminal[915].mob.centerLatitude = 41.652
+-*.terminal[915].mob.centerLongitude = -4.724
+-*.terminal[916].mob.centerLatitude = 37.177
+-*.terminal[916].mob.centerLongitude = -3.599
+-*.terminal[917].mob.centerLatitude = 38.879
+-*.terminal[917].mob.centerLongitude = -6.970
+-*.terminal[918].mob.centerLatitude = 51.340
+-*.terminal[918].mob.centerLongitude = 12.373
+-*.terminal[919].mob.centerLatitude = 49.452
+-*.terminal[919].mob.centerLongitude = 11.076
+-*.terminal[920].mob.centerLatitude = 54.092
+-*.terminal[920].mob.centerLongitude = 12.099
+-*.terminal[921].mob.centerLatitude = 51.312
+-*.terminal[921].mob.centerLongitude = 9.479
+-*.terminal[922].mob.centerLatitude = 50.978
+-*.terminal[922].mob.centerLongitude = 11.029
+-*.terminal[923].mob.centerLatitude = 51.961
+-*.terminal[923].mob.centerLongitude = 7.626
+-*.terminal[924].mob.centerLatitude = 43.769
+-*.terminal[924].mob.centerLongitude = 11.255
+-*.terminal[925].mob.centerLatitude = 41.117
+-*.terminal[925].mob.centerLongitude = 16.871
+-*.terminal[926].mob.centerLatitude = 45.441
+-*.terminal[926].mob.centerLongitude = 12.316
+-*.terminal[927].mob.centerLatitude = 42.464
+-*.terminal[927].mob.centerLongitude = 14.214
+-*.terminal[928].mob.centerLatitude = 53.219
+-*.terminal[928].mob.centerLongitude = 6.567
+-*.terminal[929].mob.centerLatitude = 49.612
+-*.terminal[929].mob.centerLongitude = 6.130
+-*.terminal[930].mob.centerLatitude = 47.809
+-*.terminal[930].mob.centerLongitude = 13.055
+-*.terminal[931].mob.centerLatitude = 48.306
+-*.terminal[931].mob.centerLongitude = 14.286
+-*.terminal[932].mob.centerLatitude = 46.804
+-*.terminal[932].mob.centerLongitude = 9.837
+-*.terminal[933].mob.centerLatitude = 46.829
+-*.terminal[933].mob.centerLongitude = 12.769
+-*.terminal[934].mob.centerLatitude = 60.451
+-*.terminal[934].mob.centerLongitude = 22.266
+-*.terminal[935].mob.centerLatitude = 63.431
+-*.terminal[935].mob.centerLongitude = 10.395
+-*.terminal[936].mob.centerLatitude = 63.826
+-*.terminal[936].mob.centerLongitude = 20.263
+-*.terminal[937].mob.centerLatitude = 65.584
+-*.terminal[937].mob.centerLongitude = 22.155
+-*.terminal[938].mob.centerLatitude = 58.146
+-*.terminal[938].mob.centerLongitude = 7.995
+-*.terminal[939].mob.centerLatitude = 62.472
+-*.terminal[939].mob.centerLongitude = 6.150
+-*.terminal[940].mob.centerLatitude = 65.012
+-*.terminal[940].mob.centerLongitude = 25.465
+-*.terminal[941].mob.centerLatitude = 49.883
+-*.terminal[941].mob.centerLongitude = 18.568
+-*.terminal[942].mob.centerLatitude = 47.531
+-*.terminal[942].mob.centerLongitude = 21.627
+-*.terminal[943].mob.centerLatitude = 44.179
+-*.terminal[943].mob.centerLongitude = 28.649
+-*.terminal[944].mob.centerLatitude = 45.327
+-*.terminal[944].mob.centerLongitude = 14.442
+-*.terminal[945].mob.centerLatitude = 52.406
+-*.terminal[945].mob.centerLongitude = 16.925
+-*.terminal[946].mob.centerLatitude = 51.247
+-*.terminal[946].mob.centerLongitude = 22.568
+-*.terminal[947].mob.centerLatitude = 53.133
+-*.terminal[947].mob.centerLongitude = 23.169
+-*.terminal[948].mob.centerLatitude = 48.716
+-*.terminal[948].mob.centerLongitude = 21.261
+-*.terminal[949].mob.centerLatitude = 40.694
+-*.terminal[949].mob.centerLongitude = 30.400
+-*.terminal[950].mob.centerLatitude = 37.066
+-*.terminal[950].mob.centerLongitude = 37.383
+-*.terminal[951].mob.centerLatitude = 37.871
+-*.terminal[951].mob.centerLongitude = 32.485
+-*.terminal[952].mob.centerLatitude = 38.721
+-*.terminal[952].mob.centerLongitude = 35.487
+-*.terminal[953].mob.centerLatitude = 64.836
+-*.terminal[953].mob.centerLongitude = -23.708
+-*.terminal[954].mob.centerLatitude = 38.907
+-*.terminal[954].mob.centerLongitude = 1.421
+-*.terminal[955].mob.centerLatitude = 39.889
+-*.terminal[955].mob.centerLongitude = 4.265
+-*.terminal[956].mob.centerLatitude = 36.434
+-*.terminal[956].mob.centerLongitude = 28.217
+-*.terminal[957].mob.centerLatitude = 35.339
+-*.terminal[957].mob.centerLongitude = 25.144
+-*.terminal[958].mob.centerLatitude = 28.963
+-*.terminal[958].mob.centerLongitude = -13.548
+-*.terminal[959].mob.centerLatitude = 67.856
+-*.terminal[959].mob.centerLongitude = 20.225
+diff --git a/simulations/Test_Individual/devices/make_load_devices.py b/simulations/Test_Individual/devices/make_load_devices.py
+deleted file mode 100644
+index 66d3e0df1..000000000
+--- a/simulations/Test_Individual/devices/make_load_devices.py
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#!/usr/bin/env python3
+-"""Write a device file for the load sweep by cycling over the 60 closed-loop centres.
+-
+-Each terminal keeps a centre from WorldWide-60_closed_loop_ML_unique.ini, so geography stays the
+-same as the LATINCOM closed loop. Ter_Mob spreads terminals around their centre with its default
+-deployment radius, so terminals that share a centre do not share a position.
+-
+-Usage: make_load_devices.py [count]   (default 960, run from this folder)
+-"""
+-import re
+-import sys
+-from pathlib import Path
+-
+-HERE = Path(__file__).parent
+-SOURCE = HERE / "WorldWide-60_closed_loop_ML_unique.ini"
+-COUNT = int(sys.argv[1]) if len(sys.argv) > 1 else 960
+-
+-centres = {}
+-for line in SOURCE.read_text().splitlines():
+-    m = re.match(r"\*\.terminal\[(\d+)\]\.mob\.center(Latitude|Longitude)\s*=\s*([-\d.]+)", line.strip())
+-    if m:
+-        centres.setdefault(int(m.group(1)), {})[m.group(2)] = m.group(3)
+-if len(centres) != 60:
+-    sys.exit(f"expected 60 centres, found {len(centres)}")
+-
+-out = [f"# Generated by make_load_devices.py: {COUNT} terminals over the 60 closed-loop centres.", ""]
+-for i in range(COUNT):
+-    c = centres[i % 60]
+-    out.append(f"*.terminal[{i}].mob.centerLatitude = {c['Latitude']}")
+-    out.append(f"*.terminal[{i}].mob.centerLongitude = {c['Longitude']}")
+-(HERE / f"WorldWide-{COUNT}_closed_loop_load.ini").write_text("\n".join(out) + "\n")
+-print(f"wrote {COUNT} terminals")
+diff --git a/simulations/Test_Individual/gate/tau_elevation.csv b/simulations/Test_Individual/gate/tau_elevation.csv
+deleted file mode 100644
+index 7b6f95fd7..000000000
+--- a/simulations/Test_Individual/gate/tau_elevation.csv
++++ /dev/null
+@@ -1,51 +0,0 @@
+-u,tau
+-0.020000,71.549824
+-0.040000,63.496040
+-0.060000,57.364848
+-0.080000,52.635260
+-0.100000,48.958820
+-0.120000,45.495124
+-0.140000,43.052152
+-0.160000,40.198824
+-0.180000,38.254276
+-0.200000,36.693180
+-0.220000,34.932472
+-0.240000,33.748920
+-0.260000,32.675176
+-0.280000,31.308676
+-0.300000,30.275400
+-0.320000,29.103120
+-0.340000,28.051612
+-0.360000,27.139164
+-0.380000,26.169892
+-0.400000,25.141780
+-0.420000,24.238964
+-0.440000,23.591864
+-0.460000,22.772912
+-0.480000,22.120500
+-0.500000,21.358400
+-0.520000,20.634352
+-0.540000,19.841832
+-0.560000,19.279232
+-0.580000,18.707404
+-0.600000,18.117340
+-0.620000,17.530632
+-0.640000,16.960636
+-0.660000,16.343932
+-0.680000,15.882752
+-0.700000,15.449860
+-0.720000,15.052924
+-0.740000,14.528704
+-0.760000,14.144712
+-0.780000,13.659860
+-0.800000,13.293340
+-0.820000,12.962612
+-0.840000,12.621188
+-0.860000,12.311340
+-0.880000,11.962088
+-0.900000,11.635420
+-0.920000,11.329196
+-0.940000,11.020164
+-0.960000,10.696936
+-0.980000,10.350532
+-1.000000,10.001900
+diff --git a/simulations/Test_Individual/gate/tau_transformer.csv b/simulations/Test_Individual/gate/tau_transformer.csv
+deleted file mode 100644
+index fb8eeda4c..000000000
+--- a/simulations/Test_Individual/gate/tau_transformer.csv
++++ /dev/null
+@@ -1,51 +0,0 @@
+-u,tau
+-0.020000,0.984898
+-0.040000,0.979793
+-0.060000,0.974807
+-0.080000,0.970389
+-0.100000,0.964810
+-0.120000,0.957491
+-0.140000,0.950120
+-0.160000,0.943145
+-0.180000,0.937523
+-0.200000,0.931826
+-0.220000,0.926451
+-0.240000,0.918733
+-0.260000,0.910838
+-0.280000,0.902909
+-0.300000,0.896054
+-0.320000,0.887393
+-0.340000,0.880349
+-0.360000,0.871538
+-0.380000,0.863692
+-0.400000,0.854702
+-0.420000,0.845964
+-0.440000,0.835892
+-0.460000,0.824030
+-0.480000,0.812664
+-0.500000,0.799331
+-0.520000,0.786271
+-0.540000,0.772087
+-0.560000,0.758595
+-0.580000,0.738206
+-0.600000,0.719190
+-0.620000,0.693475
+-0.640000,0.666561
+-0.660000,0.644200
+-0.680000,0.623217
+-0.700000,0.595583
+-0.720000,0.561970
+-0.740000,0.537837
+-0.760000,0.495726
+-0.780000,0.457262
+-0.800000,0.417006
+-0.820000,0.388127
+-0.840000,0.350379
+-0.860000,0.307158
+-0.880000,0.265601
+-0.900000,0.206201
+-0.920000,0.142297
+-0.940000,0.071419
+-0.960000,0.016191
+-0.980000,0.000721
+-1.000000,0.000034
+diff --git a/simulations/Test_Individual/package.ned b/simulations/Test_Individual/package.ned
+index f0b428621..ce796ed17 100644
+--- a/simulations/Test_Individual/package.ned
++++ b/simulations/Test_Individual/package.ned
+@@ -11,7 +11,6 @@ import inet.visualizer.common.IntegratedVisualizer;
+ import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
+ import Global.Medium.DSL.LoRaMedium;
+ import Global.Statistics.TransmissionStatistics.TransmissionStatistics;
+-import Global.LoadControl.LoadBroadcast;
+ 
+ import Nodes._20_Satellite._60_Mobility.Sat_Mob_Orchestrator;
+ 
+@@ -62,10 +61,6 @@ network Florasat_Individual_Sats{
+              @display("p=121,825");
+         }
+ 
+-        loadBroadcast: LoadBroadcast {
+-            @display("p=121,600");
+-        }
+-
+ 
+     connections allowunconnected:
+ 
+diff --git a/src/Global/LoadControl/LoadBroadcast.cc b/src/Global/LoadControl/LoadBroadcast.cc
+deleted file mode 100644
+index 2e24540ae..000000000
+--- a/src/Global/LoadControl/LoadBroadcast.cc
++++ /dev/null
+@@ -1,75 +0,0 @@
+-#include "LoadBroadcast.h"
+-
+-using namespace omnetpp;
+-
+-namespace loadcontrol {
+-
+-Define_Module(LoadBroadcast);
+-
+-LoadBroadcast::~LoadBroadcast()
+-{
+-    cancelAndDelete(windowTimer);
+-}
+-
+-void LoadBroadcast::initialize()
+-{
+-    ControllerParams p;
+-    p.target = par("targetBursts").doubleValue();
+-    p.fixedU = par("fixedU").doubleValue();
+-    p.uMin = par("uMin").doubleValue();
+-    p.ewmaAlpha = par("ewmaAlpha").doubleValue();
+-    p.gain = par("gain").doubleValue();
+-    p.maxRise = par("maxRise").doubleValue();
+-    p.bits = par("bits").intValue();
+-    p.delayWindows = par("delayWindows").intValue();
+-    controller = std::make_unique<AdmissionController>(p);
+-    devices = std::make_unique<DelayedAverage>(p.ewmaAlpha, p.delayWindows);
+-
+-    window = par("window");
+-    observedVector.setName("lcObservedBursts");
+-    estimateVector.setName("lcLoadEstimate");
+-    admissionVector.setName("lcAdmissionFactor");
+-
+-    if (par("enabled").boolValue()) {
+-        windowTimer = new cMessage("lcWindow");
+-        scheduleAt(simTime() + window, windowTimer);
+-    }
+-}
+-
+-void LoadBroadcast::reportBurst()
+-{
+-    windowBursts++;
+-    totalBursts++;
+-}
+-
+-void LoadBroadcast::reportDemand()
+-{
+-    windowDemand++;
+-}
+-
+-void LoadBroadcast::handleMessage(cMessage *msg)
+-{
+-    double u = controller->step((double)windowBursts);
+-    devices->step((double)windowDemand);
+-
+-    observedVector.record((double)windowBursts);
+-    estimateVector.record(controller->loadEstimate());
+-    admissionVector.record(u);
+-
+-    windows++;
+-    if (u < 1.0)
+-        windowsBelowOne++;
+-    windowBursts = 0;
+-    windowDemand = 0;
+-
+-    scheduleAt(simTime() + window, msg);
+-}
+-
+-void LoadBroadcast::finish()
+-{
+-    recordScalar("lcTotalBursts", totalBursts);
+-    recordScalar("lcWindows", windows);
+-    recordScalar("lcWindowsBelowOne", windowsBelowOne);
+-}
+-
+-} // namespace loadcontrol
+diff --git a/src/Global/LoadControl/LoadBroadcast.h b/src/Global/LoadControl/LoadBroadcast.h
+deleted file mode 100644
+index db62027ff..000000000
+--- a/src/Global/LoadControl/LoadBroadcast.h
++++ /dev/null
+@@ -1,47 +0,0 @@
+-#ifndef GLOBAL_LOADCONTROL_LOADBROADCAST_H_
+-#define GLOBAL_LOADCONTROL_LOADBROADCAST_H_
+-
+-#include <memory>
+-#include <omnetpp.h>
+-
+-#include "LoadControlCore.h"
+-
+-namespace loadcontrol {
+-
+-// Satellite side of the broadcast loop, one instance per network. Devices report the bursts the
+-// satellite would detect and read the published admission factor directly, so the air interface
+-// is bypassed. Its cost is charged afterwards, as bits per update and listening time per device.
+-class LoadBroadcast : public omnetpp::cSimpleModule {
+-  public:
+-    ~LoadBroadcast() override;
+-
+-    double admissionFactor() const { return controller->published(); }
+-    double expectedDevices() const { return devices->published(); }
+-    void reportBurst();   // a transmission the satellite would detect
+-    void reportDemand();  // a device wanting to transmit above the mask, before any gate
+-
+-  protected:
+-    void initialize() override;
+-    void handleMessage(omnetpp::cMessage *msg) override;
+-    void finish() override;
+-
+-  private:
+-    std::unique_ptr<AdmissionController> controller;
+-    std::unique_ptr<DelayedAverage> devices;
+-    omnetpp::cMessage *windowTimer = nullptr;
+-    omnetpp::simtime_t window;
+-
+-    long windowBursts = 0;
+-    long windowDemand = 0;
+-    long totalBursts = 0;
+-    long windows = 0;
+-    long windowsBelowOne = 0;
+-
+-    omnetpp::cOutVector observedVector;
+-    omnetpp::cOutVector estimateVector;
+-    omnetpp::cOutVector admissionVector;
+-};
+-
+-} // namespace loadcontrol
+-
+-#endif
+diff --git a/src/Global/LoadControl/LoadBroadcast.ned b/src/Global/LoadControl/LoadBroadcast.ned
+deleted file mode 100644
+index f12520a06..000000000
+--- a/src/Global/LoadControl/LoadBroadcast.ned
++++ /dev/null
+@@ -1,20 +0,0 @@
+-package Global.LoadControl;
+-
+-// Satellite-side broadcast admission control. See LoadBroadcast.h.
+-simple LoadBroadcast
+-{
+-    parameters:
+-        @class(loadcontrol::LoadBroadcast);
+-
+-        bool enabled = default(false);       // inert unless true
+-        double window @unit(s) = default(10s);
+-
+-        double targetBursts = default(0);    // setpoint in detected bursts per window; 0 keeps u at fixedU
+-        double fixedU = default(1);          // open-loop admission factor, for thinning sweeps
+-        double uMin = default(0.02);
+-        double ewmaAlpha = default(0.5);     // weight of the newest window in the load estimate
+-        double gain = default(0.5);          // correction exponent; 1 corrects the full error in one step
+-        double maxRise = default(1.5);       // largest upward factor per window
+-        int bits = default(0);               // broadcast quantisation; 0 keeps full precision
+-        int delayWindows = default(1);       // windows between a measurement and devices holding the value
+-}
+diff --git a/src/Global/LoadControl/LoadControlCore.h b/src/Global/LoadControl/LoadControlCore.h
+deleted file mode 100644
+index ce4c1abda..000000000
+--- a/src/Global/LoadControl/LoadControlCore.h
++++ /dev/null
+@@ -1,187 +0,0 @@
+-#ifndef GLOBAL_LOADCONTROL_LOADCONTROLCORE_H_
+-#define GLOBAL_LOADCONTROL_LOADCONTROLCORE_H_
+-
+-// Broadcast admission control and score gating for ACK-less random access.
+-// Plain C++ with no simulator dependency, so tests/loadcontrol_core_test.cpp can build it alone.
+-//
+-// The satellite counts detected bursts per window and publishes an admission factor u in
+-// [uMin, 1]. A device that hears u spends it either on a coin (access barring) or on its best
+-// opportunities, using a table that maps u to a score threshold.
+-
+-#include <algorithm>
+-#include <cmath>
+-#include <deque>
+-#include <fstream>
+-#include <sstream>
+-#include <stdexcept>
+-#include <string>
+-#include <utility>
+-#include <vector>
+-
+-namespace loadcontrol {
+-
+-struct ControllerParams {
+-    double target = 0;      // setpoint in detected bursts per window; <= 0 keeps u at fixedU
+-    double fixedU = 1;      // open-loop admission factor
+-    double uMin = 0.02;     // floor, so the channel is never closed completely
+-    double ewmaAlpha = 0.5; // weight of the newest window in the load estimate
+-    double gain = 0.5;      // exponent of the correction; 1 corrects the full error in one step
+-    double maxRise = 1.5;   // largest upward factor per window
+-    int bits = 0;           // broadcast quantisation; 0 keeps full precision
+-    int delayWindows = 1;   // windows between a measurement and the value reaching devices
+-};
+-
+-// Multiplicative integrator: u <- clip(u * (target / estimate)^gain).
+-// It needs no split between the controlled and uncontrolled load. With an uncontrolled load B and
+-// a controllable demand C, the fixed point of B + u*C = target is u = (target - B) / C, and u
+-// settles at uMin when B alone exceeds the target.
+-class AdmissionController {
+-  public:
+-    explicit AdmissionController(const ControllerParams &params)
+-        : p(params), u(params.target > 0 ? 1.0 : params.fixedU), out(quantise(u))
+-    {
+-    }
+-
+-    // Closes one window and returns the value devices hold for the next one.
+-    double step(double observedBursts)
+-    {
+-        if (p.target > 0) {
+-            estimate = primed ? p.ewmaAlpha * observedBursts + (1 - p.ewmaAlpha) * estimate
+-                              : observedBursts;
+-            primed = true;
+-            double factor = std::pow(p.target / std::max(estimate, 1e-9), p.gain);
+-            u = std::clamp(u * std::min(factor, p.maxRise), p.uMin, 1.0);
+-        }
+-        pipeline.push_back(quantise(u));
+-        if ((int)pipeline.size() > p.delayWindows) {
+-            out = pipeline.front();
+-            pipeline.pop_front();
+-        }
+-        return out;
+-    }
+-
+-    double published() const { return out; }
+-    double internal() const { return u; }
+-    double loadEstimate() const { return estimate; }
+-
+-  private:
+-    double quantise(double value) const
+-    {
+-        if (p.bits <= 0)
+-            return value;
+-        double levels = std::pow(2.0, p.bits) - 1;
+-        double width = (1.0 - p.uMin) / levels;
+-        return std::clamp(p.uMin + std::round((value - p.uMin) / width) * width, p.uMin, 1.0);
+-    }
+-
+-    ControllerParams p;
+-    double u;
+-    double out;
+-    double estimate = 0;
+-    bool primed = false;
+-    std::deque<double> pipeline;
+-};
+-
+-// Smoothed per-window count that reaches devices after a delay, used for the beaconed device count.
+-class DelayedAverage {
+-  public:
+-    DelayedAverage(double alpha, int delayWindows) : a(alpha), delay(delayWindows) {}
+-
+-    double step(double observed)
+-    {
+-        average = primed ? a * observed + (1 - a) * average : observed;
+-        primed = true;
+-        pipeline.push_back(average);
+-        if ((int)pipeline.size() > delay) {
+-            out = pipeline.front();
+-            pipeline.pop_front();
+-        }
+-        return out;
+-    }
+-
+-    double published() const { return out; }
+-
+-  private:
+-    double a;
+-    int delay;
+-    double average = 0;
+-    double out = 0;
+-    bool primed = false;
+-    std::deque<double> pipeline;
+-};
+-
+-// Maps an admission factor to a score threshold, by linear interpolation between stored points.
+-class ThresholdTable {
+-  public:
+-    ThresholdTable() = default;
+-    explicit ThresholdTable(std::vector<std::pair<double, double>> points) : rows(std::move(points))
+-    {
+-        std::sort(rows.begin(), rows.end());
+-    }
+-
+-    // CSV with a header line, then "u,tau" rows.
+-    static ThresholdTable fromCsv(const std::string &path)
+-    {
+-        std::ifstream file(path);
+-        if (!file)
+-            throw std::runtime_error("cannot open threshold table: " + path);
+-        std::vector<std::pair<double, double>> points;
+-        std::string line;
+-        std::getline(file, line);
+-        while (std::getline(file, line)) {
+-            std::stringstream fields(line);
+-            std::string a, b;
+-            if (std::getline(fields, a, ',') && std::getline(fields, b, ','))
+-                points.emplace_back(std::stod(a), std::stod(b));
+-        }
+-        if (points.empty())
+-            throw std::runtime_error("empty threshold table: " + path);
+-        return ThresholdTable(std::move(points));
+-    }
+-
+-    bool empty() const { return rows.empty(); }
+-
+-    double tau(double u) const
+-    {
+-        if (u <= rows.front().first)
+-            return rows.front().second;
+-        if (u >= rows.back().first)
+-            return rows.back().second;
+-        auto hi = std::lower_bound(rows.begin(), rows.end(), std::pair<double, double>(u, -INFINITY));
+-        auto lo = hi - 1;
+-        double w = (u - lo->first) / (hi->first - lo->first);
+-        return lo->second + w * (hi->second - lo->second);
+-    }
+-
+-  private:
+-    std::vector<std::pair<double, double>> rows; // sorted by u
+-};
+-
+-// Transmission probability around a threshold. softness <= 0 gives a hard gate; a soft gate adds
+-// dither, so devices with similar geometry do not all switch at the same instant.
+-inline double gateProbability(double score, double tau, double softness)
+-{
+-    if (softness <= 0)
+-        return score >= tau ? 1.0 : 0.0;
+-    return 1.0 / (1.0 + std::exp(-(score - tau) / softness));
+-}
+-
+-// Model probabilities bunch near 1, so a fixed softness on the probability scale cannot follow a
+-// small u. The score gate works on this scale instead.
+-inline double logit(double probability)
+-{
+-    double p = std::clamp(probability, 1e-6, 1.0 - 1e-6);
+-    return std::log(p / (1.0 - p));
+-}
+-
+-// Trajectory skip, Alvarez et al., IEEE Access 2022, Eq. (5), with N the beaconed device count.
+-// The paper calls this the probability of skipping, but the expression falls as N grows and its
+-// text says a lower pSkip means more skipping, so it is used here as the probability of transmitting.
+-inline double skipTransmitProbability(double devices, double pSkip)
+-{
+-    return 2.0 / (1.0 + std::exp(devices / pSkip));
+-}
+-
+-} // namespace loadcontrol
+-
+-#endif
+diff --git a/src/Global/Transceiver/LoRaReceiver.cc b/src/Global/Transceiver/LoRaReceiver.cc
+index b5e4e7362..f0147ff20 100755
+--- a/src/Global/Transceiver/LoRaReceiver.cc
++++ b/src/Global/Transceiver/LoRaReceiver.cc
+@@ -61,7 +61,6 @@ void LoRaReceiver::initialize(int stage)
+         // Logic to enable/disable different collision handling
+         ///enableCollisions                = par("enableCollisions").boolValue();
+         enableCollisionOverlap          = par("enableCollisionOverlap").boolValue();
+-        collisionGuardBand_Hz           = par("collisionGuardBand").doubleValue();
+     }
+ 
+     if (stage == INITSTAGE_LAST && iAmGateway)
+@@ -567,9 +566,9 @@ bool LoRaReceiver::detectCollisionOverlap(const LoRaReception *loraReception, co
+ 
+         EV << "loraReception.freq: " << freq_x.get() <<endl;
+         EV << "interference.freq: " << freq_y.get() <<endl;
+-        // Frequency overlap check: separated by less than the guard band
++        // Frequency overlap check: separated by less than 1200 Hz
+         double freqSeparation = std::abs(freq_x.get() - freq_y.get());
+-        bool frequencyOverlap = freqSeparation < collisionGuardBand_Hz;
++        bool frequencyOverlap = freqSeparation < 1200.0;
+ 
+         EV_INFO << "Temporal overlap: " << (temporalOverlap ? "YES" : "NO") << ", overlap duration: " << overlapDuration << endl;
+         EV_INFO << "Overlap duration exceeds threshold: " << (overlapExceedsThreshold ? "YES" : "NO") << ", threshold: " << minCollisionOverlap << endl;
+diff --git a/src/Global/Transceiver/LoRaReceiver.h b/src/Global/Transceiver/LoRaReceiver.h
+index ea5b155fc..f39ed62c3 100755
+--- a/src/Global/Transceiver/LoRaReceiver.h
++++ b/src/Global/Transceiver/LoRaReceiver.h
+@@ -83,7 +83,6 @@ private:
+     ///bool enableCollisions;
+     bool enableCollisionOverlap;
+     simtime_t minCollisionOverlap;
+-    double collisionGuardBand_Hz = 1200;
+ 
+     // ACHF -Added new parameters, they dont affect the behaviour of the simulator, only used to store new features for ML models.
+     // This parameter is added to store the real power at reception. It is obtained from loRaReception->getPower(),
+diff --git a/src/Global/Transceiver/LoRaReceiver.ned b/src/Global/Transceiver/LoRaReceiver.ned
+index 3ff099a74..86001cee5 100755
+--- a/src/Global/Transceiver/LoRaReceiver.ned
++++ b/src/Global/Transceiver/LoRaReceiver.ned
+@@ -45,7 +45,6 @@ module LoRaReceiver like IReceiver
+ 		//bool enableCollisions = default(true);             // If false, the receiver ignores all interference and only considers the desired signal's power for reception success
+         bool enableCollisionOverlap = default(false);       // If true, the receiver considers temporal overlap of receptions for collision detection
+         double minCollisionOverlap @unit(s) = default(0s);  // Minimum temporal overlap to count as a collision
+-        double collisionGuardBand @unit(Hz) = default(1200Hz); // Overlapping signals closer than this after Doppler collide, whatever their SF or power
+ 
+     submodules:
+         errorModel: <errorModelType> like IErrorModel if errorModelType != "";
+diff --git a/src/Global/Transceiver/LoRaTransmitter.cc b/src/Global/Transceiver/LoRaTransmitter.cc
+index e75dccfbd..0c4ee946c 100755
+--- a/src/Global/Transceiver/LoRaTransmitter.cc
++++ b/src/Global/Transceiver/LoRaTransmitter.cc
+@@ -72,28 +72,14 @@ const ITransmission *LoRaTransmitter::createTransmission(const IRadio *transmitt
+     int nPreamble = 8;
+     int payloadBytes = B(macFrame->getDataLength()).get() - B(frame->getChunkLength()).get();
+ 
++    int payloadSymbNb = 8;
++    payloadSymbNb += std::ceil((8*payloadBytes - 4*frame->getSpreadFactor() + 28 + 16 - 20*0) / (4*(frame->getSpreadFactor()-2*0))) * (frame->getCodeRendundance() + 4);
++    if(payloadSymbNb < 8) payloadSymbNb = 8;
++
+     simtime_t Tsym = pow(2, frame->getSpreadFactor()) / frame->getBandwidth().get();
+     simtime_t Tpreamble = (nPreamble + 4.25) * Tsym;
+-    simtime_t Theader, Tpayload;
+-
+-    if (par("legacyAirtime").boolValue()) {
+-        // Earlier formula, kept to reproduce stored runs: integer division before ceil, the low data
+-        // rate optimisation off, and the 8 symbols counted twice
+-        int payloadSymbNb = 8;
+-        payloadSymbNb += std::ceil((8*payloadBytes - 4*frame->getSpreadFactor() + 28 + 16 - 20*0) / (4*(frame->getSpreadFactor()-2*0))) * (frame->getCodeRendundance() + 4);
+-        if(payloadSymbNb < 8) payloadSymbNb = 8;
+-        Theader = 0.5 * (8+payloadSymbNb) * Tsym;
+-        Tpayload = 0.5 * (8+payloadSymbNb) * Tsym;
+-    }
+-    else {
+-        // Semtech AN1200.13: explicit header, CRC on, low data rate optimisation when Tsym >= 16 ms
+-        int sf = frame->getSpreadFactor();
+-        int lowDataRate = Tsym.dbl() >= 0.016 ? 1 : 0;
+-        double symbols = std::ceil((8.0*payloadBytes - 4*sf + 28 + 16) / (4.0*(sf - 2*lowDataRate))) * (frame->getCodeRendundance() + 4);
+-        double payloadSymbNb = 8 + std::max(symbols, 0.0);
+-        Theader = 0.5 * payloadSymbNb * Tsym;
+-        Tpayload = 0.5 * payloadSymbNb * Tsym;
+-    }
++    simtime_t Theader = 0.5 * (8+payloadSymbNb) * Tsym;
++    simtime_t Tpayload = 0.5 * (8+payloadSymbNb) * Tsym;
+ 
+     /*
+      * TO DO: We can set duration = 0, to do the downlink process fast without delay.
+diff --git a/src/Global/Transceiver/LoRaTransmitter.ned b/src/Global/Transceiver/LoRaTransmitter.ned
+index f6686e7bb..ca72e0a55 100755
+--- a/src/Global/Transceiver/LoRaTransmitter.ned
++++ b/src/Global/Transceiver/LoRaTransmitter.ned
+@@ -23,6 +23,5 @@ module LoRaTransmitter extends NarrowbandTransmitterBase
+         @signal[LoRaTransmissionCreated](type=bool); // optional
+         @statistic[LoRaTransmissionCreated](source=LoRaTransmissionCreated; record=count);
+         modulation = default("LoRaModulation");
+-        bool legacyAirtime = default(false);    // earlier time-on-air formula, only to reproduce stored runs
+         @class(transceiver::LoRaTransmitter);
+ }
+\ No newline at end of file
+diff --git a/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.cc b/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.cc
+index 3a2b9006b..f168c6609 100755
+--- a/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.cc
++++ b/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.cc
+@@ -154,8 +154,6 @@ void Ter_Dlk_KiWan::initialize(int stage) {
+             mlBoxTwoBranches = check_and_cast<mlbox::Transmission_Predictor_TwoBranches *>(getSubmodule("mlBoxTwoBranches"));
+         }
+ 
+-        initializeGate();
+-
+ 
+     }
+     else if (stage == INITSTAGE_LINK_LAYER) {
+@@ -170,13 +168,6 @@ void Ter_Dlk_KiWan::finish() {
+     recordScalar("successfulDetections", this->numSuccessfulDetections);
+ 
+     recordScalar("numTransmissionsApproved", this->numTransmissionsApproved);
+-    recordScalar("gateMasked", this->gateMasked);
+-    recordScalar("gateBarred", this->gateBarred);
+-    recordScalar("gateReads", this->gateReads);
+-    recordScalar("gateCapped", this->gateCapped);
+-    recordScalar("gateDeferred", this->gateDeferred);
+-    recordScalar("hearsBroadcast", this->hearsBroadcast ? 1 : 0);
+-    recordScalar("macModuleId", this->getId()); // joins the satellite's per-node counts to this device
+     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
+     //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
+ 
+@@ -675,7 +666,6 @@ void Ter_Dlk_KiWan::sendData() {
+ 
+ 
+         bool transmit = true;
+-        double gateScore = std::nan("");
+         if(mlBoxAvailable){
+             /*
+              * Transformer-Encoder
+@@ -701,8 +691,6 @@ void Ter_Dlk_KiWan::sendData() {
+ 
+             std::vector<double> output = mlBox->predict(myFeatures_2);
+             transmit = static_cast<bool>(output[0]);
+-            if (output.size() > 1)
+-                gateScore = output[1];
+ 
+             EV << "After execute model transmit: " << transmit <<endl;
+             double element_vector = transmissionId;
+@@ -795,20 +783,11 @@ void Ter_Dlk_KiWan::sendData() {
+         }
+ 
+ 
+-        if (gateMode != GateMode::NONE)
+-            transmit = applyGate(elevSat_temp, gateScore);
+-
+         if(transmit){
+-            // The satellite can only count what reaches it from above the mask
+-            if (loadBroadcast && elevSat_temp >= gateMaskDeg)
+-                loadBroadcast->reportBurst();
+             sendDown(frameCopy);
+             this->numTransmissionsApproved++;
+             currentTxCountML++;
+         }
+-        else {
+-            delete frameCopy;
+-        }
+ 
+         //sendDown(frameCopy);
+ 
+@@ -832,110 +811,6 @@ void Ter_Dlk_KiWan::sendData() {
+     }
+ }
+ 
+-void Ter_Dlk_KiWan::initializeGate()
+-{
+-    std::string mode = par("gateMode").stdstringValue();
+-    if (mode == "none") gateMode = GateMode::NONE;
+-    else if (mode == "mask") gateMode = GateMode::MASK;
+-    else if (mode == "random") gateMode = GateMode::RANDOM;
+-    else if (mode == "elevation") gateMode = GateMode::ELEVATION;
+-    else if (mode == "score") gateMode = GateMode::SCORE;
+-    else if (mode == "skip") gateMode = GateMode::SKIP;
+-    else throw cRuntimeError("Unknown gateMode '%s'", mode.c_str());
+-
+-    gateMaskDeg = par("gateMaskDeg").doubleValue();
+-    gateSoftness = par("gateSoftness").doubleValue();
+-    gateSkipParam = par("gateSkipParam").doubleValue();
+-    gateRng = par("gateRng").intValue();
+-    gateRepCap = par("gateRepCap").intValue();
+-    gateRepSpread = par("gateRepSpread").boolValue();
+-
+-    // Same devices in every arm of a run: the choice depends only on the terminal index
+-    double f = par("uncontrolledFraction").doubleValue();
+-    if (f > 0) {
+-        int index = getParentModule()->getParentModule()->getIndex();
+-        hearsBroadcast = std::fmod(index * 0.6180339887498949, 1.0) >= f;
+-    }
+-
+-    cModule *broadcast = getSystemModule()->getSubmodule("loadBroadcast");
+-    if (broadcast && broadcast->par("enabled").boolValue())
+-        loadBroadcast = check_and_cast<loadcontrol::LoadBroadcast *>(broadcast);
+-
+-    bool needsBroadcast = gateMode == GateMode::RANDOM || gateMode == GateMode::ELEVATION
+-            || gateMode == GateMode::SCORE || gateMode == GateMode::SKIP;
+-    if (needsBroadcast && !loadBroadcast)
+-        throw cRuntimeError("gateMode '%s' needs an enabled loadBroadcast module", mode.c_str());
+-    if (gateMode == GateMode::SCORE && !mlBoxAvailable)
+-        throw cRuntimeError("gateMode 'score' needs useMLBox = true");
+-
+-    if (gateMode == GateMode::ELEVATION || gateMode == GateMode::SCORE) {
+-        std::string table = par("gateTable").stdstringValue();
+-        if (table.empty())
+-            throw cRuntimeError("gateMode '%s' needs gateTable", mode.c_str());
+-        gateTable = loadcontrol::ThresholdTable::fromCsv(table);
+-    }
+-}
+-
+-bool Ter_Dlk_KiWan::applyGate(double elevDeg, double score)
+-{
+-    if (loadBroadcast && elevDeg >= gateMaskDeg)
+-        loadBroadcast->reportDemand();
+-
+-    // A device that cannot hear the downlink keeps its blind behaviour
+-    if (!hearsBroadcast)
+-        return true;
+-
+-    // Devices in lockstep would otherwise all spend a limited budget on the same repetition
+-    if (gateRepSpread && currentTxCount == 0)
+-        gateFirstSlot = intuniform(0, Ntx - 1, gateRng);
+-
+-    if (elevDeg < gateMaskDeg) {
+-        gateMasked++;
+-        return false;
+-    }
+-    if (gateMode == GateMode::MASK)
+-        return true;
+-
+-    if (currentTxCount < gateFirstSlot) {
+-        gateDeferred++;
+-        return false;
+-    }
+-
+-    gateReads++;
+-
+-    // The repetitions of a message fall within a minute, so their scores are correlated and a rank
+-    // gate alone passes all of them or none. This keeps u a share of each message.
+-    if (gateRepCap != 0) {
+-        int budget = gateRepCap > 0 ? gateRepCap : (int)std::ceil(Ntx * loadBroadcast->admissionFactor());
+-        if (currentTxCountML >= budget) {
+-            gateCapped++;
+-            return false;
+-        }
+-    }
+-
+-    double p;
+-    if (gateMode == GateMode::SKIP) {
+-        p = loadcontrol::skipTransmitProbability(loadBroadcast->expectedDevices(), gateSkipParam);
+-    }
+-    else {
+-        double u = loadBroadcast->admissionFactor();
+-        if (u >= 1.0)
+-            return true;
+-
+-        // The coin is access barring, and the fallback while the model has no score yet
+-        p = u;
+-        if (gateMode == GateMode::ELEVATION)
+-            p = loadcontrol::gateProbability(elevDeg, gateTable.tau(u), gateSoftness);
+-        else if (gateMode == GateMode::SCORE && !std::isnan(score))
+-            p = loadcontrol::gateProbability(loadcontrol::logit(score), loadcontrol::logit(gateTable.tau(u)), gateSoftness);
+-    }
+-
+-    bool admit = uniform(0, 1, gateRng) < p;
+-    if (!admit)
+-        gateBarred++;
+-    return admit;
+-}
+-
+ void Ter_Dlk_KiWan::sendDown(cMessage *message)
+ {
+     // Send down to physical layer through the standard lowerLayerOut gate
+diff --git a/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.h b/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.h
+index c7e34ee62..92ce37166 100755
+--- a/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.h
++++ b/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.h
+@@ -20,7 +20,6 @@
+ #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h"
+ #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.h"
+ #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.h"
+-#include "Global/LoadControl/LoadBroadcast.h"
+ 
+ 
+ using namespace mlbox;
+@@ -174,28 +173,6 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
+         bool mlBoxAvailableMLP = false;
+         bool mlBoxAvailableTwoBranches = false;
+ 
+-        // Load control gate
+-        enum class GateMode { NONE, MASK, RANDOM, ELEVATION, SCORE, SKIP };
+-        GateMode gateMode = GateMode::NONE;
+-        double gateMaskDeg = 10;
+-        double gateSoftness = 0;
+-        double gateSkipParam = 0;
+-        int gateRng = 0;
+-        int gateRepCap = 0;
+-        bool gateRepSpread = false;
+-        int gateFirstSlot = 0;
+-        bool hearsBroadcast = true;
+-        loadcontrol::ThresholdTable gateTable;
+-        loadcontrol::LoadBroadcast *loadBroadcast = nullptr;
+-        int gateMasked = 0;  // repetitions held back because no satellite was above the mask
+-        int gateBarred = 0;  // repetitions held back by the broadcast admission factor
+-        int gateReads = 0;   // times the device read the broadcast; listening energy is charged per read
+-        int gateCapped = 0;  // repetitions held back by the budget per message
+-        int gateDeferred = 0; // repetitions held back before the drawn first slot
+-
+-        void initializeGate();
+-        bool applyGate(double elevDeg, double score);
+-
+ }; // namespace mac
+ 
+ }
+diff --git a/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.ned b/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.ned
+index 1b527f741..333738205 100755
+--- a/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.ned
++++ b/src/Nodes/_10_Terminal/_20_Data_Link/Ter_Dlk_KiWan.ned
+@@ -60,17 +60,6 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
+ 		bool useAnalytical = default(false);
+ 		bool useMLBoxMLP = default(false);
+ 		bool useMLBoxTwoBranches = default(false);
+-
+-        // Load control gate. "none" keeps the decision of the selected predictor.
+-        string gateMode = default("none");          // none, mask, random, elevation, score, skip
+-        double gateMaskDeg = default(10);           // keep equal to radioMedium.minimumElevationTermSat
+-        string gateTable = default("");             // CSV of u,tau for the elevation and score modes
+-        double gateSoftness = default(0);           // logistic width: degrees for elevation, logit units for score; 0 is a hard gate
+-        double gateSkipParam = default(4000);       // p_skip of Alvarez 2022, to fit per scenario
+-        int gateRng = default(0);                   // set to a spare RNG to keep arms paired
+-        int gateRepCap = default(0);                // repetitions sent per message: 0 no limit, k at most k, -1 ceil(Ntx * u)
+-        bool gateRepSpread = default(false);        // each message may start only from a randomly drawn repetition
+-        double uncontrolledFraction = default(0);   // share of devices that never hear the broadcast
+     submodules:
+         queue: <default("DropTailQueue")> like IPacketQueue {
+             parameters:
+diff --git a/src/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.cc b/src/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.cc
+index 37bf1ce6d..2a904b847 100644
+--- a/src/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.cc
++++ b/src/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor.cc
+@@ -7,7 +7,6 @@
+  */
+ 
+ 
+-#include <map>
+ #include "Transmission_Predictor.h"
+ 
+ Define_Module(Transmission_Predictor);
+@@ -26,18 +25,9 @@ void Transmission_Predictor::initialize(int stage){
+ void Transmission_Predictor::loadModel(){
+     // Loading model
+     EV << "Transformer model loaded "<<endl;
+-    // Devices differ only in window_buffer, and a Module copy is a handle, so they share one load.
+-    // At 960 devices a copy each cost about 5 minutes of startup and 14 GB per run. Never freed, so
+-    // nothing depends on destruction order against LibTorch at exit.
+-    static auto *loaded = new std::map<std::string, torch::jit::script::Module>();
+-    auto entry = loaded->find(modelPath);
+-    if (entry == loaded->end()) {
+-        auto module = torch::jit::load(modelPath);
+-        // Change to eval mode to predict
+-        module.eval();
+-        entry = loaded->emplace(modelPath, module).first;
+-    }
+-    model = entry->second;
++    model = torch::jit::load(modelPath);
++    // Change to eval mode to predict
++    model.eval();
+ 
+     // Load Scaler
+ }
+@@ -152,7 +142,7 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
+            << " -> Decision: " << (transmit ? "TRANSMIT (1)" : "NOT TRANSMIT (0)") << "\n";
+ 
+ 
+-        return {(double)transmit, (double)probability};
++        return {(double)transmit};
+ 
+     } catch (const std::exception& e) {
+         EV_ERROR << "Error running model: " << e.what() << "\n";
+diff --git a/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.cc b/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.cc
+index 3cc6a1dc6..81aaf05ad 100755
+--- a/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.cc
++++ b/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.cc
+@@ -114,13 +114,6 @@ void Sat_Dsl_Dlk_kMac::finish() {
+     recordScalar("Number of packets dropped due to fixed loss", numDroppedPackets);
+     recordScalar("Number of successful receptions", numReceptions);
+ 
+-    // Unique messages: repetitions of one message count once, unlike the receptions above
+-    recordScalar("Number of unique messages received", numUniqueMessages);
+-    for (const auto& pair : uniqueMessagesPerNode) {
+-        std::string scalarName = "Unique messages from Node " + std::to_string(pair.first);
+-        recordScalar(scalarName.c_str(), pair.second);
+-    }
+-
+ 
+ }
+ 
+@@ -294,9 +287,7 @@ void Sat_Dsl_Dlk_kMac::handleLowerMessage(cMessage *msg) {
+             if (sharedUniqueFrames.find(frameId) == sharedUniqueFrames.end()) {
+                 // This is a new unique frame ID, add it to the set
+                 sharedUniqueFrames[frameId] = true;
+-                numUniqueMessages++;
+-                uniqueMessagesPerNode[nodeId]++;
+-
++                
+                 EV_INFO << "Received unique frame with ID: " << frameId 
+                         << ", source node: " << nodeId
+                         << ", sending delay: " << packetDelayFromSending
+diff --git a/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.h b/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.h
+index f0a518a60..a68f6f053 100755
+--- a/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.h
++++ b/src/Nodes/_20_Satellite/DSL/_20_Data_Link/Sat_Dsl_Dlk_kMac.h
+@@ -95,8 +95,6 @@ class Sat_Dsl_Dlk_kMac : public Base_MacProtocol {
+ 
+         // ACHF
+         int numReceptions = 0;
+-        int numUniqueMessages = 0;
+-        std::map<int, int> uniqueMessagesPerNode;
+         cOutVector vectorMethod_ReceptionResult;
+ 
+         cOutVector successfulRepetitionVector;
+diff --git a/tests/loadcontrol_core_test.cpp b/tests/loadcontrol_core_test.cpp
+deleted file mode 100644
+index 025ee6b4e..000000000
+--- a/tests/loadcontrol_core_test.cpp
++++ /dev/null
+@@ -1,140 +0,0 @@
+-// Standalone checks for src/Global/LoadControl/LoadControlCore.h, kept outside src/ because the
+-// build scans that tree with --deep and a second main() would break it.
+-//   clang++ -std=c++17 -Isrc/Global/LoadControl tests/loadcontrol_core_test.cpp -o /tmp/lc_test && /tmp/lc_test
+-
+-#include <cassert>
+-#include <cstdio>
+-
+-#include "LoadControlCore.h"
+-
+-using namespace loadcontrol;
+-
+-static bool near(double a, double b, double tol) { return std::fabs(a - b) <= tol; }
+-
+-// Plant: uncontrolled load B plus u * C, with the loop's own delay and smoothing.
+-static double settle(ControllerParams p, double B, double C, int windows = 400)
+-{
+-    AdmissionController c(p);
+-    for (int i = 0; i < windows; i++)
+-        c.step(B + c.published() * C);
+-    return c.published();
+-}
+-
+-int main()
+-{
+-    ControllerParams p;
+-    p.target = 100;
+-
+-    // Fully controllable: u settles at target / demand.
+-    assert(near(settle(p, 0, 400), 0.25, 1e-3));
+-
+-    // Partly controllable: the fixed point is (target - B) / C, with no estimate of B needed.
+-    assert(near(settle(p, 60, 400), 0.10, 1e-3));
+-
+-    // Uncontrolled load above the target: no authority left, u rests at the floor.
+-    assert(near(settle(p, 150, 400), p.uMin, 1e-9));
+-
+-    // Demand below the target: control releases completely.
+-    assert(near(settle(p, 0, 50), 1.0, 1e-9));
+-
+-    // A longer dead time still settles at this gain.
+-    ControllerParams slow = p;
+-    slow.delayWindows = 4;
+-    slow.gain = 0.25;
+-    assert(near(settle(slow, 0, 400), 0.25, 1e-2));
+-
+-    // An idle channel at the start cannot jump u: the rise per window is capped.
+-    {
+-        ControllerParams q = p;
+-        q.delayWindows = 0;
+-        AdmissionController c(q);
+-        for (int i = 0; i < 40; i++)
+-            c.step(1000);
+-        double low = c.published();
+-        assert(low < 0.2);
+-        c.step(0);
+-        assert(c.published() <= low * q.maxRise + 1e-12);
+-    }
+-
+-    // Open loop holds fixedU whatever is measured.
+-    {
+-        ControllerParams q;
+-        q.fixedU = 0.4;
+-        AdmissionController c(q);
+-        for (int i = 0; i < 5; i++)
+-            c.step(1000);
+-        assert(near(c.published(), 0.4, 1e-12));
+-    }
+-
+-    // The published value lags by delayWindows.
+-    {
+-        ControllerParams q = p;
+-        q.delayWindows = 2;
+-        AdmissionController c(q);
+-        c.step(1000);
+-        assert(near(c.published(), 1.0, 1e-12));
+-        c.step(1000);
+-        assert(near(c.published(), 1.0, 1e-12));
+-        c.step(1000);
+-        assert(c.published() < 1.0);
+-    }
+-
+-    // Quantisation: 2^bits levels between uMin and 1, both ends reachable.
+-    {
+-        ControllerParams q = p;
+-        q.bits = 2;
+-        q.delayWindows = 0;
+-        AdmissionController c(q);
+-        assert(near(c.published(), 1.0, 1e-12));
+-        for (int i = 0; i < 100; i++)
+-            c.step(1e6);
+-        assert(near(c.published(), q.uMin, 1e-12));
+-        double width = (1.0 - q.uMin) / 3.0;
+-        for (int i = 0; i < 400; i++) {
+-            c.step(400 * c.published());
+-            double k = (c.published() - q.uMin) / width;
+-            assert(near(k, std::round(k), 1e-9));
+-        }
+-    }
+-
+-    // Threshold table: interpolation, ends held, higher admission means a lower threshold.
+-    {
+-        ThresholdTable t({{1.0, 0.0}, {0.5, 0.4}, {0.1, 0.9}});
+-        assert(near(t.tau(0.5), 0.4, 1e-12));
+-        assert(near(t.tau(0.75), 0.2, 1e-12));
+-        assert(near(t.tau(0.05), 0.9, 1e-12));
+-        assert(near(t.tau(1.0), 0.0, 1e-12));
+-        assert(t.tau(0.2) > t.tau(0.8));
+-    }
+-
+-    // Gate probability.
+-    assert(gateProbability(0.6, 0.5, 0) == 1.0);
+-    assert(gateProbability(0.4, 0.5, 0) == 0.0);
+-    assert(near(gateProbability(0.5, 0.5, 0.1), 0.5, 1e-12));
+-    assert(gateProbability(0.9, 0.5, 0.1) > 0.95);
+-
+-    // Logit scale: symmetric, and finite at the ends.
+-    assert(near(logit(0.5), 0.0, 1e-12));
+-    assert(near(logit(0.9), -logit(0.1), 1e-9));
+-    assert(std::isfinite(logit(0.0)) && std::isfinite(logit(1.0)));
+-
+-    // Trajectory skip: always transmit with no devices, less as N grows, more with a larger pSkip.
+-    assert(near(skipTransmitProbability(0, 100), 1.0, 1e-12));
+-    assert(skipTransmitProbability(200, 100) < skipTransmitProbability(100, 100));
+-    assert(skipTransmitProbability(100, 400) > skipTransmitProbability(100, 100));
+-    assert(skipTransmitProbability(1e6, 100) < 1e-6);
+-
+-    // Beaconed count: first window taken as is, then smoothed, and held back by the delay.
+-    {
+-        DelayedAverage d(0.5, 1);
+-        d.step(100);
+-        assert(near(d.published(), 0.0, 1e-12));
+-        d.step(200);
+-        assert(near(d.published(), 100.0, 1e-12));
+-        d.step(200);
+-        assert(near(d.published(), 150.0, 1e-12));
+-    }
+-
+-    std::puts("loadcontrol core: all checks passed");
+-    return 0;
+-}

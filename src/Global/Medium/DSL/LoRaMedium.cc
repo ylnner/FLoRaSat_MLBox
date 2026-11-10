@@ -39,6 +39,7 @@
 #include "Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h"
 #include "Nodes/_30_Station/_60_Mobility/Sta_Mob_StationMobility.h"
 #include "Global/Messages/_30_Network/SendAtTag_m.h"
+#include "Global/Statistics/TransmissionStatistics/TransmissionStatistics.h"
 
 
 
@@ -332,6 +333,20 @@ void LoRaMedium::addTransmission(const IRadio *transmitterRadio, const ITransmis
         scheduleAt(communicationCache->getCachedInterferenceEndTime(transmission), removeNonInterferingTransmissionsTimer);
     emit(signalAddedSignal, check_and_cast<const cObject *>(transmission));
 
+}
+
+// ACHF - Descarta interferentes cn angulo menor que 0
+bool LoRaMedium::isInterferingTransmission(const ITransmission *transmission, const IReception *reception) const{
+    auto tag = transmission->getPacket()->findTag<statistics::CstTransmissionStatisticsTag>();
+    if (tag != nullptr && tag->getElevSat() < 0){
+        EV << "tag->getElevSat(): " << tag->getElevSat() <<endl;
+        EV << "tag->getLatDev(): " << tag->getLatDev() <<endl;
+        EV << "tag->getLongDev(): " << tag->getLongDev() <<endl;
+        EV << "DescartadotevSat < 0"<<endl;
+        return false;   // bajo el horizonte: bloqueada por la Tierra, no interfiere
+    }
+
+    return RadioMedium::isInterferingTransmission(transmission, reception);
 }
 
 IWirelessSignal *LoRaMedium::createTransmitterSignal(const IRadio *radio, Packet *packet)

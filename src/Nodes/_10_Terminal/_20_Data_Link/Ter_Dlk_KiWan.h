@@ -2,6 +2,8 @@
 #define Ter_Dlk_KiWan_H
 
 #include <omnetpp.h>
+#include <array>
+
 #include "Global/Base/_20_Data_Link/Base_MacProtocol.h"
 #include "Global/Messages/_20_Data_Link/KiWanMacFrame_m.h"
 #include "Nodes/_10_Terminal/_10_Physical/Ter_Phy_LoRaRadio.h"
@@ -65,6 +67,22 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         double LoRaTP;
         double LoRaCF;
         int LoRaBW;
+
+
+        // ACHF
+        bool randomizeSF_TP;
+        int SF_min;
+        int SF_max;
+        int TP_min;//dbm
+        int TP_max;//dbm
+
+        bool useMixFile = false;
+        int mixId = -1;
+        std::array<double, 3> pSF{};
+        std::array<double, 3> pTP{};
+        void loadMix();
+        int drawWeighted(const std::array<double, 3>& p, double& prob);
+
 
         // Mac parameters
         double ttwDuration;     // Duration of transmission window
@@ -151,6 +169,8 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         
         // ACHF
         double computeReceptionPower();
+        double computeReceptionPower(int lora_TP_dbm);
+
         // statistics for ML
         int numTransmissionsApproved = 0;
         //int numTransmissionsApprovedTransformer = 0;

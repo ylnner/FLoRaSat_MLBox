@@ -13,6 +13,9 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
+#include <fstream>
+#include <sstream>
 
 #include "Ter_Dlk_KiWan.h"
 #include "Global/Messages/_20_Data_Link/KiWanMacFrame_m.h"
@@ -63,6 +66,19 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         LoRaCF = par("LoRaCF");
         LoRaBW = par("LoRaBW");
         LoRaCR = par("LoRaCR");
+
+        // ACHF
+        randomizeSF_TP = par("randomizeSF_TP");
+        SF_min = par("SF_min");
+        SF_max = par("SF_max");
+        TP_min = par("TP_min");//dbm
+        TP_max = par("TP_max");//dbm
+        if (randomizeSF_TP){
+            EV << "Previo a loadMix" <<endl;
+            loadMix();
+        }
+
+
 
         // Mac parameters
         ttwDuration = par("ttwDuration");
@@ -387,8 +403,8 @@ void Ter_Dlk_KiWan::handleTransmitWindowEnd() {
         // ACHF
         // No more data to transmit, inform to the app that al Ntw are donde
         //sendUplink = new cMessage("sendMeasurements");
-        ///cMessage *macDoneMsg = new cMessage("MacRepetitionsDone");
-        ///send(macDoneMsg, "upperLayerOut");
+        cMessage *macDoneMsg = new cMessage("MacRepetitionsDone");
+        send(macDoneMsg, "upperLayerOut");
     }
     // Otherwise, next window is already scheduled from startTransmissionWindow
 }
@@ -428,6 +444,57 @@ void Ter_Dlk_KiWan::checkForWaitingData() {
     }
 }
 
+double Ter_Dlk_KiWan::computeReceptionPower(int lora_TP_dbm) {
+
+    EV << "Transmission_Predictor_Analytical::computeReceptionPower" <<endl;
+
+    Ter_Mob* ter_mob = check_and_cast<Ter_Mob*>(getParentModule()->getParentModule()->getSubmodule("mob"));
+    satellite::Sat *sat  = check_and_cast<satellite::Sat *>(getSystemModule()->getSubmodule("satellite", 0));
+
+    Sat_Mob_SatelliteMobility_Standalone* sat_mob = check_and_cast<Sat_Mob_SatelliteMobility_Standalone*>(sat->getSubmodule("mobility"));
+
+
+    double distance = sat_mob->getDistance(ter_mob->getLatitude(), ter_mob->getLongitude(), 0);
+    distance = distance * 1000; // Pasar de km a metros
+    EV << "distance: " << distance << endl;
+
+
+    medium::LoRaMedium *radioMedium = check_and_cast<medium::LoRaMedium*>(getSystemModule()->getSubmodule("radioMedium"));
+    mps propagationSpeed = radioMedium->getPropagation()->getPropagationSpeed();
+    EV << "propagationSpeed: " << propagationSpeed << endl;
+
+    auto myRadio = ter_mob->getParentModule()->getSubmodule("phy")->getSubmodule("radio");
+
+    double transmitterAntennaGain = 1.0;
+
+    double receiverAntennaGainDb = sat->getSubmodule("phyDSL")->getSubmodule("radio")->getSubmodule("antenna")->par("gain").doubleValue();
+    EV << "receiverAntennaGainDb: " << receiverAntennaGainDb << endl;
+
+    double receiverAntennaGain = math::dB2fraction(receiverAntennaGainDb);
+    EV << "receiverAntennaGainDb: " << receiverAntennaGain << endl;
+
+    inet::Hz centerFrequency = inet::Hz(myRadio->par("centerFrequency").doubleValue());
+    EV << "centerFrequency: " << centerFrequency << endl;
+
+    //int loraTP = ter_mob->getParentModule()->getSubmodule("dlk")->getSubmodule("mac")->par("LoRaTP").doubleValue();
+    int loraTP = lora_TP_dbm;
+    EV << "loraTP: " << loraTP << endl;
+
+    //loraTag->setPower(W(math::dBmW2mW(loRaTP)));
+
+    inet::W transmissionPower = mW(math::dBmW2mW(loraTP));
+    EV << "transmissionPower: " << transmissionPower << endl;
+
+    double pathLoss = radioMedium->getPathLoss()->computePathLoss(propagationSpeed, centerFrequency, m(distance));
+    EV << "pathLoss: " << pathLoss << endl;
+
+    double obstacleLoss = 1.0; // Línea de vista directa al espacio (LOS)
+    inet::W estimatedRxPower = transmissionPower * std::min(1.0, transmitterAntennaGain * receiverAntennaGain * pathLoss * obstacleLoss);
+    EV << "estimatedRxPower: " << estimatedRxPower << endl;
+
+    return math::mW2dBmW(double(estimatedRxPower.get()*1000));;
+
+}
 
 double Ter_Dlk_KiWan::computeReceptionPower() {
 
@@ -512,6 +579,28 @@ void Ter_Dlk_KiWan::sendData() {
         EV << "repetitionNumberML: " << repetitionNumberML <<endl;
         newFrame->setRepetitionML(repetitionNumberML);
 
+        double propensity = -1;
+
+        if(randomizeSF_TP){
+            int current_SF;
+            int current_TP;
+            if(useMixFile){
+                double qSF, qTP;
+                current_SF = SF_min + drawWeighted(pSF, qSF);
+                current_TP = TP_min + drawWeighted(pTP, qTP);
+                propensity = qSF * qTP;
+
+            }else{
+                propensity = 1.0 / ((SF_max - SF_min + 1) * (TP_max - TP_min + 1));
+                current_SF = intuniform(SF_min, SF_max);
+                current_TP = intuniform(TP_min, TP_max);
+            }
+            EV <<"current_SF: "<< current_SF<<endl;
+            EV <<"current_TP: " << current_TP <<endl;
+            // Setear nuevamente el TP y SF
+            newFrame->setLoRaSF(current_SF);
+            newFrame->setLoRaTP(mW(math::dBmW2mW(current_TP)).get());
+        }
 
         newFrame->setSentAt(simTime().dbl());
         
@@ -640,8 +729,20 @@ void Ter_Dlk_KiWan::sendData() {
         //transmissionTag->set
         transmissionTag->setTxStart(tx_start);
         transmissionTag->setRepetition(repetitionNumber);
+        transmissionTag->setMixId(mixId);
+        transmissionTag->setPropensity(propensity);
 
-        transmissionTag->setRx_power_dbm_dev(computeReceptionPower());
+        if(randomizeSF_TP ){
+            //
+            EV <<"randomizeSF_TP: " << randomizeSF_TP <<endl;
+            EV <<"newFrame->getLoRaTP(): " << newFrame->getLoRaTP() <<endl;
+            int aux_tp_dbm = math::mW2dBmW(newFrame->getLoRaTP());
+            EV <<"aux_tp_dbm: " << aux_tp_dbm <<endl;
+            transmissionTag->setRx_power_dbm_dev(computeReceptionPower(aux_tp_dbm));
+        }else{
+            transmissionTag->setRx_power_dbm_dev(computeReceptionPower());
+        }
+
 
         //transmissionTag->setTxDuration(0);
         float loraTP = (mW(newFrame->getLoRaTP()).get())/1000 ;
@@ -1123,6 +1224,71 @@ bool Ter_Dlk_KiWan::isSatelliteInView() {
     });
 
     return satelliteInView;
+}
+
+
+void Ter_Dlk_KiWan::loadMix() {
+    EV << " Ter_Dlk_KiWan::loadMix() "<<endl;
+    std::string path = par("mixFile").stdstringValue();
+    useMixFile = randomizeSF_TP && !path.empty();
+
+    if (!useMixFile)
+        return;
+
+    if (SF_max - SF_min != 2 || TP_max - TP_min != 2)
+        throw cRuntimeError("mixFile requiere exactamente 3 valores de SF y 3 de TP");
+
+
+    // Misma clave que el nombre del CSV de SFTP_TransmissionStatistics
+    cModule *sys        = getSystemModule();
+    cModule *norad      = sys->getSubmodule("satellite", 0)->getSubmodule("NoradModule");
+    std::string split   = sys->par("train_or_test").stdstringValue();
+
+    int alt  = int(norad->par("altitude").doubleValue());
+    int raan = int(norad->par("raan").doubleValue());
+
+    EV << "alt: " << alt << endl;
+    EV << "raan: " << raan << endl;
+
+    const char *repStr  = getEnvir()->getConfigEx()->getVariable("repetition");
+    int seed            = repStr ? std::stoi(repStr) : 0;
+    EV << "seed: " << seed << endl;
+
+    std::ifstream in(path);
+    if (!in.is_open())
+        throw cRuntimeError("No se pudo abrir mixFile '%s'", path.c_str());
+
+    // Leemos el archivo CSV
+    std::string line;
+    std::getline(in, line);     // cabecera
+    while (std::getline(in, line)) {
+        std::replace(line.begin(), line.end(), ',', ' ');
+        std::istringstream row(line);
+        std::string rSplit;
+        int rAlt, rRaan, rSeed, rId;
+        std::array<double, 3> sf, tp;
+        if (row >> rSplit >> rAlt >> rRaan >> rSeed >> rId >> sf[0] >> sf[1] >> sf[2] >> tp[0] >> tp[1] >> tp[2]
+                && rSplit == split && rAlt == alt && rRaan == raan && rSeed == seed) {
+            mixId = rId;
+            pSF = sf;
+            pTP = tp;
+
+            EV << "mixId: "<< mixId <<endl;
+            EV << "Valores pSF: [" << pSF[0] << ", " << pSF[1] << ", " << pSF[2] << "]" << endl;
+            EV << "Valores pTP: [" << pTP[0] << ", " << pTP[1] << ", " << pTP[2] << "]" << endl;
+            return;
+        }
+    }
+    throw cRuntimeError("Sin mezcla para split=%s alt=%d raan=%d seed=%d en '%s'", split.c_str(), alt, raan, seed, path.c_str());
+}
+
+int Ter_Dlk_KiWan::drawWeighted(const std::array<double, 3>& p, double& prob) {
+    // RNG local 1 = stream propio (mac.rng-1 = 1, seed-1-mt)
+    // El tercer parametro es el q hace referencia al rng-1 definido en el ini.
+    double u = uniform(0.0, 1.0, 1); // Numero al azar usando rng 1
+    int i = (u < p[0]) ? 0 : (u < p[0] + p[1]) ? 1 : 2; //posicion elegida 0, 1, 2
+    prob = p[i];    // Guarda El peso de esa posicion
+    return i;       // devuelve a posicion
 }
 
 MacAddress Ter_Dlk_KiWan::getAddress() {

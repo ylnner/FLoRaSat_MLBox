@@ -93,6 +93,7 @@
   Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/LineSegmentsMobilityBase.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MovingMobilityBase.h \
+  Global/Statistics/TransmissionStatistics/KD_TransmissionStatistics.h \
   Global/Messages/_20_Data_Link/LoRaTagInfo_m.h \
   Nodes/_20_Satellite/_30_Network/ForwardingTable.h \
   Nodes/_30_Station/Sta.h \
@@ -225,6 +226,7 @@ Global/Statistics/TransmissionStatistics/CstTransmissionStatisticsTag_m.h:
 Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/LineSegmentsMobilityBase.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MovingMobilityBase.h:
+Global/Statistics/TransmissionStatistics/KD_TransmissionStatistics.h:
 Global/Messages/_20_Data_Link/LoRaTagInfo_m.h:
 Nodes/_20_Satellite/_30_Network/ForwardingTable.h:
 Nodes/_30_Station/Sta.h:

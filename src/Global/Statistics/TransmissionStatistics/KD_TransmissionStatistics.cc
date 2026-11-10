@@ -9,6 +9,7 @@
 
 
 # include "KD_TransmissionStatistics.h"
+#include <iomanip>
 
 namespace statistics{
 Define_Module(KD_TransmissionStatistics);
@@ -24,10 +25,15 @@ KD_TransmissionStatistics::~KD_TransmissionStatistics(){
 
 void KD_TransmissionStatistics::initialize(){
     // create folder structure
-    std::string baseBath = "results/KD_TransmissionStatistics/KD_TransmissionStatistics";
+    /*std::string baseBath = "results/KD_TransmissionStatistics/KD_TransmissionStatistics";
     if (mkdir(baseBath.c_str(), 0777) && errno != EEXIST) {
         error("mkdir failed: %s", strerror(errno));
     }
+    */
+
+    std::string outputDir = par("outputDir").stdstringValue();
+    inet::utils::makePath(outputDir.c_str());   // como "mkdir -p"
+    std::string baseBath = outputDir + "/KD_TransmissionStatistics";
 
 
     //int repetition              = getEnvir()->getConfigEx()->getActiveRunNumber();
@@ -77,20 +83,24 @@ void KD_TransmissionStatistics::initialize(){
 
     getSystemModule()->subscribe(signal_TranmissionStatisticsCorrect, this);
     getSystemModule()->subscribe(signal_TranmissionStatisticsIgnoring, this);
+    // ACHF - transmisiones descartadas por LoRaMedium (elevación < mínimo)
+    signal_BelowElevationMask = cComponent::registerSignal("LoRaMedium_BelowElevationMask");
+    getSystemModule()->subscribe(signal_BelowElevationMask, this);
 
-
-    fileStatsTmp <<"pid,srcId,dstId,srcSat,dstSat,tx_start,tx_duration,repetition,latDev,longDev,satId,elevSat,dopplerShift,loraTP,loraCF,loraSF,loraBW,loraCR,rssi_dbm,snr_db,rx_power_dbm,rx_power_dbm_at_dev,collision_flag,num_colliding_packets,rcvOk";
+    fileStatsTmp <<"pid,time,srcId,dstId,srcSat,dstSat,tx_start,tx_duration,repetition,latDev,longDev,satId,elevSat,dopplerShift,loraTP,loraCF,loraSF,loraBW,loraCR,rssi_dbm,snr_db,rx_power_dbm,rx_power_dbm_at_dev,collision_flag,num_colliding_packets,belowMask,rcvOk";
     fileStatsTmp << "\n";
     fileStatsTmp.close();
 
+    fileStats << std::setprecision(12);
     fileStats.open(filenameStats, std::ios_base::app);
+
 }
 
 void KD_TransmissionStatistics::handleMessage(cMessage *msg){
     error("Unsupported");
 }
 
-void KD_TransmissionStatistics::recordPacket(inet::Packet *packet){
+void KD_TransmissionStatistics::recordPacket(inet::Packet *packet, int belowMask, double recordTime){
     Enter_Method("recordPacket");
     EV << "TransmissionStatistics::recordPacket" <<endl;
 
@@ -142,8 +152,10 @@ void KD_TransmissionStatistics::recordPacket(inet::Packet *packet){
     int rcvOk                   = transmissionTag->getRcvOk();
     double rx_power_dbm_at_dev  = core::roundTo(transmissionTag->getRx_power_dbm_dev(),6);
 
+    double t = (recordTime >= 0) ? recordTime : simTime().dbl();
     // write statistics
     fileStats << pid;
+    fileStats << ", "<< core::roundTo(t, 6);
     fileStats << ","<< srcId;
     fileStats << ","<< dstId;
     fileStats << "," << srcSat;
@@ -167,6 +179,7 @@ void KD_TransmissionStatistics::recordPacket(inet::Packet *packet){
     fileStats << "," << rx_power_dbm_at_dev;
     fileStats << "," << collision_flag;
     fileStats << "," << num_colliding_packets;
+    fileStats << "," << belowMask;
     fileStats << "," << rcvOk;
     fileStats << "\n";
 }
@@ -175,6 +188,50 @@ void KD_TransmissionStatistics::receiveSignal(cComponent *source, simsignal_t si
     EV << "TransmissionStatistics::receiveSignal" <<endl;
     EV << "==================================================" <<endl;
     EV << "signalID: " << signalID <<endl;
+
+    // ACHF - Transmision terminal , el satelitees descartada por la mascara de elevación.
+    // No hubo recepción: rcvOk = 0, sin potencia/sensibilidad, Doppler del dispositivo
+    if (signalID == signal_BelowElevationMask) {
+        cValueMap *statsMap = check_and_cast<cValueMap *>(obj);
+        double duration = statsMap->get("duration").doubleValue();
+        Packet *pkt = check_and_cast<Packet *>(statsMap->get("macFrame").objectValue());
+
+        const auto& frame = pkt->peekAtFront<messages::LoRaPhyPreamble>();
+        auto transmissionTag = pkt->addTagIfAbsent<statistics::CstTransmissionStatisticsTag>();
+        transmissionTag->setLoraBW(frame->getBandwidth().get());
+        transmissionTag->setLoraCF(frame->getCenterFrequency().get());
+        transmissionTag->setLoraCR(frame->getCodeRendundance());
+        transmissionTag->setLoraSF(frame->getSpreadFactor());
+        transmissionTag->setLoraTP(frame->getPower().get());
+        transmissionTag->setRcvOk(0);
+
+        transmissionTag->setTxDuration(duration);
+        transmissionTag->setSensitivity_dbm(0);
+        transmissionTag->setMinPower_dbm(0);
+
+        satellite::Sat *sat = check_and_cast<satellite::Sat *>(getSystemModule()->getSubmodule("satellite", 0));
+        transmissionTag->setSatId(sat->getId());
+
+        //if(transmissionTag->getRx_power_dbm() != -999){
+        //    snrd_db  = transmissionTag->getRx_power_dbm() - transmissionTag->getNoise_dbm();
+        //}
+
+        //transmissionTag->setDoppler(doppler_map);
+        transmissionTag->setSnr_db(-999);
+        transmissionTag->setRssi_dbm(-999);
+        transmissionTag->setRx_power_dbm(-999);
+
+
+
+        // time = fin de la transmisión, comparable con el fin de recepción de las filas normales
+        double recordTime = transmissionTag->getTxStart() + duration;
+
+        // llama a recordPacket con belowMask=1*/
+        //recordPacket(pkt, NAN, NAN, duration, 1, recordTime);
+        recordPacket(pkt, 1, recordTime);
+        return;
+    }
+
 
     if(signalID == signal_TranmissionStatisticsCorrect || signalID == signal_TranmissionStatisticsIgnoring){
         cValueMap *statsMap = check_and_cast<cValueMap *>(obj);

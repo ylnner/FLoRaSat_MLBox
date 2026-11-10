@@ -114,6 +114,14 @@ void Sat_Dsl_Dlk_kMac::finish() {
     recordScalar("Number of packets dropped due to fixed loss", numDroppedPackets);
     recordScalar("Number of successful receptions", numReceptions);
 
+    // Took it from Juan commit
+    // Unique messages: repetitions of one message count once, unlike the receptions above
+    recordScalar("Number of unique messages received", numUniqueMessages);
+    for (const auto& pair : uniqueMessagesPerNode) {
+        std::string scalarName = "Unique messages from Node " + std::to_string(pair.first);
+        recordScalar(scalarName.c_str(), pair.second);
+    }
+
 
 }
 
@@ -287,6 +295,8 @@ void Sat_Dsl_Dlk_kMac::handleLowerMessage(cMessage *msg) {
             if (sharedUniqueFrames.find(frameId) == sharedUniqueFrames.end()) {
                 // This is a new unique frame ID, add it to the set
                 sharedUniqueFrames[frameId] = true;
+                numUniqueMessages++;
+                uniqueMessagesPerNode[nodeId]++;
                 
                 EV_INFO << "Received unique frame with ID: " << frameId 
                         << ", source node: " << nodeId

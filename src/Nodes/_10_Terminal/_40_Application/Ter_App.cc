@@ -169,12 +169,12 @@ void Ter_App::handleMessage(cMessage *msg)
             // More packets to send
             if (numberOfPacketsToSend == 0 || sentPackets < numberOfPacketsToSend)
             {
-
+                /*
                 // ACHF - COMENTAR ESTO CUANDTO SE TENGA LISTO, ES PARA PPP
                 // Schedule next packet
                 sendUplink = new cMessage("sendMeasurements");
                 scheduleAt(simTime() + timeToNextPacket, sendUplink);
-
+                */
 
 
                 // Schedule next packet ack timeout
@@ -188,10 +188,8 @@ void Ter_App::handleMessage(cMessage *msg)
             }
 
         }
-    }
-    // ACHF - DESCOMENTAR ESTO CUANDO SE TENGA LISTO
-
-    /*else{
+    }else{
+        // ACHF - Add timeToNextPacket when all repetitions are done
         if (strcmp(msg->getName(), "MacRepetitionsDone") == 0) {
             if (numberOfPacketsToSend == 0 || sentPackets < numberOfPacketsToSend){
                 timeToNextPacket = par("timeToNextPacket");
@@ -206,7 +204,7 @@ void Ter_App::handleMessage(cMessage *msg)
                 return;
             }
         }
-    }*/
+    }
 }
 
 

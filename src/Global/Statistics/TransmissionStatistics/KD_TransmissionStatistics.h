@@ -24,23 +24,25 @@
 #include "Nodes/_10_Terminal/Ter.h"
 #include "Nodes/_20_Satellite/Sat.h"
 #include "Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h"
+#include "TransmissionStatistics.h"
 
 using namespace omnetpp;
 using namespace inet;
 
 namespace statistics{
 
-class KD_TransmissionStatistics: public cSimpleModule, public cListener{
+class KD_TransmissionStatistics: public TransmissionStatistics{ //public cSimpleModule, public cListener{
 private:
     simsignal_t signal_TranmissionStatisticsCorrect;
     simsignal_t signal_TranmissionStatisticsIgnoring;
 
     simsignal_t signal_LoRaReceiver;
+    simsignal_t signal_BelowElevationMask;   // ACHF - emitida por LoRaMedium
 
 public:
     KD_TransmissionStatistics();
     //void recordPacket(inet::Packet *packet, double minPower_dBm, double sensitivity_dBm, double duration);
-    void recordPacket(inet::Packet *packet);
+    void recordPacket(inet::Packet *packet, int belowMask = 0, double recordTime = -1);
 
 
 protected:

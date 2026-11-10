@@ -72,14 +72,37 @@ const ITransmission *LoRaTransmitter::createTransmission(const IRadio *transmitt
     int nPreamble = 8;
     int payloadBytes = B(macFrame->getDataLength()).get() - B(frame->getChunkLength()).get();
 
-    int payloadSymbNb = 8;
-    payloadSymbNb += std::ceil((8*payloadBytes - 4*frame->getSpreadFactor() + 28 + 16 - 20*0) / (4*(frame->getSpreadFactor()-2*0))) * (frame->getCodeRendundance() + 4);
-    if(payloadSymbNb < 8) payloadSymbNb = 8;
+    //int payloadSymbNb = 8;
+    //payloadSymbNb += std::ceil((8*payloadBytes - 4*frame->getSpreadFactor() + 28 + 16 - 20*0) / (4*(frame->getSpreadFactor()-2*0))) * (frame->getCodeRendundance() + 4);
+    //if(payloadSymbNb < 8) payloadSymbNb = 8;
 
     simtime_t Tsym = pow(2, frame->getSpreadFactor()) / frame->getBandwidth().get();
     simtime_t Tpreamble = (nPreamble + 4.25) * Tsym;
-    simtime_t Theader = 0.5 * (8+payloadSymbNb) * Tsym;
-    simtime_t Tpayload = 0.5 * (8+payloadSymbNb) * Tsym;
+
+    // Took it from Juan commit
+    simtime_t Theader, Tpayload;
+
+    if (par("legacyAirtime").boolValue()) {
+        // Earlier formula, kept to reproduce stored runs: integer division before ceil, the low data
+        // rate optimisation off, and the 8 symbols counted twice
+        int payloadSymbNb = 8;
+        payloadSymbNb += std::ceil((8*payloadBytes - 4*frame->getSpreadFactor() + 28 + 16 - 20*0) / (4*(frame->getSpreadFactor()-2*0))) * (frame->getCodeRendundance() + 4);
+        if(payloadSymbNb < 8) payloadSymbNb = 8;
+        Theader = 0.5 * (8+payloadSymbNb) * Tsym;
+        Tpayload = 0.5 * (8+payloadSymbNb) * Tsym;
+    }else {
+        // Semtech AN1200.13: explicit header, CRC on, low data rate optimisation when Tsym >= 16 ms
+        int sf = frame->getSpreadFactor();
+        int lowDataRate = Tsym.dbl() >= 0.016 ? 1 : 0;
+        double symbols = std::ceil((8.0*payloadBytes - 4*sf + 28 + 16) / (4.0*(sf - 2*lowDataRate))) * (frame->getCodeRendundance() + 4);
+        double payloadSymbNb = 8 + std::max(symbols, 0.0);
+        Theader = 0.5 * payloadSymbNb * Tsym;
+        Tpayload = 0.5 * payloadSymbNb * Tsym;
+    }
+
+
+    //simtime_t Theader = 0.5 * (8+payloadSymbNb) * Tsym;
+    //simtime_t Tpayload = 0.5 * (8+payloadSymbNb) * Tsym;
 
     /*
      * TO DO: We can set duration = 0, to do the downlink process fast without delay.

@@ -44,6 +44,7 @@
 
 using namespace omnetpp;
 using namespace inet;
+//using namespace statistics;
 
 namespace medium {
 class LoRaMedium : public RadioMedium
@@ -62,6 +63,8 @@ protected:
     virtual bool matchesMacAddressFilter(const IRadio *radio, const Packet *packet) const override;
     virtual bool isInCommunicationRange(const ITransmission *transmission, const Coord& startPosition, const Coord& endPosition) const override;
     virtual bool isPotentialReceiver(const IRadio *receiver, const ITransmission *transmission) const override;
+    // ACHF - Se declara funcion para evaluar cuando elevSat < 0, asi se descartan como interferentes.
+    virtual bool isInterferingTransmission(const ITransmission *transmission, const IReception *reception) const override;
         //@}
     public:
       mutable const IRadio* globalPotentialReceiver = nullptr;
@@ -72,6 +75,8 @@ protected:
       virtual const IReceptionResult *getReceptionResult(const IRadio *receiver, const IListening *listening, const ITransmission *transmission) const override;
       virtual void addTransmission(const IRadio *transmitterRadio, const ITransmission *transmission) override;
       virtual IWirelessSignal *createTransmitterSignal(const IRadio *radio, Packet *packet) override;
+
+
 
 };
 }

@@ -60,6 +60,15 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		bool useAnalytical = default(false);
 		bool useMLBoxMLP = default(false);
 		bool useMLBoxTwoBranches = default(false);
+		
+		bool randomizeSF_TP = default(false);
+		int SF_min = default(10);
+		int SF_max = default(12);
+		int TP_min = default(12);//dbm
+		int TP_max = default(14);//dbm
+		
+		
+		string mixFile = default("");
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {
             parameters:
