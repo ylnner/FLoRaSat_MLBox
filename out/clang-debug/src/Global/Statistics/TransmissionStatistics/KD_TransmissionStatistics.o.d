@@ -78,7 +78,8 @@
   Global/Utilities/libnorad/cOrbitA.h Global/Utilities/libnorad/cTLE.h \
   Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h \
   /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/LineSegmentsMobilityBase.h \
-  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MovingMobilityBase.h
+  /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MovingMobilityBase.h \
+  Global/Statistics/TransmissionStatistics/TransmissionStatistics.h
 Global/Statistics/TransmissionStatistics/KD_TransmissionStatistics.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/include/omnetpp.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/common/INETUtils.h:
@@ -167,3 +168,4 @@ Global/Utilities/libnorad/cTLE.h:
 Nodes/_20_Satellite/_60_Mobility/Sat_Mob_SatelliteMobility_Standalone.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/LineSegmentsMobilityBase.h:
 /home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2/src/inet/mobility/base/MovingMobilityBase.h:
+Global/Statistics/TransmissionStatistics/TransmissionStatistics.h:
