@@ -116,6 +116,13 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         //ACHF
         currentTxCountML = 0;
 
+        //ACHF -for KD
+        useStopRule = par("useStopRule");
+        stopTarget = par("stopTarget");
+        stopGamma = par("stopGamma");
+        if (useStopRule && (stopTarget <= 0 || stopTarget >= 1 || stopGamma <= 0 || stopGamma > 1))
+            throw cRuntimeError("Stop rule: stopTarget must be in (0, 1) and stopGamma in (0, 1]");
+
         // Initialize detection state
         currentDetectCount = 0;
         currentSyncCount = 0;
@@ -169,7 +176,12 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         if(mlBoxAvailableTwoBranches){
             mlBoxTwoBranches = check_and_cast<mlbox::Transmission_Predictor_TwoBranches *>(getSubmodule("mlBoxTwoBranches"));
         }
+        mlBoxAvailableMLPKD = par("useMLBoxMLPKD").boolValue();
+        if(mlBoxAvailableMLPKD){
+            mlBoxMLPKD = check_and_cast<mlbox::Transmission_Predictor_MLP_KD *>(getSubmodule("mlBoxMLPKD"));
+        }
 
+        useCoin = par("useCoin").boolValue();
 
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
@@ -184,6 +196,14 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("successfulDetections", this->numSuccessfulDetections);
 
     recordScalar("numTransmissionsApproved", this->numTransmissionsApproved);
+
+    // ACHF KD
+    if (mlBoxAvailableMLPKD) {
+        recordScalar("numSkippedByStopRule", this->numSkippedByStopRule);
+        recordScalar("sumApprovedProb", this->sumApprovedProb);
+    }
+
+
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
     //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
 
@@ -328,6 +348,8 @@ void Ter_Dlk_KiWan::startTransmissionWindow() {
         // Count the message as sent at the beginning of the first transmission window
         if (currentTwCount == 0) {
             numMessagesSent++;
+            // ACHF - KD
+            cumMissProb = 1.0;   // stop rule: new message, nothing sent yet
         }
         
         currentTwCount++;
@@ -356,6 +378,7 @@ void Ter_Dlk_KiWan::startTransmissionWindow() {
         // Reset transmission counter for this window
         currentTxCount = 0;
         currentTxCountML = 0;
+
         // Check if satellite detection is enabled for this window
         if (enableSatDetect) {
             // Start satellite detection phase for this window
@@ -765,7 +788,7 @@ void Ter_Dlk_KiWan::sendData() {
         double transmissionId = (newFrame->getId() * 100) + (newFrame->getRepetition());
 
 
-
+        double probML = -1;
         bool transmit = true;
         if(mlBoxAvailable){
             /*
@@ -881,13 +904,59 @@ void Ter_Dlk_KiWan::sendData() {
 
             //EV << "Transformer element_vector: " << element_vector <<endl;
             //vector_preds_Transformer.record(element_vector);
-        }
+        }else if(mlBoxAvailableMLPKD){
+            /*
+             * MLP KD
+             * */
+            // New order for the inputs in MLP_KD
+            // Check the input of each model
+            //dopplerShift", "elevSat", "latDev", "longDev", "loraTP", "loraSF", "alt", "raan
+            std::vector<double> myFeatures = {doppler, elevSat, latDev, longDev, loraTP, loraSF ,alt, raan};
 
+            // For MLP KD
+            std::vector<double> myFeatures_2 = mlBoxMLPKD->scaleFeatures(myFeatures);
+            std::vector<double> output = mlBoxMLPKD->predict(myFeatures_2);
+
+
+            transmit = static_cast<bool>(output[0]);
+            probML   = output.size() > 1 ? output[1] : 1.0;
+            EV << "After execute model: " << transmit <<endl;
+            if (transmit && useStopRule && (1.0 - cumMissProb) >= stopTarget) {
+                // el mensaje ya tiene la entrega "asegurada"
+                transmit = false;
+                numSkippedByStopRule++;
+                EV << "Stop rule: P(delivered) = " << 1.0 - cumMissProb << " >= " << stopTarget << " -> skip" << endl;
+            }
+
+            /*
+            double element_vector = transmissionId;
+            if (transmit)
+                element_vector = element_vector + 0.1;
+
+            EV << "MLP KD element_vector: " << element_vector <<endl;
+            vector_preds_MLP.record(element_vector);
+            */
+        }else if (useCoin) {
+            // 50/50 para transmitir
+            transmit = bernoulli(0.5);
+
+            if (transmit) {
+                EV << "COIN - Transmitir." << endl;
+            } else {
+                EV << "COIN - No transmitir" << endl;
+            }
+        }
 
         if(transmit){
             sendDown(frameCopy);
             this->numTransmissionsApproved++;
             currentTxCountML++;
+
+            // ACHF - KD
+            if (probML >= 0) {
+                cumMissProb *= (1.0 - stopGamma * probML);
+                sumApprovedProb += probML;
+            }
         }
 
         //sendDown(frameCopy);

@@ -9,6 +9,7 @@ import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Pred
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_BiLSTM;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_MLP;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_TwoBranches;
+import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_MLP_KD;
 
 module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 {
@@ -60,6 +61,8 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		bool useAnalytical = default(false);
 		bool useMLBoxMLP = default(false);
 		bool useMLBoxTwoBranches = default(false);
+		bool useMLBoxMLPKD = default(false);
+		bool useCoin = default(false);
 		
 		bool randomizeSF_TP = default(false);
 		int SF_min = default(10);
@@ -69,6 +72,11 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		
 		
 		string mixFile = default("");
+		
+		bool useStopRule = default(false);
+		double stopTarget = default(0.9);
+		// < 1 corrige que los intentos de un mismo mensaje no son independientes
+		double stopGamma = default(1.0);
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {
             parameters:
@@ -89,8 +97,12 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		
 		mlBoxMLP: Transmission_Predictor_MLP if useMLBoxMLP{
 			 @display("p=100,250");
-		}		
+		}
 		mlBoxTwoBranches : Transmission_Predictor_TwoBranches if useMLBoxTwoBranches{
 		    @display("p=100,250");
+		}
+				
+		mlBoxMLPKD: Transmission_Predictor_MLP_KD if useMLBoxMLPKD{
+			 @display("p=100,250");
 		}
 }

@@ -22,6 +22,7 @@
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.h"
+#include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP_KD.h"
 
 
 using namespace mlbox;
@@ -82,6 +83,13 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         std::array<double, 3> pTP{};
         void loadMix();
         int drawWeighted(const std::array<double, 3>& p, double& prob);
+
+        bool useStopRule;
+        double stopTarget;
+        double stopGamma;
+        double cumMissProb = 1.0; // Π(1 − γ·p) de las tx ya enviadas de este mensaje
+        double numSkippedByStopRule = 0;
+        double sumApprovedProb = 0;
 
 
         // Mac parameters
@@ -186,13 +194,16 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         Transmission_Predictor_Analytical *predAnalytical;
         Transmission_Predictor_MLP *mlBoxMLP;
         Transmission_Predictor_TwoBranches *mlBoxTwoBranches;
+        Transmission_Predictor_MLP_KD *mlBoxMLPKD;
 
         bool mlBoxAvailable = false;
         bool mlBoxAvailableBiLSTM = false;
         bool analyticalAvailable = false;
         bool mlBoxAvailableMLP = false;
         bool mlBoxAvailableTwoBranches = false;
+        bool mlBoxAvailableMLPKD = false;
 
+        bool useCoin = false;
 }; // namespace mac
 
 }
