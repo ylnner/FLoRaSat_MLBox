@@ -62,6 +62,8 @@ void LoRaReceiver::initialize(int stage)
         ///enableCollisions                = par("enableCollisions").boolValue();
         enableCollisionOverlap          = par("enableCollisionOverlap").boolValue();
         collisionGuardBand_Hz           = par("collisionGuardBand").doubleValue();
+        captureMarginDb                 = par("captureMarginDb").doubleValue();
+        captureSumInterference          = par("captureSumInterference").boolValue();
     }
 
     if (stage == INITSTAGE_LAST && iAmGateway)
@@ -237,6 +239,7 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
 
 
     int receptionSF = loRaReception->getLoRaSF();
+    double sameSfInterference_mw = 0;
     for (auto interferingReception : *interferingReceptions) {
         EV << "Inside loop, clean"<<endl;
         bool overlap = false;
@@ -259,7 +262,8 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
         int interferenceSF = loRaInterference->getLoRaSF();
 
         /* If difference in power between two signals is greater than threshold, no collision*/
-        if(signalRSSI_dBm - interferenceRSSI_dBm >= nonOrthDelta[receptionSF-7][interferenceSF-7])
+        double requiredDelta = receptionSF == interferenceSF ? captureMarginDb : nonOrthDelta[receptionSF-7][interferenceSF-7];
+        if(signalRSSI_dBm - interferenceRSSI_dBm >= requiredDelta)
             captureEffect = true;
 
 
@@ -279,6 +283,10 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
         simtime_t csBegin = loRaReception->getPreambleStartTime() + Tsym * (nPreamble - 6);
         if(csBegin < loRaInterference->getEndTime())
             timingCollision = true;
+
+        // Same-SF bursts that could collide, summed for the aggregate check after the loop
+        if (overlap && frequencyCollision && timingCollision && receptionSF == interferenceSF)
+            sameSfInterference_mw += interferenceRSSI_mw;
 
         if (overlap && frequencyCollision)
         {
@@ -300,6 +308,13 @@ bool LoRaReceiver::isPacketCollided(const IReception *reception, IRadioSignal::S
             }
 
         }
+    }
+
+    if (captureSumInterference && !alohaChannelModel && sameSfInterference_mw > 0
+            && signalRSSI_dBm - math::mW2dBmW(sameSfInterference_mw) < captureMarginDb) {
+        if(iAmGateway && (part == IRadioSignal::SIGNAL_PART_DATA || part == IRadioSignal::SIGNAL_PART_WHOLE))
+            const_cast<LoRaReceiver* >(this)->emit(LoRaReceptionCollision, true);
+        return true;
     }
 
     return false;

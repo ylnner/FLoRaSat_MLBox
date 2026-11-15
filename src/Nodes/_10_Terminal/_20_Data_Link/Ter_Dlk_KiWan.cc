@@ -175,6 +175,8 @@ void Ter_Dlk_KiWan::finish() {
     recordScalar("gateReads", this->gateReads);
     recordScalar("gateCapped", this->gateCapped);
     recordScalar("gateDeferred", this->gateDeferred);
+    recordScalar("gateBackoffDb", this->gateBackoffDb);
+    recordScalar("gateOffGrid", this->gateOffGrid);
     recordScalar("hearsBroadcast", this->hearsBroadcast ? 1 : 0);
     recordScalar("macModuleId", this->getId()); // joins the satellite's per-node counts to this device
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
@@ -523,6 +525,12 @@ void Ter_Dlk_KiWan::sendData() {
 
 
         newFrame->setSentAt(simTime().dbl());
+
+        // The frame is immutable once inserted, so the power grid acts here
+        bool offGrid = false;
+        double backoffDb = gatePowerGridDb > 0 ? powerGridBackoff(offGrid) : 0;
+        if (backoffDb > 0)
+            newFrame->setLoRaTP(mW(math::dBmW2mW(LoRaTP - backoffDb)).get());
         
         // Insert the frame
         frameCopy->insertAtFront(newFrame);
@@ -804,6 +812,9 @@ void Ter_Dlk_KiWan::sendData() {
                 loadBroadcast->reportBurst();
             sendDown(frameCopy);
             this->numTransmissionsApproved++;
+            gateBackoffDb += backoffDb;
+            if (offGrid)
+                gateOffGrid++;
             currentTxCountML++;
         }
         else {
@@ -849,6 +860,10 @@ void Ter_Dlk_KiWan::initializeGate()
     gateRng = par("gateRng").intValue();
     gateRepCap = par("gateRepCap").intValue();
     gateRepSpread = par("gateRepSpread").boolValue();
+    gatePowerGridDb = par("gatePowerGridDb").doubleValue();
+    gatePowerErrDb = par("gatePowerErrDb").doubleValue();
+    gatePowerStepDb = par("gatePowerStepDb").doubleValue();
+    gatePowerGuardDb = par("gatePowerGuardDb").doubleValue();
 
     // Same devices in every arm of a run: the choice depends only on the terminal index
     double f = par("uncontrolledFraction").doubleValue();
@@ -874,6 +889,25 @@ void Ter_Dlk_KiWan::initializeGate()
             throw cRuntimeError("gateMode '%s' needs gateTable", mode.c_str());
         gateTable = loadcontrol::ThresholdTable::fromCsv(table);
     }
+}
+
+// Back-off that puts the expected received power on the grid. The device knows that power from the
+// pass geometry, with an error of gatePowerErrDb, and its radio sets power in steps of
+// gatePowerStepDb. A burst that would fall too close to its sensitivity keeps full power.
+double Ter_Dlk_KiWan::powerGridBackoff(bool &offGrid)
+{
+    double rx = computeReceptionPower();
+    double estimate = rx + (gatePowerErrDb > 0 ? normal(0, gatePowerErrDb, gateRng) : 0);
+    double backoff = estimate - std::floor(estimate / gatePowerGridDb) * gatePowerGridDb;
+    if (gatePowerStepDb > 0)
+        backoff = std::round(backoff / gatePowerStepDb) * gatePowerStepDb;
+    static const double sensitivity[] = {-133, -135, -137}; // SF10 to SF12 at 125 kHz, as in LoRaReceiver
+    double floorDbm = (LoRaSF >= 10 && LoRaSF <= 12 ? sensitivity[LoRaSF - 10] : -124) + gatePowerGuardDb;
+    if (rx - backoff < floorDbm) {
+        offGrid = true;
+        return 0;
+    }
+    return backoff;
 }
 
 bool Ter_Dlk_KiWan::applyGate(double elevDeg, double score)

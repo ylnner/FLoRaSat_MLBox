@@ -183,6 +183,13 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         int gateRng = 0;
         int gateRepCap = 0;
         bool gateRepSpread = false;
+        double gatePowerGridDb = 0;
+        double gatePowerErrDb = 0;
+        double gatePowerStepDb = 0;
+        double gatePowerGuardDb = 0.2;
+        double gateBackoffDb = 0;   // total back-off over transmitted bursts, for the energy account
+        int gateOffGrid = 0;        // transmitted bursts left at full power to stay above sensitivity
+        double powerGridBackoff(bool &offGrid);
         int gateFirstSlot = 0;
         bool hearsBroadcast = true;
         loadcontrol::ThresholdTable gateTable;

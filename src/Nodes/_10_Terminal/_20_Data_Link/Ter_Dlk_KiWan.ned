@@ -70,6 +70,14 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
         int gateRng = default(0);                   // set to a spare RNG to keep arms paired
         int gateRepCap = default(0);                // repetitions sent per message: 0 no limit, k at most k, -1 ceil(Ntx * u)
         bool gateRepSpread = default(false);        // each message may start only from a randomly drawn repetition
+
+        // Received-power grid. The device backs its transmit power off so that the power it expects at
+        // the satellite lands on a grid of this spacing; overlapping bursts are then a full step apart
+        // or on the same level. 0 keeps the configured power.
+        double gatePowerGridDb = default(0);
+        double gatePowerErrDb = default(0);         // standard deviation of the device's error on its received power, per burst
+        double gatePowerStepDb = default(0);        // transmit power resolution; 0 is continuous
+        double gatePowerGuardDb = default(0.2);     // no back-off that would leave less than this above sensitivity
         double uncontrolledFraction = default(0);   // share of devices that never hear the broadcast
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {

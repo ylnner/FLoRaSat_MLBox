@@ -84,6 +84,8 @@ private:
     bool enableCollisionOverlap;
     simtime_t minCollisionOverlap;
     double collisionGuardBand_Hz = 1200;
+    double captureMarginDb = 1;
+    bool captureSumInterference = false;
 
     // ACHF -Added new parameters, they dont affect the behaviour of the simulator, only used to store new features for ML models.
     // This parameter is added to store the real power at reception. It is obtained from loRaReception->getPower(),

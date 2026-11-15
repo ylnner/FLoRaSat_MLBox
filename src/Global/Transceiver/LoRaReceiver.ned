@@ -45,6 +45,8 @@ module LoRaReceiver like IReceiver
 		//bool enableCollisions = default(true);             // If false, the receiver ignores all interference and only considers the desired signal's power for reception success
         bool enableCollisionOverlap = default(false);       // If true, the receiver considers temporal overlap of receptions for collision detection
         double minCollisionOverlap @unit(s) = default(0s);  // Minimum temporal overlap to count as a collision
+        double captureMarginDb = default(1);                // Same-SF capture margin of the FLoRa check; 1 dB is FLoRa's value
+        bool captureSumInterference = default(false);       // If true, the same-SF margin applies to the sum of overlapping same-SF bursts
         double collisionGuardBand @unit(Hz) = default(1200Hz); // Overlapping signals closer than this after Doppler collide, whatever their SF or power
 
     submodules:
