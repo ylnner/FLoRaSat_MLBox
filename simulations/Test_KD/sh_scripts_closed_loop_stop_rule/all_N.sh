@@ -9,7 +9,7 @@ echo "Starting Main N=100 ..."
 echo "Starting Main N=200 ..."
 ./all_closed_loop_N_200_parallel.sh
 
-#echo "Starting Main N=300 ..."
-#./all_closed_loop_N_300_parallel.sh
+echo "Starting Main N=300 ..."
+./all_closed_loop_N_300_parallel.sh
 
 echo "All experiments finished."

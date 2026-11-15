@@ -63,6 +63,7 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		bool useMLBoxTwoBranches = default(false);
 		bool useMLBoxMLPKD = default(false);
 		bool useCoin = default(false);
+		double coinOdds = default(0.5);
 		
 		bool randomizeSF_TP = default(false);
 		int SF_min = default(10);
@@ -77,6 +78,8 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		double stopTarget = default(0.9);
 		// < 1 corrige que los intentos de un mismo mensaje no son independientes
 		double stopGamma = default(1.0);
+		
+		
     submodules:
         queue: <default("DropTailQueue")> like IPacketQueue {
             parameters:

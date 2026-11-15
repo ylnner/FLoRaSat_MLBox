@@ -1,5 +1,5 @@
 #!/bin/bash
-# Rutas absolutas del proyecto y de INET (si mueves el proyecto, cambia solo estas dos lineas)
+# Rutas absolutas del proyecto y de INET 
 PROJECT_DIR=/home/ylnner/Documents/ToGitHubTemporal/FLoRaSat_MLBox
 INET_DIR=/home/ylnner/Documents/omnet++/omnetpp-6.3.0/samples/inet4.5_2
 

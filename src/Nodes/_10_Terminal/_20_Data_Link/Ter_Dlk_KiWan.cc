@@ -152,6 +152,7 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         vector_preds_Transformer.setName("vector_preds_Transformer");
         vector_preds_Analytical.setName("vector_preds_Analytical");
         vector_preds_MLP.setName("vector_preds_MLP");
+        vector_msgVisiblesOpp.setName("msgVisiblesOpp");
 
         mlBoxAvailable = par("useMLBox").boolValue();
         if( mlBoxAvailable ){
@@ -183,6 +184,10 @@ void Ter_Dlk_KiWan::initialize(int stage) {
 
         useCoin = par("useCoin").boolValue();
 
+        if(useCoin){
+            coindOdds = par("coinOdds").doubleValue();
+        }
+
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
         this->radio->setRadioMode(IRadio::RADIO_MODE_SLEEP);
@@ -202,8 +207,8 @@ void Ter_Dlk_KiWan::finish() {
         recordScalar("numSkippedByStopRule", this->numSkippedByStopRule);
         recordScalar("sumApprovedProb", this->sumApprovedProb);
     }
-
-
+    recordScalar("oppBelowMask", this->numOppBelowMask);
+    recordScalar("mlApprovedBelowMask", this->numMLApprovedBelowMask);
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
     //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
 
@@ -347,6 +352,7 @@ void Ter_Dlk_KiWan::startTransmissionWindow() {
         
         // Count the message as sent at the beginning of the first transmission window
         if (currentTwCount == 0) {
+            msgVisibleOpp = 0;
             numMessagesSent++;
             // ACHF - KD
             cumMissProb = 1.0;   // stop rule: new message, nothing sent yet
@@ -420,6 +426,9 @@ void Ter_Dlk_KiWan::handleTransmitWindowEnd() {
         if (debugOutput) {
             std::cout << "Node " << address << " at time " << simTime() << ": all " << Ntw << " transmission windows completed" << endl;
         }
+
+        vector_msgVisiblesOpp.record(msgVisibleOpp);
+
         this->deleteCurrentTxFrame();
         checkForWaitingData();
 
@@ -790,11 +799,12 @@ void Ter_Dlk_KiWan::sendData() {
 
         double probML = -1;
         bool transmit = true;
+        bool noMLBox  = true;
         if(mlBoxAvailable){
             /*
              * Transformer-Encoder
              * */
-
+            noMLBox  = false;
             EV << "Transformer Input: "<< endl;
             //EV << "loraTP: " << loraTP <<endl;
             //EV << "loRaSF: " << loRaSF <<endl;
@@ -827,6 +837,7 @@ void Ter_Dlk_KiWan::sendData() {
             /*
              * Analytical
              * */
+            noMLBox  = false;
             double pred_analytical = predAnalytical->predict(loraSF, dopplerShift, timeToNextPacket);
             EV <<"pred_analytical: " << pred_analytical <<endl;
             transmit = static_cast<bool>(pred_analytical);
@@ -836,7 +847,7 @@ void Ter_Dlk_KiWan::sendData() {
             /*
              * Bi-LSTM
              * */
-
+            noMLBox  = false;
             bool transmitBiLSTM = false;
             std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
 
@@ -861,7 +872,7 @@ void Ter_Dlk_KiWan::sendData() {
             /*
              * MLP
              * */
-
+            noMLBox  = false;
             bool transmitMLP = false;
             std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
 
@@ -885,6 +896,7 @@ void Ter_Dlk_KiWan::sendData() {
              * Two Branches model
              * */
             //mlBoxTwoBranches
+            noMLBox  = false;
             bool transmitTwoBranches = false;
             std::vector<double> myFeatures = {latDev, longDev, elevSat,loraTP, loraSF, doppler,alt, raan};
             // For Two Branches
@@ -910,6 +922,7 @@ void Ter_Dlk_KiWan::sendData() {
              * */
             // New order for the inputs in MLP_KD
             // Check the input of each model
+            noMLBox  = false;
             //dopplerShift", "elevSat", "latDev", "longDev", "loraTP", "loraSF", "alt", "raan
             std::vector<double> myFeatures = {doppler, elevSat, latDev, longDev, loraTP, loraSF ,alt, raan};
 
@@ -920,6 +933,11 @@ void Ter_Dlk_KiWan::sendData() {
 
             transmit = static_cast<bool>(output[0]);
             probML   = output.size() > 1 ? output[1] : 1.0;
+
+            if (transmit && elevSat < 10) {
+                numMLApprovedBelowMask++;   // el modelo aprobó, pero el satélite está bajo la máscara
+            }
+
             EV << "After execute model: " << transmit <<endl;
             if (transmit && useStopRule && (1.0 - cumMissProb) >= stopTarget) {
                 // el mensaje ya tiene la entrega "asegurada"
@@ -938,13 +956,24 @@ void Ter_Dlk_KiWan::sendData() {
             */
         }else if (useCoin) {
             // 50/50 para transmitir
-            transmit = bernoulli(0.5);
+            //transmit = bernoulli(0.5);
+            transmit = bernoulli(coindOdds);
 
             if (transmit) {
                 EV << "COIN - Transmitir." << endl;
             } else {
                 EV << "COIN - No transmitir" << endl;
             }
+        }
+
+        if(noMLBox){
+            // Only used with NoML and Coin
+            if(elevSat < 10)
+                transmit = false;
+        }else{
+            // Apply the filter for any option even for ML options.
+            if(elevSat < 10)
+                transmit = false;
         }
 
         if(transmit){
@@ -962,6 +991,13 @@ void Ter_Dlk_KiWan::sendData() {
         //sendDown(frameCopy);
 
         this->numTransmissions++;
+
+        // Si elevSat >=10, registrar oportunidad de visibilidad.
+        if(elevSat >= 10){
+            msgVisibleOpp++;
+        }else {
+            numOppBelowMask++;
+        }
 
         // Increment transmission counter
         currentTxCount++;

@@ -27,28 +27,28 @@ echo "Iniciando simulacion MLP KD"
 echo "====================================================="
 
 echo "005"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_KD_005p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_KD_005p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \
 -l "$INET_DIR/src/INET"
 
 echo "010"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_KD_010p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_KD_010p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \
 -l "$INET_DIR/src/INET"
 
 echo "015"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_KD_015p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_KD_015p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \
 -l "$INET_DIR/src/INET"
 
 echo "100"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_KD_100p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_KD_100p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \
@@ -62,28 +62,28 @@ echo "Iniciando simulacion No KD"
 echo "====================================================="
 
 echo "005"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_NoKD_005p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_NoKD_005p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \
 -l "$INET_DIR/src/INET"
 
 echo "010"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_NoKD_010p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_NoKD_010p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \
 -l "$INET_DIR/src/INET"
 
 echo "015"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_NoKD_015p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_NoKD_015p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \
 -l "$INET_DIR/src/INET"
 
 echo "100"
-opp_runall -j $JOBS opp_run -m -f "200_devices/Test_MLP_NoKD_100p_StopRule.ini" -u Cmdenv -c General \
+opp_runall -j $JOBS opp_run -m --cmdenv-redirect-output=false -f "200_devices/Test_MLP_NoKD_100p_StopRule.ini" -u Cmdenv -c General \
 -n "$PROJECT_DIR/src:$PROJECT_DIR/simulations:$INET_DIR/src:$INET_DIR/examples:$INET_DIR/tutorials:$INET_DIR/showcases" \
 --image-path="$PROJECT_DIR/images:$INET_DIR/images" \
 -l "$PROJECT_DIR/src/florasat" \

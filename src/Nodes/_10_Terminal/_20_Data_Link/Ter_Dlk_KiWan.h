@@ -90,7 +90,8 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         double cumMissProb = 1.0; // Π(1 − γ·p) de las tx ya enviadas de este mensaje
         double numSkippedByStopRule = 0;
         double sumApprovedProb = 0;
-
+        double coindOdds;
+        int numMLApprovedBelowMask = 0;
 
         // Mac parameters
         double ttwDuration;     // Duration of transmission window
@@ -188,6 +189,9 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         cOutVector vector_preds_Transformer;
         cOutVector vector_preds_Analytical;
         cOutVector vector_preds_MLP;
+        cOutVector vector_msgVisiblesOpp; // Numde oportunidades con elevSat>=10
+        int msgVisibleOpp = 0;
+        int numOppBelowMask = 0;   // oportunidades con elevSat < 10 (todas, incluido el mensaje abierto al final)
     protected:
         Transmission_Predictor *mlBox;
         Transmission_Predictor_BiLSTM *mlBoxBiLSTM;
