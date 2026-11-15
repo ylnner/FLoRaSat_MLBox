@@ -11,18 +11,19 @@ import numpy as np
 from sklearn.metrics import (accuracy_score, auc, precision_recall_curve, precision_score,
                              recall_score, f1_score, roc_auc_score)
 
-from config import (SCRIPTS_DIR, CACHE_DIR, RESULTS_DIR, SELECTION_METRIC)
+from config import (SCRIPTS_DIR, CACHE_DIR, RESULTS_DIR, SELECTION_METRIC, ONLY_VISIBLE)
 
 if SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, SCRIPTS_DIR)
 
 from global_funcs import subset_metrics
+from funcs_create_dataset import load_dataset
 
 # Claves del dataset que usa el modelo
 DATA_KEYS = ["X_student", "X_geo", "y_true", "below_mask", "id_simulation", "src_id", "tx_start", "orig_index"]
 
 SPLITS = ("train", "val", "test")
-
+MSG_GAP_S = 20.0   # dentro de un mensaje: <= 15 s; entre mensajes: >= 39,9 s 
 
 # ---------------------------------------------------------------------------
 # Rutas
@@ -33,6 +34,19 @@ def cache_path(seed, split):
 def cache_path_with_N(seed, split, str_N):
     os.makedirs(os.path.join(CACHE_DIR, str_N), exist_ok=True)
     return os.path.join(CACHE_DIR, str_N, f"seed_{seed}_{split}.npz")
+
+def load_split(seed, split, str_N):
+    """
+    Carga la cache .npz de (seed, split, N).
+    Con ONLY_VISIBLE quita las filas bajo la mascara (below_mask == 1, elevSat < 10).
+    Todas las claves de DATA_KEYS tienen una fila por transmision, asi que el mismo filtro las mantiene alineadas.
+    """
+    data = load_dataset(cache_path_with_N(seed, split, str_N))
+    data["msg_id"] = message_ids(data)
+    if ONLY_VISIBLE:
+        keep = data["below_mask"] == 0
+        data = {k: v[keep] for k, v in data.items()}
+    return data
 
 def phase_dir(phase, *sub):
     path = os.path.join(RESULTS_DIR, phase, *sub)
@@ -175,3 +189,50 @@ def test_metrics(y_true_val, y_prob_val, y_true_test, y_prob_test, threshold, be
         out.update(subset_metrics(y_true_test, y_prob_test, threshold, below_mask_test))
 
     return out
+
+####
+# Funciones por nuevos cambios
+####
+def message_ids(data):
+    """
+    Id de mensaje por fila: misma simulación y dispositivo, y menos de MSG_GAP_S desde la tx anterior.
+    """
+    # Ordena por tx start, dispositivo y simulacion
+    order = np.lexsort((data["tx_start"], data["src_id"], data["id_simulation"]))
+    # Obtiene los datos
+    sim, src, t = data["id_simulation"][order], data["src_id"][order], data["tx_start"][order]
+    
+    new_msg = np.ones(len(order), dtype=bool)
+    # detecta cambio dispositivo si es otra simulacion u otro dispositivo.
+    same_dev = (sim[1:] == sim[:-1]) & (src[1:] == src[:-1])
+
+    # Detecta un nuevo mensaje si no es el mismo dispositivo o si pasan mas de 20s de MSG_GAP_S
+    new_msg[1:] = ~same_dev | ((t[1:] - t[:-1]) > MSG_GAP_S)
+    
+    ids = np.empty(len(order), dtype=np.int64)
+    ids[order] = np.cumsum(new_msg)
+    return ids
+
+
+def unique_weights(y, msg_id):
+    """
+    Peso por fila. Acierto: 1/k, con k = copias recibidas de su mensaje, normalizado para que la media de los
+    aciertos sea 1 (pos_weight sigue sieudo usado yvaliendo). 
+    El Fallo tiene peso 1.
+
+    numpy.bincount(x, /, weights=None, minlength=0)
+    Count number of occurrences of each value in array of non-negative ints.
+    """
+    # Inicializa w en 1 para fallos y actualiza solo donde se ha recibido correctamente y=1
+    w = np.ones(len(y), dtype=np.float32)
+    pos = y == 1
+
+    # Copias recibidas del msg_id ponderado por y
+    k = np.bincount(msg_id, weights=y)[msg_id]
+
+    # Aciertos
+    w[pos] = 1.0 / k[pos]
+    
+    #Normaliza
+    w[pos] *= pos.sum() / w[pos].sum()
+    return w

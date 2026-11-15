@@ -14,7 +14,17 @@ PROJECT     = os.path.dirname(ROOT)                                     # KD_new
 SCRIPTS_DIR = os.environ.get('KD_SCRIPTS_DIR', os.path.join(PROJECT, 'scripts'))
 DATA_DIR    = os.environ.get('KD_DATA_DIR', os.path.join(PROJECT, 'data', 'repetitions', 'new_data'))
 CACHE_DIR   = os.environ.get('KD_CACHE_DIR', os.path.join(ROOT, 'cache'))
-RESULTS_DIR = os.environ.get('KD_RESULTS_DIR', os.path.join(ROOT, 'results'))
+#RESULTS_DIR = os.environ.get('KD_RESULTS_DIR', os.path.join(ROOT, 'results'))
+
+# filtro de filas (solo visibles)
+# KD_ONLY_VISIBLE=1: maestro y estudiante se entrenan y evaluan solo con las filas visibles (below_mask == 0, es decir elevSat > 10).
+# Los resultados van a otra carpeta (results_visible/) para no mezclarse con los del dataset completo.
+ONLY_VISIBLE = os.environ.get('KD_ONLY_VISIBLE', '0') == '1'
+if ONLY_VISIBLE:
+    DEFAULT_RESULTS_DIR = os.path.join(ROOT, 'results_visible_v2')
+else:
+    DEFAULT_RESULTS_DIR = os.path.join(ROOT, 'results_v2')
+RESULTS_DIR = os.environ.get('KD_RESULTS_DIR', DEFAULT_RESULTS_DIR)
 
 SEEDS  = list(range(10))
 EPOCHS = 20

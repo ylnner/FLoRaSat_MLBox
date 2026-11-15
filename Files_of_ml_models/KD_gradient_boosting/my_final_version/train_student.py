@@ -15,13 +15,15 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+
+import torch.nn.functional as F
 from sklearn.metrics import (average_precision_score, precision_recall_curve, precision_recall_fscore_support,
                              roc_auc_score)
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader, TensorDataset
 
 from config import (ALPHAS, BASE_EPOCHS, BATCH_SIZE, FRACTIONS, LR, NUM_WORKERS, PATIENCE, SEEDS,
-                        STUDENT_DROPOUT, STUDENT_HIDDEN, TEMPS, THRESHOLD_METRIC, EVAL_SUBSET)
+                        STUDENT_DROPOUT, STUDENT_HIDDEN, TEMPS, THRESHOLD_METRIC, EVAL_SUBSET, ONLY_VISIBLE)
 
 assert EVAL_SUBSET in ("visible", "all"), f"EVAL_SUBSET debe ser 'visible' o 'all', no {EVAL_SUBSET!r}"
 assert THRESHOLD_METRIC in ("f1_c1", "macro_f1"), f"THRESHOLD_METRIC debe ser 'f1_c1' o 'macro_f1', no {THRESHOLD_METRIC!r}"
@@ -30,7 +32,8 @@ SELECTION_COL = f"val_ap_{EVAL_SUBSET}"        # columna de las runs con la que 
 SUBSETS    = (("all", "todas"), ("visible", "visibles"))
 THRESHOLDS = (("best_th", f"{THRESHOLD_METRIC}_val_{EVAL_SUBSET}"), ("th_05", "0.5"))
 
-from common import results_dir, cache_path_with_N
+# unique_weights: peso 1/k por mensaje
+from common import results_dir, cache_path_with_N, load_split, unique_weights
 
 from funcs_create_dataset import load_dataset, STUDENT_INPUTS
 from global_funcs import set_seed, find_best_threshold
@@ -138,7 +141,7 @@ def predict(model, loader):
     logits = torch.cat(all_logits)
     return y_true, logits
 
-def train_student(train_loader, val_loader, pos_weight, is_kd, alpha, temperature, max_epochs, val_mask):
+def train_student(train_loader, val_loader, pos_weight, is_kd, alpha, temperature, max_epochs, val_mask, w_val):
     """
     Usa early stopping sobre la AP de validacion, calculada sobre las filas de val_mask
     val_mask se setea de igual forma que EVAL_SUBSET. Si es 'visible' solo son las filas visibles, si es 'all' se aplica a todas.
@@ -148,8 +151,10 @@ def train_student(train_loader, val_loader, pos_weight, is_kd, alpha, temperatur
 
     # Model, losses and optimizer
     model     = StudentModel()
-    loss_eval = nn.BCEWithLogitsLoss(pos_weight=pos_weight)        # loss de validacion, igual para no_kd y KD
+
+    # Se quita loss_eval (nn.BCEWithLogitsLoss sin pesos). noKD y la validaicon usan ahora la BCE funcional con w.
     loss_kd   = MyDistillationLoss(alpha, temperature, pos_weight) if is_kd else None
+    w_val_t   = torch.as_tensor(w_val, dtype=torch.float32)
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 
     best_val_ap       = -1.0
@@ -166,13 +171,14 @@ def train_student(train_loader, val_loader, pos_weight, is_kd, alpha, temperatur
         for batch in train_loader:
             x_batch        = batch["x"]
             y_batch        = batch["y_true"]
+            w_batch        = batch["w"]
             student_logits = model(x_batch)
 
             if is_kd:
-                teacher_batch = batch["teacher_logits"]
-                loss = loss_kd(student_logits, teacher_batch, y_batch)
+                teacher_batch = batch["teacher_logits"]                
+                loss = loss_kd(student_logits, teacher_batch, y_batch, w_batch)   
             else:
-                loss = loss_eval(student_logits, y_batch)
+                loss = F.binary_cross_entropy_with_logits(student_logits, y_batch, weight=w_batch, pos_weight=pos_weight)
 
             optimizer.zero_grad()
             loss.backward()
@@ -184,9 +190,11 @@ def train_student(train_loader, val_loader, pos_weight, is_kd, alpha, temperatur
 
         # Validation
         y_val, logits_val = predict(model, val_loader)
-        val_loss          = loss_eval(logits_val, y_val).item()          # se sigue guardando, solo como informacion
+
+        # val_loss y val_ap pesadas con w_val (cuentan mensajes unicos, no transmisiones)
+        val_loss          = F.binary_cross_entropy_with_logits(logits_val, y_val, weight=w_val_t, pos_weight=pos_weight).item()
         p_val             = torch.sigmoid(logits_val).numpy()        
-        val_ap            = average_precision_score(y_val[val_mask], p_val[val_mask])
+        val_ap            = average_precision_score(y_val[val_mask], p_val[val_mask], sample_weight=w_val[val_mask])
 
         # Early stopping
         #if val_loss < best_val_loss:
@@ -220,11 +228,12 @@ def train_one(frac, teacher, alpha, temp, seed, str_N):
     t0 = time.time()
 
     is_kd = teacher != "no_kd"
+    
+    # Con ONLY_VISIBLE solo quedan las filas con below_mask == 0 (elevSat >= 10)
+    train = load_split(seed, "train", str_N)
+    val   = load_split(seed, "val", str_N)
+    test  = load_split(seed, "test", str_N)
 
-    # Load data (cache .npz de la seed)
-    train = load_dataset(cache_path_with_N(seed, "train", str_N))
-    val   = load_dataset(cache_path_with_N(seed, "val", str_N))
-    test  = load_dataset(cache_path_with_N(seed, "test", str_N))
     
     # Get subset of index according to the frac, it is only used to reduce training data
     idx = subset_indices(len(train["y_true"]), seed, frac)
@@ -245,15 +254,28 @@ def train_one(frac, teacher, alpha, temp, seed, str_N):
     n_pos      = float((y_train == 1).sum())
     pos_weight = torch.tensor([n_neg / n_pos])
 
+
+    # Pesos de unicos mensajes. k (copias recibidas del mensaje) se cuenta con todo el trainset, porque es una propiedad
+    # del mensaje y no del subconjunto; luego se toma el subconjunto idx y se renormaliza para que la media de los
+    # aciertos sea 1. En validacion se usan todas las filas.
+    w_train = unique_weights(train["y_true"], train["msg_id"])[idx]
+    #  True en los aciertos, False en los fallos.
+    pos = y_train == 1
+    # normaliza los aciertos dentro del subconjunto para que su media vuelva a ser exactamente 1
+    w_train[pos] *= pos.sum() / w_train[pos].sum()
+
+    #Pesos de la validacion completa (todas sus filas, sin subconjunto)
+    w_val = unique_weights(y_val, val["msg_id"])
+
     # Create Dataset. Los logits del maestro corresponden SOLO a train (mismo orden que la cache):
     # se toman las mismas filas idx que el subconjunto.
     if is_kd:
         teacher_logits = torch.load(os.path.join(results_dir(str_N, f"teacher_gradient_boosting", "logits"), f"teacher_logits_seed{seed}.pt"))        
 
         assert len(teacher_logits) == len(train["y_true"]), "los logits no corresponden al train de esta seed"
-        train_dataset = MyCustonStudentDistillationDataset(train_scaled, y_train, teacher_logits=teacher_logits[idx])        
+        train_dataset = MyCustonStudentDistillationDataset(train_scaled, y_train, teacher_logits=teacher_logits[idx], w = w_train)
     else:
-        train_dataset = MyCustomStudentDataset(train_scaled, y_train)
+        train_dataset = MyCustomStudentDataset(train_scaled, y_train, w = w_train) 
 
     val_dataset  = MyCustomStudentDataset(val_scaled, y_val)
     test_dataset = MyCustomStudentDataset(test_scaled, y_test)
@@ -282,7 +304,7 @@ def train_one(frac, teacher, alpha, temp, seed, str_N):
     else:
         sel_val = np.ones(len(y_val), dtype = bool)
 
-    model, val_loss, pred_val, best_epoch = train_student(train_loader, val_loader, pos_weight, is_kd, alpha, temp, max_epochs, val_mask = sel_val)    
+    model, val_loss, pred_val, best_epoch = train_student(train_loader, val_loader, pos_weight, is_kd, alpha, temp, max_epochs, val_mask = sel_val, w_val = w_val)
     
     # Predict test
     _, logits_test = predict(model, test_loader)
@@ -301,6 +323,13 @@ def train_one(frac, teacher, alpha, temp, seed, str_N):
     
 
     y_test_int = y_test.astype(int)
+
+    # Con ONLY_VISIBLE no hay filas bajo la mascara en test: la fuga no se puede medir
+    if (~visible_test).any():
+        belowmask_leak = float((pred_test[~visible_test] >= thr).mean())
+    else:
+        belowmask_leak = float("nan")
+
     r = dict(frac    = frac, 
              teacher = teacher, 
              alpha   = alpha, 
@@ -310,7 +339,7 @@ def train_one(frac, teacher, alpha, temp, seed, str_N):
 
              eval_subset        = EVAL_SUBSET,                 # filas de val usadas para early stopping, umbral y seleccion
              threshold_metric   = THRESHOLD_METRIC,          # criterio del umbral, F1 score, o Macro F1
-
+             only_visible       = ONLY_VISIBLE,             # True: entrenado y evaluado solo con filas visibles
              threshold      = thr,
              best_epoch     = best_epoch, 
              val_loss       = float(val_loss),              
@@ -321,7 +350,7 @@ def train_one(frac, teacher, alpha, temp, seed, str_N):
              test_auc_visible    = float(roc_auc_score(y_test[visible_test], pred_test[visible_test])),
              test_auc_all        = float(roc_auc_score(y_test, pred_test)),     # inflada por las filas bajo la mascara (faciles)
              test_ap_all         = float(average_precision_score(y_test, pred_test)),
-             test_belowmask_leak = float((pred_test[~visible_test] >= thr).mean()),
+             test_belowmask_leak = belowmask_leak,
              test_tx_avoided     = float((pred_test < thr).mean()),
              test_success_lost   = float(((pred_test < thr) & (y_test_int == 1)).sum() / max((y_test_int == 1).sum(), 1))
              )
@@ -329,8 +358,10 @@ def train_one(frac, teacher, alpha, temp, seed, str_N):
     
     for tname, th in (("best_th", thr), ("th_05", 0.5)):          # thr = umbral de threshold metric escogida en val 
         r.update(class_metrics(y_test_int[visible_test], pred_test[visible_test], th, f"{tname}_visible"))
-        r.update(class_metrics(y_test_int[~visible_test], pred_test[~visible_test], th, f"{tname}_novisible",
-                               undefined_as_nan=True))
+        # Con ONLY_VISIBLE el subconjunto no visible esta vacio (class_metrics daria error)
+        if (~visible_test).any():
+            r.update(class_metrics(y_test_int[~visible_test], pred_test[~visible_test], th, f"{tname}_novisible",
+                                   undefined_as_nan=True))       
 
         r.update(class_metrics(y_test_int, pred_test, th, f"{tname}_all"))
     r["secs"] = time.time() - t0
@@ -457,7 +488,11 @@ def compare_with_no_kd(runs, best):
         kd_runs    = runs[same_frac & (runs["teacher"] != "no_kd") & (runs["alpha"] == alpha) & (runs["temp"] == temp)]
 
         for column, subset, metric in metrics_full:
+            # Con ONLY_VISIBLE no hay filas no visibles: esas metricas no existen
+            if ONLY_VISIBLE and subset == "no_visibles":
+                continue
             no_kd_mean = no_kd_runs[column].mean()
+            
             kd_mean    = kd_runs[column].mean()
             rows.append(dict(frac       = frac,
                              alpha      = alpha,
@@ -534,7 +569,17 @@ def summarize(str_N):
         if found != {want}:
             raise ValueError(f"Las runs de {str_N} tienen {col}={found} y config pide '{want}': "
                              f"borra results/{str_N}/student y vuelve a entrenar")    
-        
+
+    # Todas las runs deben venir del mismo filtro de filas que config.ONLY_VISIBLE.
+    # Las runs anteriores a este cambio no tienen la clave: se entrenaron con todas las filas (False).
+    if "only_visible" in runs.columns:
+        found = set(runs["only_visible"].unique())
+    else:
+        found = {False}
+    if found != {ONLY_VISIBLE}:
+        raise ValueError(f"Las runs de {str_N} tienen only_visible={found} y config pide {ONLY_VISIBLE}: "
+                         f"revisa KD_ONLY_VISIBLE y KD_RESULTS_DIR")
+    
     grid, best  = select_best_configs(runs)
 
     out_dir = results_dir(str_N, "student")

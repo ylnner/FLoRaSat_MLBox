@@ -24,8 +24,8 @@ import torch
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-from config import LOGIT_CLIP, SEEDS, TEACHER_FOLDS, TEACHER_ITERS
-from common import cache_path_with_N, results_dir #results_dir_with_N # results_dir # cache_path
+from config import LOGIT_CLIP, SEEDS, TEACHER_FOLDS, TEACHER_ITERS, ONLY_VISIBLE
+from common import cache_path_with_N, results_dir, load_split, unique_weights
 from funcs_create_dataset import load_dataset
 
 
@@ -80,7 +80,21 @@ def out_of_fold_proba(X, y, fold):
         p[held] = new_model().fit(X[train], y[train]).predict_proba(X[held])[:, 1]
     return p
 
-def out_of_fold_logits(X, y, fold):
+
+def teacher_weights(y, msg_id):
+    """
+    sample_weight del maestro = mismo objetivo que el termino duro del estudiante. Acierto: pos_weight * w. 
+    
+    Para fallo: 1.    
+    """
+    pos_weight = (y == 0).sum() / (y == 1).sum()
+    sw = unique_weights(y, msg_id).astype(np.float64)
+    sw[y == 1] *= pos_weight
+    return sw, pos_weight
+
+
+# Recibe sw y lo pasa a cada fit de los pliegues (solo las filas de train del pliegue).
+def out_of_fold_logits(X, y, fold, sw):
     # Fold representa una lista con valores True, False para todas las id_simulaciones
     # True donde la simulacion es parte del train, es decir que el fold no lo saco del train
     # False donde la simulacion no es parte de train, el fon lo saco del train.
@@ -94,8 +108,9 @@ def out_of_fold_logits(X, y, fold):
         # El modelo se entrena con las simulaciones del fold -> new_model().fit(X[train], y[train])
         # predice las simulaciones que estan fuera del fold. -> .decision_function(X[held])
         # Y usa eso para generar los logits de este fold
-        # En z[held] se guarda el logit de las simulaciones fuera del fod. 
-        z[held] = new_model().fit(X[train], y[train]).decision_function(X[held])   # log-odds, sin clip
+        # En z[held] se guarda el logit de las simulaciones fuera del fod.         
+        # pesos por mensaje unico]  -> fit con sample_weight=sw[train]
+        z[held] = new_model().fit(X[train], y[train], sample_weight=sw[train]).decision_function(X[held])   # log-odds, sin clip
     return z
 
 def to_logits(p):
@@ -115,9 +130,10 @@ def visible_scores(y, p, below_mask):
 
 
 def build_one_seed(seed, str_N):    
-    # Lee el csv por N    
-    train   = load_dataset(cache_path_with_N(seed, "train", str_N))
-    val     = load_dataset(cache_path_with_N(seed, "val", str_N))
+    # Lee el csv por N        
+    # Con ONLY_VISIBLE solo quedan las filas con below_mask == 0 (elevSat >= 10)
+    train   = load_split(seed, "train", str_N)
+    val     = load_split(seed, "val", str_N)
 
     # Obtiene X, y
     X       = teacher_inputs(train)
@@ -133,7 +149,9 @@ def build_one_seed(seed, str_N):
     #       [1, 0, 2, 2, 0, 0, 0, 0, 0, 2, 0, 0, 2, 1, 1, 0, 1, 2, 2, 2, 1, 1, 0, 1, 0, 2, 2])
 
     # En z_oof se guardan todas las logits del oof. 
-    z_oof = out_of_fold_logits(X, y, simulation_folds(train["id_simulation"], seed))
+    # Pesos del maestro calculados con msg_id (lo añade load_split antes del filtro de visibles).
+    sw, pos_weight = teacher_weights(y, train["msg_id"])
+    z_oof = out_of_fold_logits(X, y, simulation_folds(train["id_simulation"], seed), sw)
     logits_file = os.path.join(results_dir(str_N, "teacher_gradient_boosting", "logits"), f"teacher_logits_seed{seed}.pt")
 
     # Guardo el z_oof an logits file
@@ -144,9 +162,11 @@ def build_one_seed(seed, str_N):
     # Se reporta con el 100% del train (In-sample) solo para evaluacion. Esto no se destila, solo es para ver que tan bueno es el maestro con el 100%
     # Cuando se aplica out of fold (OOF) da una verdadera incertidumbe y el estudiante aprende mas de eso. 
     # evaluacion: modelo con el 100 % del train
-    full = new_model().fit(X, y)
+    full = new_model().fit(X, y, sample_weight=sw)
     metrics = {
         "seed": seed,
+        "only_visible": ONLY_VISIBLE,
+        "pos_weight": float(pos_weight),
         "train_oof": visible_scores(y, p_oof, train["below_mask"]), # Reporta los que estan son visibles.
         "train_in_sample": visible_scores(y, full.predict_proba(X)[:, 1], train["below_mask"]), # Reporta los que son visibles
         "val_in_sample": visible_scores(val["y_true"], full.predict_proba(teacher_inputs(val))[:, 1], val["below_mask"]),
@@ -170,7 +190,7 @@ def main():
     str_N_list = [str_N] * len(args.seeds)
     if args.workers <= 1:
         for s in args.seeds:
-            print(build_one_seed(s, str_N_list), flush=True)
+            print(build_one_seed(s, str_N), flush=True)
     else:
         with cf.ProcessPoolExecutor(args.workers) as pool:
             for msg in pool.map(build_one_seed, args.seeds, str_N_list):

@@ -1,6 +1,7 @@
 import numpy as np
 import torch 
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
 
@@ -21,21 +22,28 @@ class MyCustomDataset(Dataset):
         return {k: v[idx] for k, v in self.data.items()}
 """
 
-class MyCustomStudentDataset(Dataset):
-    def __init__(self, x, y_true):
+class MyCustomStudentDataset(Dataset):    
+    # El dataset acepta w (peso por fila). Si no se pasa, todos valen 1 y el comportamiento es el de antes.
+    def __init__(self, x, y_true, w=None):
         self.x      = torch.as_tensor(x, dtype=torch.float32)
         self.y_true = torch.as_tensor(y_true, dtype=torch.float32)
         self.n      = len(self.y_true)
+        #  cada fila lleva su peso w: 1/k normalizado si es un acierto, 1 si es un fallo. Lo calcula unique_weights 
+        if w is None:
+            self.w = torch.ones(self.n)
+        else:
+            self.w = torch.as_tensor(w, dtype=torch.float32)
 
     def __len__(self):
         return self.n
 
     def __getitem__(self, idx):
-        return {"x": self.x[idx], "y_true": self.y_true[idx]}
+        return {"x": self.x[idx], "y_true": self.y_true[idx], "w": self.w[idx]}
 
 class MyCustonStudentDistillationDataset(MyCustomStudentDataset):
-    def __init__(self, x, y_true, teacher_logits):
-        super().__init__(x, y_true)
+    #el dataset de destilacion pasa w a la clase base
+    def __init__(self, x, y_true, teacher_logits, w=None):
+        super().__init__(x, y_true, w)
         self.teacher_logits = torch.as_tensor(teacher_logits, dtype=torch.float32)
         
         assert len(self.teacher_logits) == self.n, f"teacher_logits ({len(self.teacher_logits)}) != muestras ({self.n})"
@@ -80,12 +88,15 @@ class MyDistillationLoss(nn.Module):
 
         self.alpha  = alpha
         self.T      = temperature
-        #pos_weight    = torch.tensor([81.38/18.62], device='cpu') # 18.62% vs 81.38%        
-        self.bce_hard = nn.BCEWithLogitsLoss(pos_weight = pos_weight)
+            
+        # Se cambia nnBCEWithLogtsLoss porque no admite pesos distintos. y se guarda pos_weight como buffer? 
+        # se usa la version funcional en forward.
+        self.register_buffer("pos_weight", pos_weight)
 
-    def forward(self,  student_logits, teacher_logits, y_true):
-        
-        L_hard = self.bce_hard(student_logits, y_true,)
+    def forward(self, student_logits, teacher_logits, y_true, w):
+        # Se pasa aca el w, solo al termino duro(etiqueta real) se pesa: L_hard = BCE(weight=w, pos_weight).
+        # L_hard compara con la etiqueta real,donde  importa si la recepcion es la unica del mensaje o una de varias copias.
+        L_hard = F.binary_cross_entropy_with_logits(student_logits, y_true, weight=w, pos_weight=self.pos_weight)
 
         teacher_soft = torch.sigmoid(teacher_logits / self.T)
         student_soft = torch.sigmoid(student_logits / self.T)
