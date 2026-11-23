@@ -31,21 +31,21 @@ namespace mlbox{
         //double threshold;
 
         // Transformer
-        const std::vector<double> means = {
+        std::vector<double> means = {
                 48.55624, 11.995906750000001, 9.738305531309523,
                 0.0206337, 11.033333333333333, -637.2126803374404,
                 715.0, 214.82142857142858
         };
 
 
-        const std::vector<double> scales = {
+        std::vector<double> scales = {
                 8.63089616932873, 13.408186415520877, 17.75413475236267,
                 0.003885927908492385, 0.8359957469322968, 14639.724221620067,
                 88.94219631712659, 75.23750659052429
         };
 
-        const double mean_delta_t = 61.31933958104395;
-        const double scale_delta_t = 40.97636157062998;
+        double mean_delta_t = 61.31933958104395;
+        double scale_delta_t = 40.97636157062998;
 
         bool coldStart;
     protected:
@@ -57,6 +57,7 @@ namespace mlbox{
         std::vector<double> predict(const std::vector<double>& features) override;
         std::vector<double> scaleFeatures(const std::vector<double>& rawFeatures);
         double scaleDeltaTime (double raw_delta_time);
+        void loadScaler();
     };
 }
 

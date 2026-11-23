@@ -103,6 +103,8 @@ OBJS = \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_BiLSTM.o \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.o \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP_KD.o \
+    $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP_Policy_SFTP.o \
+    $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP_SFTP.o \
     $O/Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.o \
     $O/Nodes/_10_Terminal/_30_Network/GroundForwardingTable.o \
     $O/Nodes/_10_Terminal/_30_Network/Ter_Net_TerminalRouting.o \

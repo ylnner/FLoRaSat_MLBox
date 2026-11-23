@@ -1,18 +1,23 @@
 import numpy as np
 import pandas as pd
 
+# v3: la etiqueta de red y' y el grafo de captura se calculan con la replica del receptor
+from network_receiver import ELEV_MASK, build_kill_graph, network_label, received
 
 
 # Entradas del estudiante, en el orden en que entran al MLP (= run_train_student.STUDENT_INPUTS,
 # = orden del JSON de scalers que lee el simulador)
-STUDENT_INPUTS  = ["dopplerShift", "elevSat", "latDev", "longDev", "loraTP", "loraSF", "alt", "raan"]
+# sin raan: raan esta confundido con alt en el dataset (850 km solo con raan 277-327) y hace que el modelo dse confuda
+STUDENT_INPUTS  = ["dopplerShift", "elevSat", "latDev", "longDev", "loraTP", "loraSF", "alt"]
 #GEO_COLS        = ["g_near_dopp", "g_near_dopp_load", "g_kill", "g_kill_load", "g_up"]
 GEO_COLS        = ["g_kill", "g_kill_load", "g_up"]
 
 # Columnas que dependen del resultado de la recepcion: NUNCA pueden ser entradas
 FORBIDDEN_AS_INPUT  = ["rssi_dbm", "snr_db", "rx_power_dbm", "collision_flag", "num_colliding_packets", "belowMask", "rcvOk"]
-REQUIRED            = STUDENT_INPUTS + ["id_simulation", "srcId", "tx_start", "tx_duration", "rx_power_dbm_at_dev",
-                             "loraCF", "belowMask", "rcvOk", "collision_flag", "rssi_dbm"]
+
+# se comprueba porque la replica del receptor supone BW = 125 kHz
+REQUIRED            = STUDENT_INPUTS + ["raan", "id_simulation", "srcId", "pid", "tx_start", "tx_duration", "rx_power_dbm_at_dev",
+                             "loraCF", "loraBW", "belowMask", "rcvOk", "collision_flag", "rssi_dbm"]
 
 
 # Umbral de captura de FLoRaSat (LoRaReceiver.h): NON_ORTH_DELTA[SF_x - 7][SF_j - 7], en dB
@@ -38,7 +43,19 @@ R2: solapamiento en tiempo y frecuencia (detectCollisionOverlap)
 ################################################################
 ################################################################
 
-DATA_KEYS = ["X_student", "X_geo", "y_true", "below_mask", "id_simulation", "src_id", "tx_start", "orig_index"]
+# Nueva version: la cache solo guarda las filas VISIBLES (elevSat >= 10): el C++ nunca transmite por debajo de la mascara, asi que
+# esas filas no son decisiones del modelo. Claves por fila visible:
+#   X_student, X_geo     entradas del estudiante y features geo del maestro (las geo se calculan con TODAS las filas)
+#   raan                 Sin raan: NO es entrada. Solo para evaluar en compare_offline.py los modelos desplegados
+#                        que todavia tienen 8 entradas (X_student + raan)
+#   y_true               rcvOk de FLoRaSat (red del dataset: todas las copias radiadas). Solo como referencia
+#   y_net                y': la copia llegaria con la red FV_1 (etiqueta de entrenamiento)
+#   receivable           pasa mascara y sensibilidad (sin colisiones)
+#   msg_id               id del mensaje (simulacion, dispositivo, pid), unico dentro del split
+#   id_simulation, src_id, pid, tx_start, orig_index
+#   edge_victim, edge_killer   grafo de captura entre filas visibles (indices de este mismo array)
+DATA_KEYS = ["X_student", "X_geo", "raan", "y_true", "y_net", "receivable", "msg_id", "id_simulation", "src_id", "pid",
+             "tx_start", "orig_index", "edge_victim", "edge_killer"]
 
 def load_dataset(path):
     with np.load(path, allow_pickle=False) as z:
@@ -56,6 +73,13 @@ def check_csv(df, name=""):
     assert not df[inputs].isna().any().any(), f"{name}: hay NaN en las entradas"
     assert (df.rx_power_dbm_at_dev != SENTINEL).all(), f"{name}: rx_power_dbm_at_dev con -999"
     assert df.loraSF.between(7, 12).all(), f"{name}: SF fuera de 7-12"
+    # La replica del receptor (network_receiver.py) tiene la sensibilidad de SF10-12 con BW 125 kHz
+    assert df.loraSF.between(10, 12).all(), f"{name}: la replica del receptor solo tiene SF10-12"
+    assert (df.loraBW == 125000).all(), f"{name}: la replica del receptor supone BW = 125 kHz"
+    # La mascara de belowMask debe ser la misma que la de la replica (elevSat >= 10)
+    assert ((df.belowMask == 0) == (df.elevSat >= ELEV_MASK)).all(), f"{name}: belowMask no coincide con elevSat >= 10"
+    # Cada mensaje (simulacion, dispositivo, pid) tiene sus copias en filas distintas
+    assert not df.duplicated(["id_simulation", "srcId", "pid", "tx_start"]).any(), f"{name}: filas repetidas"
     
      # R1 (isPacketCollided) y g_kill suponen una sola portadora: todos los paquetes comparten canal
     assert df.loraCF.nunique() == 1, f"{name}: hay varias loraCF"
@@ -197,6 +221,67 @@ def reorder(df):
 
 
     
+def network_columns(df_final):
+    """
+    etiqueta de red y' y grafo de captura de un split (todas las simulaciones del CSV).
+
+    1 Grafo "j mata a r" con TODAS las filas (tambien las de elevSat 0-10, que en el dataset existan y pueden
+       interferir). Con todas las filas transmitiendo se reproduce rcvOk: es la verificacion de la replica.
+    2 Red de referencia FV_1: cada mensaje envia solo su primera copia visible (elevSat >= 10), como la red
+       desplegada. y' de cada fila = llegaria si se transmite con esa red en el aire.
+    3 Se quedan solo las filas visibles y las aristas entre filas visibles , renumeradas a los indices de las filas visibles.
+    """
+
+    sim      = df_final["id_simulation"].to_numpy()
+    tx_start = df_final["tx_start"].to_numpy(np.float64)
+    elev     = df_final["elevSat"].to_numpy(np.float64)
+    lora_sf  = df_final["loraSF"].to_numpy().astype(np.int64)
+
+    #receivable = [True, True, True, False, True, False] Marca si la fila llegaría sin interferencia
+    # edge_victim = array len k 
+    # edge_killer = aray len k
+    # la arista k es el indice entre ambos
+    # si edge_killer[k] transmite, entonces edge_victim[k] no llega   
+    receivable, edge_victim, edge_killer = build_kill_graph(sim, tx_start,
+                                                            df_final["tx_duration"].to_numpy(np.float64), lora_sf,
+                                                            df_final["rx_power_dbm_at_dev"].to_numpy(np.float64), elev)
+
+    # Verificacion: con todas las filas transmitiendo (como en el dataset) la replica debe dar rcvOk
+    all_tx      = np.ones(len(df_final), dtype=bool)
+    replica_ok  = received(edge_victim, edge_killer, receivable, all_tx)
+    visible     = elev >= ELEV_MASK
+    rcv_ok      = df_final["rcvOk"].to_numpy().astype(bool)
+    agree_visible = float(np.mean(replica_ok[visible] == rcv_ok[visible]))
+
+    # Red FV_1: primera copia visible de cada mensaje.     
+    # (df_final ya esta ordenado por simulacion, dispositivo y tiempo; se ordena de nuevo por seguridad).
+    visible_rows = df_final[visible].sort_values(["id_simulation", "srcId", "pid", "tx_start"])
+    # # cumcount numera las filas visibles dentro de cada grupo 'id_simulation, srcId, pid' en orden de tx_start    
+    visible_rank = visible_rows.groupby(["id_simulation", "srcId", "pid"]).cumcount()
+
+    tx_reference = np.zeros(len(df_final), dtype=bool)
+    # Un vector booleano con True en todos que tiene visible_rank , que corresponde a FV 1
+    tx_reference[visible_rows.index[visible_rank.to_numpy() == 0]] = True
+
+    # COn esto filtramos todas las visibles y las que transmiten primero en su ventana.
+
+    # Genreamos nuevos labels
+    y_net = network_label(edge_victim, edge_killer, receivable, tx_reference)
+
+    # Renumera las aristas a las filas visibles; las aristas con una fila no visible se descartan
+    new_index   = np.full(len(df_final), -1, dtype=np.int64)
+    new_index[visible] = np.arange(visible.sum())
+    keep        = visible[edge_victim] & visible[edge_killer]
+
+    stats = {"rows": int(len(df_final)), "visible_rows": int(visible.sum()),
+             "replica_agree_visible": agree_visible,
+             "rcvOk_visible": float(rcv_ok[visible].mean()), "y_net_visible": float(y_net[visible].mean()),
+             "receivable_visible": float(receivable[visible].mean()),
+             "reference_tx": int(tx_reference.sum())}
+    return {"visible": visible, "y_net": y_net, "receivable": receivable,
+            "edge_victim": new_index[edge_victim[keep]], "edge_killer": new_index[edge_killer[keep]], "stats": stats}
+
+
 def build_dataset(csv_path):
 
     df = pd.read_csv(csv_path)
@@ -216,14 +301,28 @@ def build_dataset(csv_path):
     assert not df_final[GEO_COLS].isna().any().any(), "NaN en las features geo"
     assert not set(FORBIDDEN_AS_INPUT) & set(STUDENT_INPUTS + GEO_COLS), "columna prohibida como entrada"
 
-    return {
-        "X_student":     df_final[STUDENT_INPUTS].to_numpy(np.float64),
-        "X_geo":         df_final[GEO_COLS].to_numpy(np.float64),
-        "y_true":        df_final["rcvOk"].to_numpy(np.float32),
-        "below_mask":    df_final["belowMask"].to_numpy(np.int8),
-        "id_simulation": df_final["id_simulation"].astype(str).to_numpy(dtype=np.str_),   # texto unicode (sin pickle)
-        "src_id":        df_final["srcId"].to_numpy(np.int64),
-        "tx_start":      df_final["tx_start"].to_numpy(np.float64),
-        "orig_index":    df_final["_orig"].to_numpy(np.int64),
-    }
+    # y', receivable y grafo de captura (con todas las filas); despues solo se guardan las filas visibles
+    net      = network_columns(df_final)
+    visible  = net["visible"]
+    df_vis   = df_final[visible]
 
+    # v3: id de mensaje = (simulacion, dispositivo, pid). ngroup numera cada grupo con un entero (0..M-1).
+    msg_id = df_vis.groupby(["id_simulation", "srcId", "pid"], sort=True).ngroup().to_numpy(np.int64)
+
+    data = {
+        "X_student":     df_vis[STUDENT_INPUTS].to_numpy(np.float64),
+        "X_geo":         df_vis[GEO_COLS].to_numpy(np.float64),
+        "raan":          df_vis["raan"].to_numpy(np.float64),          # solo referencia, no es entrada
+        "y_true":        df_vis["rcvOk"].to_numpy(np.float32),
+        "y_net":         net["y_net"][visible].astype(np.float32),
+        "receivable":    net["receivable"][visible],
+        "msg_id":        msg_id,
+        "id_simulation": df_vis["id_simulation"].astype(str).to_numpy(dtype=np.str_),   # texto unicode (sin pickle)
+        "src_id":        df_vis["srcId"].to_numpy(np.int64),
+        "pid":           df_vis["pid"].to_numpy(np.int64),
+        "tx_start":      df_vis["tx_start"].to_numpy(np.float64),
+        "orig_index":    df_vis["_orig"].to_numpy(np.int64),
+        "edge_victim":   net["edge_victim"],
+        "edge_killer":   net["edge_killer"],
+    }
+    return data, net["stats"]

@@ -123,6 +123,17 @@ void Ter_Dlk_KiWan::initialize(int stage) {
         if (useStopRule && (stopTarget <= 0 || stopTarget >= 1 || stopGamma <= 0 || stopGamma > 1))
             throw cRuntimeError("Stop rule: stopTarget must be in (0, 1) and stopGamma in (0, 1]");
 
+        // ACHF - moneda despues del filtro del MLP
+        useMLCoin  = par("useMLCoin").boolValue();
+        mlCoinProb = par("mlCoinProb").doubleValue();
+        mlCoinRng  = par("mlCoinRng");
+
+        if (useMLCoin && (mlCoinProb <= 0 || mlCoinProb > 1))
+            throw cRuntimeError("mlCoinProb must be in (0, 1]");
+
+
+
+
         // Initialize detection state
         currentDetectCount = 0;
         currentSyncCount = 0;
@@ -182,10 +193,50 @@ void Ter_Dlk_KiWan::initialize(int stage) {
             mlBoxMLPKD = check_and_cast<mlbox::Transmission_Predictor_MLP_KD *>(getSubmodule("mlBoxMLPKD"));
         }
 
+        if (useMLCoin && !mlBoxAvailableMLPKD)
+            throw cRuntimeError("useMLCoin only works with useMLBoxMLPKD");
+
         useCoin = par("useCoin").boolValue();
 
         if(useCoin){
             coindOdds = par("coinOdds").doubleValue();
+        }
+
+        mlBoxAvailableMLP_SFTP = par("useMLBoxMLP_SFTP").boolValue();
+        if(mlBoxAvailableMLP_SFTP){
+            if (randomizeSF_TP)
+                throw cRuntimeError("useMLBoxMLP_SFTP and randomizeSF_TP do not work at the same time");
+
+            mlBoxMLP_SFTP = check_and_cast<mlbox::Transmission_Predictor_MLP_SFTP *>(getSubmodule("mlBoxMLP_SFTP"));
+        }
+
+        mlBoxAvailableMLP_Policy_SFTP = par("useMLBoxMLP_Policy_SFTP").boolValue();
+        if (mlBoxAvailableMLP_Policy_SFTP) {
+            if (randomizeSF_TP || mlBoxAvailableMLP_SFTP)
+                throw cRuntimeError("useMLBoxMLP_Policy and randomizeSF_TP do not work at the same time");
+            policyRng = par("policyRng");
+            mlBoxMLP_Policy_SFTP = check_and_cast<mlbox::Transmission_Predictor_MLP_Policy_SFTP *>(getSubmodule("mlBoxMLP_Policy_SFTP"));
+        }
+
+        // Baselines FV_k / RV_k (despues de leer todos los flags de ML)
+        visBudget = par("visBudget");
+        visPolicy = par("visPolicy").stdstringValue();
+        visRng    = par("visRng");
+        visProb   = par("visProb").doubleValue();
+        if (visBudget > 0) {
+            if (visPolicy != "first" && visPolicy != "random")
+                throw cRuntimeError("visPolicy must be \"first\" or \"random\"");
+
+            if (visProb <= 0 || visProb > 1)
+                throw cRuntimeError("visProb must be in (0, 1]");
+
+            // Control de seguridad para que no afecte otros case.
+            bool anyOtherPolicy = useCoin || useStopRule || mlBoxAvailable || analyticalAvailable
+                                || mlBoxAvailableBiLSTM || mlBoxAvailableMLP || mlBoxAvailableTwoBranches
+                                || mlBoxAvailableMLPKD || mlBoxAvailableMLP_SFTP || mlBoxAvailableMLP_Policy_SFTP;
+
+            if (anyOtherPolicy)
+                throw cRuntimeError("visBudget is a no-ML baseline: disable useCoin, useStopRule and every ML box");
         }
 
     }
@@ -206,9 +257,20 @@ void Ter_Dlk_KiWan::finish() {
     if (mlBoxAvailableMLPKD) {
         recordScalar("numSkippedByStopRule", this->numSkippedByStopRule);
         recordScalar("sumApprovedProb", this->sumApprovedProb);
+        recordScalar("numSkippedByMLCoin", this->numSkippedByMLCoin);
     }
     recordScalar("oppBelowMask", this->numOppBelowMask);
     recordScalar("mlApprovedBelowMask", this->numMLApprovedBelowMask);
+
+    if (mlBoxAvailableMLP_SFTP)
+        recordScalar("numSkippedByMinProbability", this->numSkippedByMinProbability);
+
+    if(mlBoxAvailableMLP_Policy_SFTP){
+        recordScalar("numPolicyNoTx", this->numPolicyNoTx);
+        recordScalar("numPolicyRepeats", this->numPolicyRepeats);
+    }
+    if (visBudget > 0)
+        recordScalar("visUnderBudget", this->numVisUnderBudget);
     //recordScalar("numTransmissionsApprovedTransformer", this->numTransmissionsApprovedTransformer);
     //recordScalar("numTransmissionsApprovedBiLSTM", this->numTransmissionsApprovedBiLSTM);
 
@@ -353,6 +415,8 @@ void Ter_Dlk_KiWan::startTransmissionWindow() {
         // Count the message as sent at the beginning of the first transmission window
         if (currentTwCount == 0) {
             msgVisibleOpp = 0;
+            msgPolicyTx   = 0;     // n_prev = 0 al empezar cada mensaje
+            visSentInMsg  = 0;     // FV/RV: new message, no copy sended
             numMessagesSent++;
             // ACHF - KD
             cumMissProb = 1.0;   // stop rule: new message, nothing sent yet
@@ -426,6 +490,11 @@ void Ter_Dlk_KiWan::handleTransmitWindowEnd() {
         if (debugOutput) {
             std::cout << "Node " << address << " at time " << simTime() << ": all " << Ntw << " transmission windows completed" << endl;
         }
+
+        // FV/RV: el mensaje tenia al menos min(k, visibles) slots disponibles y se enviaron menos copias.
+        // En FV debe ser siempre 0; en RV cuenta los mensajes que la moneda dejó con menos de min(k, visibles) copias
+        if (visBudget > 0 && visSentInMsg < std::min(visBudget, msgVisibleOpp))
+            numVisUnderBudget++;
 
         vector_msgVisiblesOpp.record(msgVisibleOpp);
 
@@ -579,6 +648,81 @@ double Ter_Dlk_KiWan::computeReceptionPower() {
 
 }
 
+Ter_Dlk_KiWan::ML_SFTP_Input Ter_Dlk_KiWan::calculate_ML_SFTP_inputs() {
+    satellite::Sat *sat = check_and_cast<satellite::Sat *>(getSystemModule()->getSubmodule("satellite", 0));
+    Ter *ter            = check_and_cast<Ter *>(getParentModule()->getParentModule());
+    ML_SFTP_Input in;
+
+    in.latDev  = ter->getLatitude();
+    in.longDev = ter->getLongitude();
+    in.elevSat = sat->getElevation(*ter);
+
+
+
+    // Doppler: el mismo calculo que hoy esta en sendData (posicion ECEF, velocidad del satelite, f_rx = f_tx (c + v_r) / c)
+    Hz originalFreq = Hz(ter->getSubmodule("app")->par("initialLoRaCF").doubleValue());
+    Ter_Mob *ter_mob = check_and_cast<Ter_Mob *>(ter->getSubmodule("mob"));
+    Ter_Mob *transmitterTerMobility  = dynamic_cast<mobility::Ter_Mob *>(ter_mob);
+    Sat_Mob_SatelliteMobility_Standalone *receiverSatMobility = dynamic_cast<mobility::Sat_Mob_SatelliteMobility_Standalone *>(getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("mobility"));//(receiverMobility);
+
+    double terminalLatDeg = transmitterTerMobility->getLatitude();
+    double terminalLonDeg = transmitterTerMobility->getLongitude();
+    double terminalAltKm  = transmitterTerMobility->getCurrentPosition().z / 1000.0; // m -> km
+    double satelliteLatDeg = receiverSatMobility->getLatitude();
+    double satelliteLonDeg = receiverSatMobility->getLongitude();
+    double satelliteAltKm  = receiverSatMobility->getAltitude();
+
+    cEcef terminalEcef(terminalLatDeg, terminalLonDeg, terminalAltKm);
+    cEcef satelliteEcef(satelliteLatDeg, satelliteLonDeg, satelliteAltKm);
+    // Use real ECEF velocity from satellite mobility (m/s)
+    Coord rxVel;
+
+    if (receiverSatMobility) {
+        //EV_DETAIL << "Satellite real velocity (m/s): " << satMobility->getRealVelocity() << endl;
+        EV_DETAIL << "Satellite real velocity (m/s): " << receiverSatMobility->getCurrentVelocityEcef() << endl;
+        //rxVel = satMobility->getCurrentVelocityEcef();
+        rxVel = receiverSatMobility->getCurrentVelocityEcef();
+    }else{
+        EV_WARN << "No mobility module found for receiverSatMobility" << endl;
+    }
+
+    // Relative position vector in ECEF (km)
+    Coord relativePos(
+        satelliteEcef.getX() - terminalEcef.getX(),
+        satelliteEcef.getY() - terminalEcef.getY(),
+        satelliteEcef.getZ() - terminalEcef.getZ()
+    );
+
+
+    double distance = relativePos.length();
+    EV_DETAIL << "computeDopplerFrequency: relative position (km): " << relativePos << ", distance: " << distance << " km" << endl;
+
+    // Convert rxVel from m/s to km/s for consistency with relativePos (km)
+    Coord rxVelKmPerS = rxVel / 1000.0;
+
+    double relativeVelAlongLOS = (relativePos.x * rxVelKmPerS.x +
+                                  relativePos.y * rxVelKmPerS.y +
+                                  relativePos.z * rxVelKmPerS.z) / distance;
+    // Positive radial velocity => satellite is approaching terminal
+    double radialVelocity = -relativeVelAlongLOS; // km/s
+
+    // Doppler: f_rx = f_tx * (c + v_r) / c
+    double c = 299792.458; // km/s
+    double dopplerShiftedFreqValue = originalFreq.get() * (c + radialVelocity) / c;
+    double dopplerShift = dopplerShiftedFreqValue - originalFreq.get();
+    EV_INFO << "calculate DopplerShift: " << dopplerShift <<endl;
+    EV_INFO << "computeDopplerFrequency: original=" << originalFreq
+            << ", radial_vel=" << radialVelocity
+            << " km/s, shifted=" << dopplerShiftedFreqValue / 1e6
+            << " MHz (shift=" << dopplerShift / 1e6 << " MHz)" << endl;
+
+    in.dopplerShif = (Hz(dopplerShift).get());
+    in.alt = ((getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("NoradModule"))->par("altitude").doubleValue());
+    in.raan = ((getSystemModule()->getSubmodule("satellite", 0)->getSubmodule("NoradModule"))->par("raan").doubleValue());
+
+    return in;
+}
+
 void Ter_Dlk_KiWan::sendData() {
     if (currentTxCount < Ntx) {
         if (debugOutput) {
@@ -611,8 +755,72 @@ void Ter_Dlk_KiWan::sendData() {
         EV << "repetitionNumberML: " << repetitionNumberML <<endl;
         newFrame->setRepetitionML(repetitionNumberML);
 
-        double propensity = -1;
+        // ACHF - Used to automatic selection fo SF/TP with ML Model
+        int chosenCombo = -1;
+        double chosenProb = -1;
+        ML_SFTP_Input sftp_in = calculate_ML_SFTP_inputs();
+        if(mlBoxAvailableMLP_SFTP){
+            if(sftp_in.elevSat >=10){
+                // Mismo orden que scaler.json["inputs"]
+                std::vector<double> x = {sftp_in.dopplerShif, sftp_in.elevSat, sftp_in.latDev, sftp_in.longDev, sftp_in.alt, sftp_in.raan};
+                std::vector<double> probs = mlBoxMLP_SFTP->predict(mlBoxMLP_SFTP->scaleFeatures(x));
+                chosenCombo = mlBoxMLP_SFTP->chooseCombo(probs);
+                if (chosenCombo >= 0)
+                    chosenProb = probs[chosenCombo];
+                else
+                    numSkippedByMinProbability++;
+            }
 
+            if (chosenCombo >= 0) { // Transmit
+                int sf = mlbox::Transmission_Predictor_MLP_SFTP::comboSF(chosenCombo);
+                int tp = mlbox::Transmission_Predictor_MLP_SFTP::comboTP(chosenCombo);
+                newFrame->setLoRaSF(sf);
+                newFrame->setLoRaTP(mW(math::dBmW2mW(tp)).get());
+
+                EV << "MLP SF/TP: combo " << chosenCombo << " -> SF" << sf << " TP" << tp << " dBm, P = " << chosenProb << endl;
+            }
+        }
+
+        if (mlBoxAvailableMLP_Policy_SFTP && sftp_in.elevSat >= 10) {
+            // msgVisibleOpp = oportunidades visibles ANTERIORES de este mensaje = vis_idx del entrenamiento
+            // (se reinicia con cada mensaje y se incrementa al final de sendData, despues de esta decision)
+            double visIdx = msgVisibleOpp;
+            // n_prev = transmisiones ANTERIORES de este mensaje (se actualiza despues de sendDown, abajo)
+            double nPrev  = mlBoxMLP_Policy_SFTP->capNPrev(msgPolicyTx);
+
+            std::vector<double> x = {sftp_in.dopplerShif, sftp_in.elevSat, sftp_in.latDev, sftp_in.longDev,
+                                     sftp_in.alt, sftp_in.raan, visIdx, nPrev};
+
+            EV << "visIdx: " << visIdx <<endl;
+            EV << "nPrev: " << nPrev <<endl;
+
+            std::vector<double> probs = mlBoxMLP_Policy_SFTP->predict(mlBoxMLP_Policy_SFTP->scaleFeatures(x));
+
+            // RNG propio: el sorteo no consume numeros del RNG 0 (trafico, posiciones), asi el trafico es
+            // identico al de las otras politicas. Se sortea SIEMPRE que hay visibilidad.
+            // Genera numero aleatorio uniformemente distribuido[0, 1)
+            double u = uniform(0, 1, policyRng);
+            EV << "u: " << u <<endl;
+            int action = mlBoxMLP_Policy_SFTP->sampleAction(probs, u);
+
+            if (action != mlbox::Transmission_Predictor_MLP_Policy_SFTP::NO_TX) {
+                chosenCombo = action;
+                chosenProb  = probs[action];
+                int sf = mlbox::Transmission_Predictor_MLP_Policy_SFTP::comboSF(action);
+                int tp = mlbox::Transmission_Predictor_MLP_Policy_SFTP::comboTP(action);
+                newFrame->setLoRaSF(sf);
+                newFrame->setLoRaTP(mW(math::dBmW2mW(tp)).get());
+                EV << "MLP policy SFTP: vis_idx " << visIdx << " -> SF" << sf << " TP" << tp << " (p = " << chosenProb << ")" << " n_prev " << nPrev << endl;
+            } else {
+                numPolicyNoTx++;
+                EV << "MLP policy SFTP: vis_idx " << visIdx << " -> NO_TX (p = " << probs[action] << ")" << " n_prev " << nPrev << endl;
+            }
+        }
+        //END ACHF
+
+        /// ACHF - Used to generate SF/TP Randomized follwing a distribucion,
+        // This is only used to generate dataset
+        double propensity = -1;
         if(randomizeSF_TP){
             int current_SF;
             int current_TP;
@@ -633,6 +841,7 @@ void Ter_Dlk_KiWan::sendData() {
             newFrame->setLoRaSF(current_SF);
             newFrame->setLoRaTP(mW(math::dBmW2mW(current_TP)).get());
         }
+        /// ACHF - END.
 
         newFrame->setSentAt(simTime().dbl());
         
@@ -764,7 +973,7 @@ void Ter_Dlk_KiWan::sendData() {
         transmissionTag->setMixId(mixId);
         transmissionTag->setPropensity(propensity);
 
-        if(randomizeSF_TP ){
+        if(randomizeSF_TP || mlBoxAvailableMLP_SFTP || mlBoxAvailableMLP_Policy_SFTP){
             //
             EV <<"randomizeSF_TP: " << randomizeSF_TP <<endl;
             EV <<"newFrame->getLoRaTP(): " << newFrame->getLoRaTP() <<endl;
@@ -825,6 +1034,14 @@ void Ter_Dlk_KiWan::sendData() {
 
             std::vector<double> output = mlBox->predict(myFeatures_2);
             transmit = static_cast<bool>(output[0]);
+            // ACHF - regla de parada: -1 si no hay probabilidad (buffer incompleto o error) -> no actualiza cumMissProb
+            probML   = output.size() > 1 ? output[1] : -1.0;
+
+            if (transmit && elevSat < 10) {
+                // el modelo aprobo, pero el satelite esta bajo la mascara
+                numMLApprovedBelowMask++;
+            }
+
 
             EV << "After execute model transmit: " << transmit <<endl;
             double element_vector = transmissionId;
@@ -833,6 +1050,14 @@ void Ter_Dlk_KiWan::sendData() {
 
             EV << "Transformer element_vector: " << element_vector <<endl;
             vector_preds_Transformer.record(element_vector);
+
+            // ACHF - misma regla de parada que la rama MLP KD
+            if (transmit && useStopRule && (1.0 - cumMissProb) >= stopTarget) {
+                // el mensaje ya tiene la entrega "asegurada"
+                transmit = false;
+                numSkippedByStopRule++;
+                EV << "Stop rule: P(delivered) = " << 1.0 - cumMissProb << " >= " << stopTarget << " -> skip" << endl;
+            }
         }else if (analyticalAvailable){
             /*
              * Analytical
@@ -924,7 +1149,7 @@ void Ter_Dlk_KiWan::sendData() {
             // Check the input of each model
             noMLBox  = false;
             //dopplerShift", "elevSat", "latDev", "longDev", "loraTP", "loraSF", "alt", "raan
-            std::vector<double> myFeatures = {doppler, elevSat, latDev, longDev, loraTP, loraSF ,alt, raan};
+            std::vector<double> myFeatures = {doppler, elevSat, latDev, longDev, loraTP, loraSF ,alt}; // raan
 
             // For MLP KD
             std::vector<double> myFeatures_2 = mlBoxMLPKD->scaleFeatures(myFeatures);
@@ -938,6 +1163,18 @@ void Ter_Dlk_KiWan::sendData() {
                 numMLApprovedBelowMask++;   // el modelo aprobó, pero el satélite está bajo la máscara
             }
 
+
+            // ACHF - moneda: solo en slots visibles que el MLP aprobo (p >= threshold)
+            if (transmit && useMLCoin && elevSat >= 10) {
+                double u = uniform(0, 1, mlCoinRng);
+                if (u >= mlCoinProb) {
+                    transmit = false;
+                    numSkippedByMLCoin++;
+                }
+                EV << "ML coin: u = " << u << ", prob = " << mlCoinProb << " -> " << (transmit ? "TX" : "skip") << endl;
+            }
+
+
             EV << "After execute model: " << transmit <<endl;
             if (transmit && useStopRule && (1.0 - cumMissProb) >= stopTarget) {
                 // el mensaje ya tiene la entrega "asegurada"
@@ -946,14 +1183,12 @@ void Ter_Dlk_KiWan::sendData() {
                 EV << "Stop rule: P(delivered) = " << 1.0 - cumMissProb << " >= " << stopTarget << " -> skip" << endl;
             }
 
-            /*
-            double element_vector = transmissionId;
-            if (transmit)
-                element_vector = element_vector + 0.1;
+        }else if(mlBoxAvailableMLP_SFTP){
+            transmit = (chosenCombo >= 0);     // el SF/TP ya se fijo anteriormente
 
-            EV << "MLP KD element_vector: " << element_vector <<endl;
-            vector_preds_MLP.record(element_vector);
-            */
+        }else if(mlBoxAvailableMLP_Policy_SFTP){
+            transmit = (chosenCombo >= 0);     // el SF/TP ya se fijo anteriormente
+
         }else if (useCoin) {
             // 50/50 para transmitir
             //transmit = bernoulli(0.5);
@@ -963,6 +1198,19 @@ void Ter_Dlk_KiWan::sendData() {
                 EV << "COIN - Transmitir." << endl;
             } else {
                 EV << "COIN - No transmitir" << endl;
+            }
+        }else if (visBudget > 0) { // Se activa con budget de limitaciones
+            bool visibleNow = elevSat >= 10;
+            int  left       = visBudget - visSentInMsg;     // copias que aun puedo enviar
+
+            if (!visibleNow || left <= 0) { // Ya no hay budget
+                transmit = false;
+            } else if (visPolicy == "first") { // hay presupuesto y es politica first
+                // FV_k: el slot visible actual es uno de los primeros k visibles
+                transmit = true;
+            } else {
+                // RV_k: slot visible y con presupuesto -> transmitir con probabilidad visProb (sin información del futuro)
+                transmit = uniform(0, 1, visRng) < visProb;
             }
         }
 
@@ -981,10 +1229,20 @@ void Ter_Dlk_KiWan::sendData() {
             this->numTransmissionsApproved++;
             currentTxCountML++;
 
+            if (visBudget > 0)
+                visSentInMsg++;     // FV/RV: una copia menos del presupuesto
+
             // ACHF - KD
             if (probML >= 0) {
                 cumMissProb *= (1.0 - stopGamma * probML);
                 sumApprovedProb += probML;
+            }
+
+            // n_prev sube en 1 cada vez que el nodo transmite, llegue o no (el nodo no sabe si llego)
+            if (mlBoxAvailableMLP_Policy_SFTP) {
+                if (msgPolicyTx >= 1)
+                    numPolicyRepeats++;
+                msgPolicyTx++;
             }
         }
 

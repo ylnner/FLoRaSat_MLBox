@@ -45,7 +45,7 @@ void Transmission_Predictor_MLP_KD::loadScaler(){
     scales = check_and_cast<cValueArray *>(sc->get("scale").objectValue())->asDoubleVector();
 
     // New order in the input
-    const std::vector<std::string> expectedInputs = {"dopplerShift", "elevSat", "latDev", "longDev", "loraTP", "loraSF", "alt", "raan"};
+    const std::vector<std::string> expectedInputs = {"dopplerShift", "elevSat", "latDev", "longDev", "loraTP", "loraSF", "alt"};
 
     // El orden de las entradas del JSON debe ser el mismo que el del vector que arma Ter_Dlk_KiWan
     if (inputs != expectedInputs || means.size() != inputs.size() || scales.size() != inputs.size())

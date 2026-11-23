@@ -1,0 +1,66 @@
+{
+  "inputs": [
+    "dopplerShift",
+    "elevSat",
+    "latDev",
+    "longDev",
+    "alt",
+    "raan",
+    "vis_idx",
+    "n_prev"
+  ],
+  "mean": [
+    101.1056956591188,
+    24.88463576822373,
+    48.820190456927165,
+    13.797053356479637,
+    734.7531255474685,
+    161.45565943079202,
+    3.2280112758604216,
+    1.0
+  ],
+  "scale": [
+    12553.350899562083,
+    14.300519901035189,
+    6.100094628618974,
+    11.940885261768633,
+    85.28849445624236,
+    90.55185439715079,
+    2.273208316681142,
+    0.816496580927726
+  ],
+  "outputs": [
+    "SF10_TP12",
+    "SF10_TP13",
+    "SF10_TP14",
+    "SF11_TP12",
+    "SF11_TP13",
+    "SF11_TP14",
+    "SF12_TP12",
+    "SF12_TP13",
+    "SF12_TP14",
+    "NO_TX"
+  ],
+  "dtype": "float32",
+  "n_prev_states": 3,
+  "how_to_use": [
+    "1. Solo si elevSat >= 10: si no, no transmitir (la red se entreno solo con copias visibles).",
+    "2. Entradas en el orden de 'inputs'; vis_idx = numero de oportunidades visibles (elevSat >= 10) anteriores del mismo mensaje: 0 en la primera visible, 1 en la segunda, ... (se reinicia con cada mensaje nuevo).",
+    "3. n_prev (ultima entrada) = numero de veces que el nodo YA transmitio el mensaje actual (0 si todavia no lo transmitio; se reinicia con cada mensaje nuevo; sube en 1 cada vez que transmite, llegue o no). Se pasa min(n_prev, 2).",
+    "4. Normalizar todas las entradas (tambien n_prev): z = (x - mean) / scale.",
+    "5. Salida = 10 logits -> SOFTMAX (no sigmoid) -> probabilidad de cada accion; suman 1.",
+    "6. SORTEAR una accion con esas probabilidades (u ~ Uniforme(0,1) con un RNG propio; se elige la accion cuyo tramo acumulado contiene u). No usar argmax: la red se optimizo para el resultado del sorteo.",
+    "7. Accion a: si a == 9 no transmitir; si no, SF = 10 + a // 3 y TP = 12 + a % 3 (dBm). Si transmite, n_prev += 1."
+  ],
+  "model": "mlp_policy_nprev",
+  "N": 1000,
+  "kappa": 50.0,
+  "seed": 2,
+  "criterion": "val_objective = (U - E / kappa) / M",
+  "val_objective": 0.19547262818346264,
+  "val_unique_fraction": 0.3083393008121731,
+  "val_energy_per_msg": 5.643333631435521,
+  "best_epoch": 229,
+  "data_dir": "/home/ylnner/Documents/ClaudeSFTP/nueva_data_mezcla/N_1000",
+  "check_max_prob_diff": 7.823565353892725e-07
+}

@@ -20,6 +20,7 @@ from LoraCollisionTransformer import LoraCollisionTransformer
 import joblib
 import gc
 
+
 # Selecting continuous features and cols to drop
 continuous_features = ['latDev', 'longDev', 'elevSat', 'loraTP', 'loraSF', 'doppler', 'alt', 'raan']
 cols_to_drop        = ['dstId', 'srcSat', 'dstSat', 'loraCF', 'loraBW', 'loraCR', 'satId']

@@ -1,25 +1,21 @@
 """
-La seleccion ya NO usa val_ap_visible ni best_alpha_temp.csv (ver el comentario sobre ARMS mas abajo).
-Ahora usa student/runs_unique.csv, que escribe select_by_unique.py, y escribe G_off_por_seed.csv en vez de
-val_ap_visible_por_seed.csv. El texto original de abajo describe la seleccion anterior.
-
-Selecciona, por cada N y cada fraccion, los modelos del estudiante que se integraran en FLoRaSat: uno KD y uno noKD.
+Selecciona, por cada N, los modelos del estudiante que se integraran en FLoRaSat: uno KD y uno noKD (solo 100 %).
 No reentrena nada.
 
-KD:
-  1. Toma el mejor alpha/T de cada fraccion de results/N_*/student/best_alpha_temp.csv. Su columna val_ap_visible
-     es la media entre seeds de la val_ap_visible de ese alpha/T.
-  2. Elige la seed cuya val_ap_visible (logs results/N_*/student/runs/*.json) es la mas cercana a esa media.
-noKD:
-  1. La columna no_kd_val_ap_visible del mismo CSV es la media entre seeds de la val_ap_visible de no_kd en esa
-     fraccion.
-  2. Elige la seed de no_kd cuya val_ap_visible es la mas cercana a esa media.
+La seleccion usa la misma metrica que el early stopping: mensajes unicos de validacion frente a FV_1 (en %),
+medidos con la replica del receptor y la regla de despliegue (p >= 0.5, como mucho 1 copia). 
+
+1. Toma la mejor configuracion (mu, alpha, T) de results/N_*/student/best_config.csv (la escribe train_student.py:
+    mayor media entre seeds de val_gain_fv1_pct; empate -> menos transmisiones).
+2. Elige la seed cuya val_gain_fv1_pct (logs results/N_*/student/runs/*.json) es la mas cercana a esa media.
 
 Copia el .pth (models/) y el scaler .json (scalers/) de cada seed elegida, con sus nombres originales, a
 results/N_*/best_models/. Ahi escribe tambien:
-    seleccion.csv                   el modelo elegido por fraccion y brazo (kd / no_kd); lo usa export_best_models.py
-    val_ap_visible_por_seed.csv     todas las seeds, para revisar la eleccion
+    seleccion.csv                   el modelo elegido por brazo (kd / no_kd); lo usa export_best_models.py
+    val_gain_por_seed.csv           todas las seeds de la configuracion elegida, para revisar la eleccion
 Antes de copiar borra los .pth, .pt, .json y .csv en la carpeta
+
+python select_best_models.py 300
 """
 import os
 import sys
@@ -33,49 +29,46 @@ import pandas as pd
 from common import results_dir
 
 
-# Antes: (alpha, T) por la media de val_ap_visible y seed mas cercana a esa media.
-# Ahora: para cada fraccion y brazo se elige el (alpha, T) con la mayor media entre seeds de G_off_pct, es decir,
-# los mensajes unicos por encima de la mejor referencia (REP_k o Coin) con las mismas transmisiones, medidos offline
-# reproduciendo el MAC del simulador (select_by_unique.py). noKD solo tiene alpha = 0, T = 0.
-# Solo se aceptan configuraciones con todas las seeds. Despues se elige la seed cuya G_off_pct esta mas cerca de la
-# media (igual que antes, pero con otra metrica). Correlacion G_off offline vs G del simulador: buena con N 60/100
-# (+0,86/+0,84), debil con N 200/300 (+0,46/+0,29) -> con N >= 200 la eleccion es menos fiable.
 ARMS = {"kd": "student", "no_kd": "no_kd"}
-COLS = ["frac", "alpha", "temp", "seed", "name", "G_off", "G_off_pct", "thr_G_off",
-        "val_ap_visible", "val_ap_all", "test_ap_visible", "threshold"]
-NS   = [f"N_{n}" for n in (sys.argv[1:] or (60, 100, 200, 300))]
+COLS = ["mu", "alpha", "temp", "seed", "name", "best_epoch", "val_unique", "val_tx", "val_gain_fv1_pct",
+        "test_unique", "test_tx", "test_gain_fv1_pct", "threshold"]
+NS   = [f"N_{n}" for n in (sys.argv[1:] or (300,))]
 
 for str_N in NS:
     stud = results_dir(str_N, "student")
-    runs = pd.DataFrame([dict(json.load(open(f)), name=os.path.basename(f)[:-5])
-                         for f in glob.glob(os.path.join(stud, "runs", "*.json"))])
-    uni  = pd.read_csv(os.path.join(stud, "runs_unique.csv"))[["name", "G_off", "G_off_pct", "thr_G_off"]]
-    runs = runs.merge(uni, on="name", how="inner")
-    n_seeds = runs.seed.nunique()
+    runs = []
+    for f in glob.glob(os.path.join(stud, "runs", "*.json")):
+        run = json.load(open(f))
+        run["name"] = os.path.basename(f)[:-5]
+        runs.append(run)
+    runs = pd.DataFrame(runs)
+    best = pd.read_csv(os.path.join(stud, "best_config.csv"))
+
     out  = results_dir(str_N, "best_models")
     for f in os.listdir(out):
         if f.endswith((".pth", ".pt", ".json", ".csv")):
             os.remove(os.path.join(out, f))
     filas, sel = [], []
 
-    for frac in sorted(runs.frac.unique()):
-        for arm, teacher in ARMS.items():
-            r = runs[(runs.teacher == teacher) & np.isclose(runs.frac, frac)]
-            grid = r.groupby(["alpha", "temp"]).agg(n=("seed", "nunique"), mean=("G_off_pct", "mean")).reset_index()
-            grid = grid[grid.n == n_seeds]
-            b = grid.loc[grid["mean"].idxmax()]
+    for arm, teacher in ARMS.items():
+        b = best[best["teacher"] == teacher]
+        assert len(b) == 1, f"{str_N}: best_config.csv no tiene el brazo {teacher}"
+        b = b.iloc[0]
 
-            df = r[np.isclose(r.alpha, b.alpha) & np.isclose(r.temp, b.temp)][COLS].sort_values("seed").copy()
-            df.insert(0, "arm", arm); df.insert(0, "N", str_N)
-            df["mean_G_off_pct"]  = b["mean"]
-            df["dist_a_la_media"] = (df.G_off_pct - b["mean"]).abs()
-            g = df.loc[df.dist_a_la_media.idxmin()]
-            filas.append(df); sel.append(g)
+        same = (runs["teacher"] == teacher) & np.isclose(runs["mu"], b["mu"]) & \
+               np.isclose(runs["alpha"], b["alpha"]) & np.isclose(runs["temp"], b["temp"])
+        df = runs[same][COLS].sort_values("seed").copy()
+        df.insert(0, "arm", arm); df.insert(0, "N", str_N)
+        df["mean_val_gain_fv1_pct"] = b["val_gain_fv1_pct"]
+        df["dist_a_la_media"]       = (df["val_gain_fv1_pct"] - b["val_gain_fv1_pct"]).abs()
+        g = df.loc[df["dist_a_la_media"].idxmin()]
+        filas.append(df); sel.append(g)
 
-            for sub, ext in (("models", ".pth"), ("scalers", ".json")):
-                shutil.copy2(os.path.join(stud, sub, g["name"] + ext), out)
-            print(f"{str_N} {arm:5s} frac={frac:.2f} -> alpha {b.alpha} T {b.temp} seed {g.seed}: "
-                  f"G_off {g.G_off_pct:.2f} % (media {b['mean']:.2f} %), umbral offline {g.thr_G_off}  {g['name']}")
+        for sub, ext in (("models", ".pth"), ("scalers", ".json")):
+            shutil.copy2(os.path.join(stud, sub, g["name"] + ext), out)
+        print(f"{str_N} {arm:5s} -> mu {b['mu']:g} alpha {b['alpha']:g} T {b['temp']:g} seed {g['seed']}: "
+              f"val {g['val_gain_fv1_pct']:+.2f} % vs FV_1 (media {b['val_gain_fv1_pct']:+.2f} %) | "
+              f"test {g['test_gain_fv1_pct']:+.2f} %  {g['name']}")
 
-    pd.concat(filas).to_csv(os.path.join(out, "G_off_por_seed.csv"), index=False)
+    pd.concat(filas).to_csv(os.path.join(out, "val_gain_por_seed.csv"), index=False)
     pd.DataFrame(sel).to_csv(os.path.join(out, "seleccion.csv"), index=False)

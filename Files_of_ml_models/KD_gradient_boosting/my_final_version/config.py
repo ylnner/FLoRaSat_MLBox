@@ -1,69 +1,52 @@
 """
 Configuracion de la ejecucion paralela: rutas, seeds, epocas y grids de hiperparametros.
 
-Las rutas se pueden cambiar con variables de entorno:
-    KD_SCRIPTS_DIR   carpeta con el codigo original (scripts/)
-    KD_DATA_DIR      carpeta con los CSV seed_k_final_{train,val,test}_data_transmission.csv
-    KD_CACHE_DIR     donde se guardan los datasets ya construidos (.npz)
-    KD_RESULTS_DIR   donde se guardan resultados, logs, modelos y logits
+todas las rutas se fijan aqui (ya no hay variables de entorno). Solo se entrena con el 100 % del train.
+Para usar otro dataset nuevo basta con cambiar DATA_DIR.
 """
 import os
 
+# ROOT = esta carpeta (my_final_version) y PROJECT = v3_sequential, calculadas desde la ubicacion de config.py:
 ROOT        = os.path.dirname(os.path.abspath(__file__))
-PROJECT     = os.path.dirname(ROOT)                                     # KD_new_model/
-SCRIPTS_DIR = os.environ.get('KD_SCRIPTS_DIR', os.path.join(PROJECT, 'scripts'))
-DATA_DIR    = os.environ.get('KD_DATA_DIR', os.path.join(PROJECT, 'data', 'repetitions', 'new_data'))
-CACHE_DIR   = os.environ.get('KD_CACHE_DIR', os.path.join(ROOT, 'cache'))
-#RESULTS_DIR = os.environ.get('KD_RESULTS_DIR', os.path.join(ROOT, 'results'))
+PROJECT     = os.path.dirname(ROOT)
+SCRIPTS_DIR = os.path.join(PROJECT, "scripts")
 
-# filtro de filas (solo visibles)
-# KD_ONLY_VISIBLE=1: maestro y estudiante se entrenan y evaluan solo con las filas visibles (below_mask == 0, es decir elevSat > 10).
-# Los resultados van a otra carpeta (results_visible/) para no mezclarse con los del dataset completo.
-ONLY_VISIBLE = os.environ.get('KD_ONLY_VISIBLE', '0') == '1'
-if ONLY_VISIBLE:
-    DEFAULT_RESULTS_DIR = os.path.join(ROOT, 'results_visible_v2')
-else:
-    DEFAULT_RESULTS_DIR = os.path.join(ROOT, 'results_v2')
-RESULTS_DIR = os.environ.get('KD_RESULTS_DIR', DEFAULT_RESULTS_DIR)
+# Carpeta con los CSV seed_k_final_{train,val,test}_data_transmission.csv de N = 300
+DATA_DIR    = "/home/ylnner/Documents/ToGitHubTemporal/FLoRaSat_MLBox/Files_of_ml_models/KD_gradient_boosting/new_data"
+
+CACHE_DIR   = os.path.join(ROOT, "cache")       # datasets ya construidos (.npz), solo filas visibles
+RESULTS_DIR = os.path.join(ROOT, "results")     # resultados, logs, modelos y logits
 
 SEEDS  = list(range(10))
-EPOCHS = 20
-CAUSAL = False
 
-
-# Criterio para elegir la mejor configuracion (media entre seeds).
-# 'val_loss' es el criterio del codigo original (menor es mejor).
-# Alternativas: 'val_auc_pr' o 'val_auc_roc' (mayor es mejor).
-SELECTION_METRIC = 'auc_pr'
-
-# ---------------------------------------------------------------- lista N
-NSs = ["N_60", "N_100", "N_200", "N_300", "N_400", "N_500"]
+# ---------------------------------------------------------------- dataset / receptor
+# Copias por mensaje en el dataset (Ntx del .ini). Es el numero maximo de oportunidades de un mensaje.
+NTX = 5
 
 # ---------------------------------------------------------------- maestro
 TEACHER_FOLDS = 5          # validacion cruzada por simulacion (logits out-of-fold)
 TEACHER_ITERS = 300        # maximos arboles del HistGradientBoostingClassifier
-LOGIT_CLIP    = 1e-4       # p se recorta a [1e-4, 1 - 1e-4] antes de pasar a logit
-
-EVAL_SUBSET  = os.environ.get('KD_EVAL_SUBSET', 'all')
-THRESHOLD_METRIC = os.environ.get('KD_THRESHOLD_METRIC', 'f1_c1') # otro valor es macro_f1
 
 
-# ---------------------------------------------------------------- estudiante (igual que run_train_student.py)
+# ---------------------------------------------------------------- estudiante
 STUDENT_HIDDEN  = (64, 32)
 STUDENT_DROPOUT = 0.1
 LR              = 1e-3
-BATCH_SIZE      = 32
-PATIENCE        = 30       # early stopping sobre AP de val 
-BASE_EPOCHS     = 20       # maximo de epocas = ceil(BASE_EPOCHS / fraccion)
+BATCH_MESSAGES  = 256      # v3: el batch se cuenta en mensajes (cada uno con hasta NTX oportunidades)
+MAX_EPOCHS      = 200
+PATIENCE        = 30       # early stopping sobre los mensajes unicos de validacion (replica del receptor)
 
-FRACTIONS = [0.05, 0.10, 0.15, 1.0]
-ALPHAS    = (0, 0.1, 0.2, 0.3, 0.5) # alpha for KD
-TEMPS     = (0.5, 1, 2, 4, 8)          # temperature for JD
+# Regla de despliegue (la misma que el C++ con threshold = 0.5 y stopTarget = 0.01):
+# transmitir en la primera oportunidad visible con p >= DEPLOY_THRESHOLD, como mucho DEPLOY_BUDGET copias.
+DEPLOY_THRESHOLD = 0.5
+DEPLOY_BUDGET    = 1
 
-#FRACTIONS = [0.02]
-#ALPHAS    = (0.1, 0.3, 0.5) # alpha for KD
-#TEMPS     = (1, 2)          # temperature for JD
-
+# Grid de la perdida secuencial:
+#   MUS     coste por transmision esperada (mu = 0: solo maximiza mensajes entregados)
+#   ALPHAS  peso de y' frente a la etiqueta suave del maestro (solo KD; noKD usa alpha = 1)
+#   TEMPS   temperatura de la etiqueta suave del maestro (solo KD)
+MUS    = (0.0, 0.1, 0.2)
+ALPHAS = (0.3, 0.6)
+TEMPS  = (1, 2)
 
 NUM_WORKERS = 20           # procesos en paralelo (la maquina tiene 22 hilos)
-

@@ -10,6 +10,8 @@ import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Pred
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_MLP;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_TwoBranches;
 import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_MLP_KD;
+import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_MLP_SFTP;
+import Nodes._10_Terminal._20_Data_Link.Transmission_Predictor.Transmission_Predictor_MLP_Policy_SFTP;
 
 module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 {
@@ -65,6 +67,23 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		bool useCoin = default(false);
 		double coinOdds = default(0.5);
 		
+		// ACHF - moneda despues del filtro del MLP: si p >= threshold, transmite con probabilidad mlCoinProb
+		bool useMLCoin 	  = default(false);
+		double mlCoinProb = default(0.5);
+		int mlCoinRng     = default(1);     // RNG local de la moneda (no toca el rng 0 = trafico y tiempos)
+		
+		
+        // Baselines sin ML con mascara
+        int    visBudget = default(0); // como máximo k copias por mensaje solo en slots visibles (elev >= 10), con 0 desactivado
+        string visPolicy = default("first"); 	// "first"  -> FV_k: los primeros k slots visibles
+        										// "random" -> RV_k: cada slot visible se transmite con probabilidad visProb
+        int    visRng    = default(1);          // RNG local del sorteo de RV (no toca el rng 0 = tráfico y tiempos)		
+        double visProb 	 = default(0.5);		// Probabilidad de transmitir en cada slot visible
+		
+		bool useMLBoxMLP_SFTP = default(false);
+		bool useMLBoxMLP_Policy_SFTP = default(false);
+		int  policyRng = default(1);          // indice de RNG local para el sorteo de la politica
+		
 		bool randomizeSF_TP = default(false);
 		int SF_min = default(10);
 		int SF_max = default(12);
@@ -108,4 +127,11 @@ module Ter_Dlk_KiWan extends MacProtocolBase like IMacProtocol
 		mlBoxMLPKD: Transmission_Predictor_MLP_KD if useMLBoxMLPKD{
 			 @display("p=100,250");
 		}
+		
+		mlBoxMLP_SFTP: Transmission_Predictor_MLP_SFTP if useMLBoxMLP_SFTP{
+		    @display("p=100,250");
+		}
+		mlBoxMLP_Policy_SFTP: Transmission_Predictor_MLP_Policy_SFTP if useMLBoxMLP_Policy_SFTP {
+            @display("p=100,250");
+        }
 }

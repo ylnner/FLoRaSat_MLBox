@@ -23,6 +23,8 @@
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_TwoBranches.h"
 #include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP_KD.h"
+#include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP_SFTP.h"
+#include "Nodes/_10_Terminal/_20_Data_Link/Transmission_Predictor/Transmission_Predictor_MLP_Policy_SFTP.h"
 
 
 using namespace mlbox;
@@ -92,6 +94,20 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         double sumApprovedProb = 0;
         double coindOdds;
         int numMLApprovedBelowMask = 0;
+
+        // ACHF - moneda despues del filtro del MLP - KD
+        bool useMLCoin = false;
+        double mlCoinProb = 0.5;
+        int mlCoinRng = 1;
+        double numSkippedByMLCoin = 0;   // slots aprobados por el MLP que la moneda descarto
+
+        // Baselines FV_k / RV_k
+        int visBudget = 0;      // Maximum transmissions to transmit, 0 disabled
+        std::string visPolicy; // first, random
+        int visRng = 1;
+        double visProb = 0.5; // RV - probabilida de transmitir en cada slot visible
+        int visSentInMsg = 0;        // copias ya transmitidas del mensaje actual
+        long numVisUnderBudget = 0;  // mensajes con min(k, visibles) > copias enviadas (FV siempre es 0, RV efecto moneda)
 
         // Mac parameters
         double ttwDuration;     // Duration of transmission window
@@ -191,7 +207,16 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         cOutVector vector_preds_MLP;
         cOutVector vector_msgVisiblesOpp; // Numde oportunidades con elevSat>=10
         int msgVisibleOpp = 0;
+        int msgPolicyTx   = 0;     // n_prev: veces que el nodo transmitio el mensaje actual (politica con memoria)
+        long numPolicyRepeats = 0; // transmisiones de la politica con n_prev >= 1 (repeticiones), para revisar
+
         int numOppBelowMask = 0;   // oportunidades con elevSat < 10 (todas, incluido el mensaje abierto al final)
+        int numSkippedByMinProbability = 0; // usado por SF/TP model
+
+
+        bool mlBoxAvailableMLP_Policy_SFTP = false;
+        int  policyRng = 1;
+        long numPolicyNoTx = 0;     // veces que la politica sorteo "no transmitir" (con elevSat >= 10)
     protected:
         Transmission_Predictor *mlBox;
         Transmission_Predictor_BiLSTM *mlBoxBiLSTM;
@@ -199,6 +224,8 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         Transmission_Predictor_MLP *mlBoxMLP;
         Transmission_Predictor_TwoBranches *mlBoxTwoBranches;
         Transmission_Predictor_MLP_KD *mlBoxMLPKD;
+        Transmission_Predictor_MLP_SFTP *mlBoxMLP_SFTP;
+        Transmission_Predictor_MLP_Policy_SFTP *mlBoxMLP_Policy_SFTP = nullptr;
 
         bool mlBoxAvailable = false;
         bool mlBoxAvailableBiLSTM = false;
@@ -206,8 +233,17 @@ class Ter_Dlk_KiWan : public Base_MacProtocol {
         bool mlBoxAvailableMLP = false;
         bool mlBoxAvailableTwoBranches = false;
         bool mlBoxAvailableMLPKD = false;
+        bool mlBoxAvailableMLP_SFTP = false;
 
         bool useCoin = false;
+
+        // ACHF - Calculate the inputs for MLP_SFTP
+        struct ML_SFTP_Input {
+            double dopplerShif, elevSat, latDev, longDev, alt, raan;
+        };
+        ML_SFTP_Input calculate_ML_SFTP_inputs();
+        // ACHF - END
+
 }; // namespace mac
 
 }

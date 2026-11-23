@@ -18,9 +18,36 @@ void Transmission_Predictor::initialize(int stage){
         scalerPath = par("scalerPath").stringValue();
         coldStart = par("coldStart").boolValue();
         //threshold = par("threshold").doubleValue();
+        loadScaler();
     }
 }
 
+
+void Transmission_Predictor::loadScaler(){
+    cValueMap *sc = check_and_cast<cValueMap *>(par("scaler").objectValue());
+    if (sc->size() == 0) {
+        EV << "Transformer scaler: no se dio 'scaler', se usan los valores fijos del .h" << endl;
+        return;
+    }
+    for (const char *key : {"inputs", "mean", "scale", "mean_delta_t", "scale_delta_t"})
+        if (!sc->containsKey(key))
+            throw cRuntimeError("Transformer scaler: falta la clave '%s' en el JSON", key);
+
+    std::vector<std::string> inputs = check_and_cast<cValueArray *>(sc->get("inputs").objectValue())->asStringVector();
+    std::vector<double> newMeans  = check_and_cast<cValueArray *>(sc->get("mean").objectValue())->asDoubleVector();
+    std::vector<double> newScales = check_and_cast<cValueArray *>(sc->get("scale").objectValue())->asDoubleVector();
+
+    // Mismo orden que el vector que arma Ter_Dlk_KiWan en la rama del Transformer
+    const std::vector<std::string> expectedInputs = {"latDev", "longDev", "elevSat", "loraTP", "loraSF", "doppler", "alt", "raan"};
+    if (inputs != expectedInputs || newMeans.size() != inputs.size() || newScales.size() != inputs.size())
+        throw cRuntimeError("Transformer scaler: inputs are not in the same order");
+
+    means         = newMeans;
+    scales        = newScales;
+    mean_delta_t  = sc->get("mean_delta_t").doubleValue();
+    scale_delta_t = sc->get("scale_delta_t").doubleValue();
+    EV << "Transformer scaler loaded: " << endl;
+}
 
 void Transmission_Predictor::loadModel(){
     // Loading model
@@ -74,7 +101,7 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
         if (window_buffer.size() < seq_length) {
             EV << "Buffer not complete (" << window_buffer.size() << "/" << seq_length
                << "). Returning 1 by default \n";
-            return {1}; // Return a vector with 1
+            return {1, -1.0}; // Return a vector with 1
         }
     }
 
@@ -142,11 +169,11 @@ std::vector<double> Transmission_Predictor::predict(const std::vector<double>& f
            << " -> Decision: " << (transmit ? "TRANSMIT (1)" : "NOT TRANSMIT (0)") << "\n";
 
 
-        return {(double)transmit};
+        return {(double)transmit, (double)probability}; // [0] decision, [1] probability para la StopRule
 
     } catch (const std::exception& e) {
         EV_ERROR << "Error running model: " << e.what() << "\n";
-        return {1};
+        return {1, -1.0};
     }
 
 }

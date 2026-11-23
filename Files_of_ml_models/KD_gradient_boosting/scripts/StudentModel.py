@@ -3,9 +3,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from config import STUDENT_HIDDEN, STUDENT_DROPOUT
+from funcs_create_dataset import STUDENT_INPUTS     # v3 sin raan: 7 entradas
 
 class StudentModel(nn.Module):
-    def __init__(self, n_features = 8, hidden_dims=STUDENT_HIDDEN, dropout=STUDENT_DROPOUT):
+    def __init__(self, n_features = len(STUDENT_INPUTS), hidden_dims=STUDENT_HIDDEN, dropout=STUDENT_DROPOUT):
         super().__init__()
 
         # Capas ocultas: Linear -> ReLU -> Dropout

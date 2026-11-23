@@ -1,0 +1,61 @@
+{
+  "inputs": [
+    "dopplerShift",
+    "elevSat",
+    "latDev",
+    "longDev",
+    "alt",
+    "raan",
+    "vis_idx"
+  ],
+  "mean": [
+    159.70347527419497,
+    24.810276316314845,
+    48.779336294873715,
+    13.703196578224544,
+    735.195222402644,
+    161.76315865030324,
+    3.2263871653113765
+  ],
+  "scale": [
+    12537.79053262123,
+    14.249121351000518,
+    6.069139979754826,
+    11.928171008354521,
+    85.26356947737823,
+    90.7738318413924,
+    2.2726301329308605
+  ],
+  "outputs": [
+    "SF10_TP12",
+    "SF10_TP13",
+    "SF10_TP14",
+    "SF11_TP12",
+    "SF11_TP13",
+    "SF11_TP14",
+    "SF12_TP12",
+    "SF12_TP13",
+    "SF12_TP14",
+    "NO_TX"
+  ],
+  "dtype": "float32",
+  "how_to_use": [
+    "1. Solo si elevSat >= 10: si no, no transmitir (la red se entreno solo con copias visibles).",
+    "2. Entradas en el orden de 'inputs'; vis_idx = numero de oportunidades visibles (elevSat >= 10) anteriores del mismo mensaje: 0 en la primera visible, 1 en la segunda, ... (se reinicia con cada mensaje nuevo).",
+    "3. Normalizar: z = (x - mean) / scale.",
+    "4. Salida = 10 logits -> SOFTMAX (no sigmoid) -> probabilidad de cada accion; suman 1.",
+    "5. SORTEAR una accion con esas probabilidades (u ~ Uniforme(0,1) con un RNG propio; se elige la accion cuyo tramo acumulado contiene u). No usar argmax: la red se optimizo para el resultado del sorteo.",
+    "6. Accion a: si a == 9 no transmitir; si no, SF = 10 + a // 3 y TP = 12 + a % 3 (dBm)."
+  ],
+  "model": "mlp_policy",
+  "N": 1000,
+  "kappa": 50.0,
+  "seed": 7,
+  "criterion": "val_objective = (U - E / kappa) / M",
+  "val_objective": 0.1843688796924579,
+  "val_unique_fraction": 0.29481916873340225,
+  "val_energy_per_msg": 5.522514452047216,
+  "best_epoch": 290,
+  "data_dir": "/home/ylnner/Documents/ClaudeSFTP/nueva_data_mezcla/N_1000",
+  "check_max_prob_diff": 9.606273357887218e-07
+}
